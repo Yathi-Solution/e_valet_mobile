@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:niloufer_valet_mobile/api/operator/operator_dashboard/operator_manual_retrieval_api_service.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/bloc/operator/operator_dashboard/operator_dashboard_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/operator/operator_dashboard/operator_dashboard_event.dart';
 import 'package:niloufer_valet_mobile/bloc/operator/operator_dashboard/operator_dashboard_state.dart';
@@ -111,7 +112,7 @@ class _OperatorParkedCarScreenState extends State<OperatorParkedCarScreen> {
       if (mounted) {
         SnackBars.showErrorSnackBar(
           context,
-          'Failed to create manual retrieval request: ${e.toString()}',
+          'Failed to create manual retrieval request: ${getDisplayErrorMessage(e)}',
         );
       }
     } finally {
@@ -183,7 +184,7 @@ class _OperatorParkedCarScreenState extends State<OperatorParkedCarScreen> {
                                       labelText: t.getByKey(
                                           'parkedCarDescription',
                                           TextConstants.parkedCarDescription),
-                                      color: AppColors.grey,
+                                      color: AppColors.mutedText,
                                       fontSize:
                                           MediaQuery.of(context).size.width *
                                               0.02,
@@ -210,7 +211,7 @@ class _OperatorParkedCarScreenState extends State<OperatorParkedCarScreen> {
                                           'searchByCardNumberHint',
                                           TextConstants.searchByCardNumberHint),
                                       hintStyle: TextStyle(
-                                        color: AppColors.grey,
+                                        color: AppColors.mutedText,
                                         fontSize:
                                             MediaQuery.of(context).size.width *
                                                 0.02,
@@ -226,7 +227,7 @@ class _OperatorParkedCarScreenState extends State<OperatorParkedCarScreen> {
                                           ? IconButton(
                                               icon: Icon(
                                                 Icons.clear,
-                                                color: AppColors.grey,
+                                                color: AppColors.mutedText,
                                                 size: MediaQuery.of(context)
                                                         .size
                                                         .width *
@@ -312,7 +313,7 @@ class _OperatorParkedCarScreenState extends State<OperatorParkedCarScreen> {
                       TextComponent(
                         labelText: state.message,
                         fontSize: MediaQuery.of(context).size.width * 0.016,
-                        color: AppColors.grey,
+                        color: AppColors.mutedText,
                       ),
                     ],
                   ),

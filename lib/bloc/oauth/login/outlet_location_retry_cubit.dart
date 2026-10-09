@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:niloufer_valet_mobile/api/driver/config_api_service.dart';
 import 'package:niloufer_valet_mobile/api/driver/driver_status_api_service.dart';
+import 'package:niloufer_valet_mobile/api/driver/my_cards_api_service.dart';
+import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
 import 'package:niloufer_valet_mobile/api/outlet/outlet_api_service.dart';
 import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/oauth/login/outlet_location_retry_state.dart';
@@ -127,6 +130,20 @@ class OutletLocationRetryCubit extends Cubit<OutletLocationRetryState> {
     }
 
     await _fetchAndStoreConfig();
+
+    // Fetch assigned cards in the background for local scan validation.
+    unawaited(MyCardsApiService.refreshAssignedCardsInBackground());
+
+    try {
+      final parkedResponse =
+          await MyParkedSessionsApiService.refreshParkedSessionsForDisplay();
+      log(
+        'Driver parked cars refreshed on clock-in retry success: ${parkedResponse.sessionCount} sessions',
+      );
+    } catch (e) {
+      log('Failed to refresh parked cars on clock-in retry (non-fatal): $e');
+    }
+
     emit(OutletLocationRetrySuccess(_displayMessage, profile: profile));
   }
 

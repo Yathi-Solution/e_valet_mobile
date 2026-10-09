@@ -27,7 +27,7 @@ class _ProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.primarySurface,
       appBar: CustomAppBar(
         showOverflowMenu: true,
         leading: IconButton(

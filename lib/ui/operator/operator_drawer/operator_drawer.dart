@@ -22,7 +22,6 @@ class OperatorDrawer extends StatelessWidget {
     final itemRowHeight = isIOS ? 40.0 : 44.0;
     final itemIconSize = isIOS ? 30.0 : 35.0;
     final itemVerticalMargin = isIOS ? 3.0 : 4.0;
-
     return Drawer(
       child: Container(
         color: AppColors.primary,
@@ -35,13 +34,6 @@ class OperatorDrawer extends StatelessWidget {
               16,
             ),
             children: [
-              Center(
-                child: Image.asset(
-                  'assets/images/niloufer.logo.png',
-                  width: 112,
-                ),
-              ),
-              const SizedBox(height: 16),
               OperatorDrawerItem(
                 asset: 'assets/images/dashboard.png',
                 title: t.get(TextConstants.dashboard),

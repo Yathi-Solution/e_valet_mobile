@@ -50,6 +50,12 @@ class TextConstants {
   /// Row hint when no numbers assigned yet.
   static const String cardsNoNumbersAssigned = 'No card numbers assigned';
   static const String cardsEditAllocationTitle = 'Assigned card numbers';
+
+  /// Error shown to a driver who tries to park/retrieve using a card not allocated to them.
+  static const String driverCardNotAssigned =
+      'The card number does not match with your cards. You may have taken another driver\'s card.';
+  static const String driverCardsLoading =
+      'Your assigned cards are still loading. Please wait a moment and try again.';
   static const String cardsAllocationHint =
       'Example: 11, 12, 13, 14, 15, 61, 21, 89, 16…';
   static const String cardsAllocationHelper =
@@ -57,6 +63,8 @@ class TextConstants {
   static const String cardsSaveAllocation = 'Save';
   static const String cardSingular = 'card';
   static const String cardsPlural = 'cards';
+  static const String syncCards = 'Sync Cards';
+  static const String cardsSyncedMessage = 'Cards synced';
   static const profile = 'Profile';
   static const guidelines = 'Guidelines';
   static const help = 'Help';
@@ -200,6 +208,8 @@ class TextConstants {
   /// Hint for the parking/photo screen (after tag/QR submit): car photo only.
   static const String vehicleDetailsParkingPhotoHint =
       'Capture a photo of the car.';
+  static const String tapToCaptureVehiclePhoto =
+      'Tap to capture vehicle photo';
   static const String previewDoneButton = 'Done';
   static const String scanTabLabel = 'Scan';
   static const String typeIdNumberTabLabel = 'ID Number';
@@ -462,6 +472,12 @@ class TextConstants {
   static const String parkedCarTitle = 'Parked Car';
   static const String parkedCarDescription = 'Manage and monitor parked cars';
   static const String noCarsParked = 'No Cars Parked';
+  static const String driverParkedCarsDescription =
+      'View all cars you have parked or been assigned';
+  static const String driverOwnParkedCarsSection = 'Parked by Me';
+  static const String driverPassedToMeSection = 'Passed to Me';
+  static const String parkedCarSingular = 'parked car';
+  static const String parkedCarsPlural = 'parked cars';
 
   // QR Reader
   static const String cameraError = 'Camera error';

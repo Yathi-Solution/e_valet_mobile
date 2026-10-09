@@ -41,19 +41,19 @@ class ParkedCarCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: isHighlighted
-              ? AppColors.primary.withOpacity(0.05)
-              : AppColors.white,
+              ? AppColors.accentSoft
+              : AppColors.cardBackground,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isHighlighted
-                ? AppColors.primary
+                ? AppColors.accent
                 : AppColors.grey.withOpacity(0.2),
             width: isHighlighted ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
               color: isHighlighted
-                  ? AppColors.primary.withOpacity(0.2)
+                  ? AppColors.accent.withOpacity(0.2)
                   : AppColors.black.withOpacity(0.08),
               spreadRadius: isHighlighted ? 2 : 0,
               blurRadius: isHighlighted ? 16 : 12,
@@ -206,7 +206,7 @@ class ParkedCarCard extends StatelessWidget {
                       Icon(
                         Icons.access_time_rounded,
                         size: screenWidth * 0.018,
-                        color: AppColors.grey,
+                        color: AppColors.mutedText,
                       ),
                       SizedBox(width: screenWidth * 0.004),
                       Expanded(
@@ -214,7 +214,7 @@ class ParkedCarCard extends StatelessWidget {
                           labelText: t.get(TimeUtils.formatUtcToIstFullDateTime(
                               item.parkedAt)),
                           fontSize: screenWidth * 0.015,
-                          color: AppColors.grey,
+                          color: AppColors.mutedText,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),

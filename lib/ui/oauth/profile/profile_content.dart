@@ -75,7 +75,7 @@ class _ProfileContentState extends State<ProfileContent> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppColors.cardBackground,
                   borderRadius: BorderRadius.circular(
                     MediaQuery.of(context).size.width * 0.05,
                   ),
@@ -187,7 +187,7 @@ class _ProfileContentState extends State<ProfileContent> {
                             );
                           },
                           labelText: t.get(TextConstants.resetPassword),
-                          fontColor: AppColors.black,
+                          fontColor: AppColors.textOnDark,
                         ),
                       ),
                     ],
@@ -295,7 +295,7 @@ class _ProfileContentState extends State<ProfileContent> {
                 return TextComponent(
                   labelText: version,
                   fontSize: MediaQuery.of(context).size.width * 0.035,
-                  color: AppColors.grey,
+                  color: AppColors.mutedText,
                 );
               },
             ),

@@ -42,7 +42,7 @@ class ScannerRetrievalRequestCard extends StatelessWidget {
         vertical: size.height * 0.012,
       ),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: _statusColor(),
@@ -166,7 +166,7 @@ class ScannerRetrievalRequestCard extends StatelessWidget {
                       labelText:
                           '${t.get(TextConstants.requestedAt)} ${RetrievalRequestUtils.formatTime(request.requestedAt)}',
                       fontSize: size.width * 0.03,
-                      color: AppColors.grey,
+                      color: AppColors.mutedText,
                       fontWeight: FontWeight.w500,
                     ),
                   ],
@@ -177,7 +177,7 @@ class ScannerRetrievalRequestCard extends StatelessWidget {
                     TextComponent(
                       labelText: '${t.get(TextConstants.parkedByLabel)} ',
                       fontSize: size.width * 0.03,
-                      color: AppColors.grey,
+                      color: AppColors.mutedText,
                     ),
                     TextComponent(
                       labelText: request.parkedBy.name,
@@ -194,7 +194,7 @@ class ScannerRetrievalRequestCard extends StatelessWidget {
                       TextComponent(
                         labelText: '${t.get(TextConstants.assignedToLabel)} ',
                         fontSize: size.width * 0.03,
-                        color: AppColors.grey,
+                        color: AppColors.mutedText,
                       ),
                       TextComponent(
                         labelText: request.assignedTo.name,
@@ -221,7 +221,7 @@ class ScannerRetrievalRequestCard extends StatelessWidget {
       child: Icon(
         Icons.directions_car,
         size: size.width * 0.08,
-        color: AppColors.grey,
+        color: AppColors.mutedText,
       ),
     );
   }

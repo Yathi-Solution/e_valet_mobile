@@ -51,7 +51,7 @@ class ValetDetailsDialog extends StatelessWidget {
     final maxContentHeight = (screenHeight * 0.5).clamp(200.0, 400.0);
 
     return Dialog(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.primarySurface,
       insetPadding: EdgeInsets.only(
         left: padding.left + 16,
         right: padding.right + 16,
@@ -216,7 +216,7 @@ class _DetailRow extends StatelessWidget {
             labelText: label,
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: AppColors.grey,
+            color: AppColors.mutedText,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),

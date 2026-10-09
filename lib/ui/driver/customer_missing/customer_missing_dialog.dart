@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/initiate_repark/initiate_repark_bloc.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/initiate_repark/initiate_repark_event.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/initiate_repark/initiate_repark_state.dart';
@@ -62,7 +63,7 @@ class _CustomerMissingDialogState extends State<CustomerMissingDialog> {
       child: Container(
         padding: EdgeInsets.all(screenWidth * 0.06),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -117,7 +118,7 @@ class _CustomerMissingDialogState extends State<CustomerMissingDialog> {
               labelText: t.get(TextConstants.reparkConfirmationMessage),
               fontSize: screenWidth * 0.035,
               fontWeight: FontWeight.w400,
-              color: AppColors.grey,
+              color: AppColors.mutedText,
               textAlign: TextAlign.center,
             ),
 
@@ -217,17 +218,20 @@ class _CustomerMissingDialogState extends State<CustomerMissingDialog> {
                               setState(() => _isProcessing = false);
                               SnackBars.showErrorSnackBar(
                                 context,
-                                'Failed to get location: ${e.toString()}',
+                                'Failed to get location: ${getDisplayErrorMessage(e)}',
                               );
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.nearBlack,
+                      foregroundColor: AppColors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      disabledBackgroundColor: AppColors.greyLight,
+                      minimumSize: const Size(double.infinity, 48),
+                      disabledBackgroundColor: AppColors.disabledBackground,
+                      disabledForegroundColor: AppColors.disabledText,
                     ),
                     child: isLoading
                         ? SizedBox(
@@ -244,15 +248,15 @@ class _CustomerMissingDialogState extends State<CustomerMissingDialog> {
                             children: [
                               TextComponent(
                                 labelText: t.get(TextConstants.proceedToRepark),
-                                fontSize: screenWidth * 0.05,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.black,
+                                color: AppColors.white,
                               ),
                               SizedBox(width: screenWidth * 0.02),
                               Icon(
                                 Icons.arrow_forward,
-                                color: AppColors.black,
-                                size: screenWidth * 0.06,
+                                color: AppColors.white,
+                                size: 20,
                               ),
                             ],
                           ),
@@ -268,7 +272,7 @@ class _CustomerMissingDialogState extends State<CustomerMissingDialog> {
               labelText: t.get(TextConstants.pressBelowToCancel),
               fontSize: screenWidth * 0.035,
               fontWeight: FontWeight.w500,
-              color: AppColors.grey,
+              color: AppColors.mutedText,
               textAlign: TextAlign.center,
             ),
             SizedBox(height: screenHeight * 0.008),

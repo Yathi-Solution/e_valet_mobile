@@ -224,7 +224,7 @@ class _OvertimeValetRowState extends State<OvertimeValetRow> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.grey.withOpacity(0.3)),
       ),
@@ -252,7 +252,7 @@ class _OvertimeValetRowState extends State<OvertimeValetRow> {
                     TextComponent(
                       labelText: widget.phone,
                       fontSize: phoneFontSize,
-                      color: AppColors.grey,
+                      color: AppColors.mutedText,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -274,7 +274,7 @@ class _OvertimeValetRowState extends State<OvertimeValetRow> {
                               '${t.getByKey('overtimeExpiresAt', TextConstants.overtimeExpiresAt)}: ${widget.latestOvertimeExpiryLabel}',
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.grey,
+                          color: AppColors.mutedText,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),

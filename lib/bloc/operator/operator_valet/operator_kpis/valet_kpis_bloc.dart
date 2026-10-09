@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:niloufer_valet_mobile/api/operator/operator_valet/valet_kpis_api_service.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'valet_kpis_event.dart';
 import 'valet_kpis_state.dart';
 
@@ -20,7 +21,7 @@ class ValetKpisBloc extends Bloc<ValetKpisEvent, ValetKpisState> {
 
       emit(ValetKpisLoaded(kpis: kpis));
     } catch (e) {
-      emit(ValetKpisError(e.toString()));
+      emit(ValetKpisError(getDisplayErrorMessage(e)));
     }
   }
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 
 class SnackBars {
   static void showErrorSnackBar(BuildContext context, String message) {
+    if (isNetworkConnectivityMessage(message)) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,

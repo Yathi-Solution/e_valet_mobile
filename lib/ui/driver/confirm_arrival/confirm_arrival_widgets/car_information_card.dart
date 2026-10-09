@@ -7,6 +7,7 @@ import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/full_image_viewer_dialog.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:niloufer_valet_mobile/ui/common/widgets/vehicle_photo_placeholder.dart';
 
 class CarInformationCard extends StatelessWidget {
   final AssignedSession session;
@@ -28,7 +29,7 @@ class CarInformationCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -63,7 +64,7 @@ class CarInformationCard extends StatelessWidget {
                       labelText: t.get(TextConstants.cardNumber),
                       fontSize:
                           compact ? screenWidth * 0.028 : screenWidth * 0.035,
-                      color: AppColors.grey,
+                      color: AppColors.mutedText,
                     ),
                     Spacer(),
                     TextComponent(
@@ -135,7 +136,7 @@ class CarInformationCard extends StatelessWidget {
                       labelText: t.get(TextConstants.parkedByLabel),
                       fontSize:
                           compact ? screenWidth * 0.028 : screenWidth * 0.035,
-                      color: AppColors.grey,
+                      color: AppColors.mutedText,
                     ),
                     if (!compact) SizedBox(height: screenHeight * 0.01),
                     TextComponent(
@@ -273,7 +274,7 @@ class CarImageSection extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.black, width: 2),
           boxShadow: [
@@ -302,48 +303,9 @@ class CarImageSection extends StatelessWidget {
   }
 
   Widget _placeholder(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final w = constraints.maxWidth;
-        final h = constraints.maxHeight;
-        return Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: AppColors.white,
-          child: Center(
-            child: ColorFiltered(
-              colorFilter: const ColorFilter.matrix([
-                -1,
-                0,
-                0,
-                0,
-                255,
-                0,
-                -1,
-                0,
-                0,
-                255,
-                0,
-                0,
-                -1,
-                0,
-                255,
-                0,
-                0,
-                0,
-                1,
-                0,
-              ]),
-              child: Image.asset(
-                'assets/images/cars.png',
-                fit: BoxFit.contain,
-                width: w > 0 ? w : 200,
-                height: h > 0 ? h : 200,
-              ),
-            ),
-          ),
-        );
-      },
+    return VehiclePhotoPlaceholder(
+      caption: TextConstants.tapToCaptureVehiclePhoto,
+      minHeight: 120,
     );
   }
 }

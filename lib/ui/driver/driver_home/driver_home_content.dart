@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
+import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_bloc.dart';
+import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_state.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/footer.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
@@ -11,6 +13,7 @@ import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_offlin
 import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_break_content.dart';
 import 'package:niloufer_valet_mobile/ui/scanner/scanner_qr_dialog.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:niloufer_valet_mobile/ui/driver/driver_home/park_flow_signals.dart';
 
 class DriverHomeContent extends StatefulWidget {
   final String driverName;
@@ -55,15 +58,17 @@ class _DriverHomeContentState extends State<DriverHomeContent>
   void dispose() {
     widget.homeResetNotifier?.removeListener(_onHomeReset);
     WidgetsBinding.instance.removeObserver(this);
+    ParkFlowSignals.setDriverHomeCardsVisible(false);
     super.dispose();
   }
 
   void _onHomeReset() {
-    if (mounted)
+    if (mounted) {
       setState(() {
         _onlineContentKey = UniqueKey();
         _showParkFlow = false;
       });
+    }
   }
 
   Future<void> _openScanDialogAndRefresh() async {
@@ -98,6 +103,10 @@ class _DriverHomeContentState extends State<DriverHomeContent>
             ? screenWidth * 0.035
             : screenWidth * 0.06;
 
+    final bool showingDriverHomeCards =
+        !widget.isOnBreak && widget.isOnline && !_showParkFlow;
+    ParkFlowSignals.setDriverHomeCardsVisible(showingDriverHomeCards);
+
     return PopScope(
       // When in park flow (QR/Tag screen), system back should return to home cards,
       // not close the app.
@@ -118,7 +127,19 @@ class _DriverHomeContentState extends State<DriverHomeContent>
           logoSize: logoSize,
           iconSize: iconSize,
         ),
-        body: Column(
+        body: BlocListener<ConnectivityBloc, ConnectivityState>(
+          listener: (listenerContext, state) {
+            if (state is ConnectivityUnavailable) {
+              // On the driver home (cards, or the offline-capable park flows under this scaffold),
+              // suppress any transient "no internet" bottom messages / banners that may have been
+              // triggered by background refreshes when connectivity drops.
+              if (ParkFlowSignals.shouldSuppressNoInternetOverlay) {
+                ScaffoldMessenger.of(listenerContext).clearMaterialBanners();
+                ScaffoldMessenger.of(listenerContext).hideCurrentSnackBar();
+              }
+            }
+          },
+          child: Column(
           children: [
             // Header Content Section (status card) — back button on left when in park flow, break toggle on right
             DriverHeaderWidget(
@@ -195,6 +216,7 @@ class _DriverHomeContentState extends State<DriverHomeContent>
               child: const Footer(),
             ),
           ],
+          ),
         ),
       ),
     );

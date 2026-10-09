@@ -93,7 +93,7 @@ class _RetrievalRequestColumnState extends State<RetrievalRequestColumn> {
         child: TextComponent(
           labelText: t.get(TextConstants.noPendingRetrievalRequests),
           fontSize: 14,
-          color: AppColors.grey,
+          color: AppColors.mutedText,
         ),
       );
     }
@@ -139,7 +139,7 @@ class _RetrievalRequestColumnState extends State<RetrievalRequestColumn> {
           ),
           padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.01),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
@@ -182,7 +182,7 @@ class _RetrievalRequestColumnState extends State<RetrievalRequestColumn> {
           TextComponent(
             labelText: t.get(TextConstants.noPendingRetrievalRequests),
             fontSize: 14,
-            color: AppColors.grey,
+            color: AppColors.mutedText,
           ),
         ],
       ),

@@ -5,7 +5,6 @@ import 'package:niloufer_valet_mobile/services/translations/app_translations_not
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/driver/retrival_request/retrival_widgets/pass_to_driver_section.dart';
 import 'package:niloufer_valet_mobile/ui/driver/retrival_request/retrival_widgets/session_card.dart';
 
 class RetrievalRequestSheet extends StatelessWidget {
@@ -166,6 +165,7 @@ class RetrievalRequestSheet extends StatelessWidget {
                             : (onAccept ?? () => Navigator.of(context).pop()),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
+                          foregroundColor: AppColors.textOnDark,
                           elevation: 2,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -178,7 +178,7 @@ class RetrievalRequestSheet extends StatelessWidget {
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                      AppColors.black),
+                                      AppColors.textOnDark),
                                 ),
                               )
                             : FittedBox(
@@ -192,13 +192,13 @@ class RetrievalRequestSheet extends StatelessWidget {
                                           TextConstants.acceptRequest),
                                       fontSize: screenWidth * 0.05,
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.black,
+                                      color: AppColors.textOnDark,
                                     ),
                                     const SizedBox(width: 8),
                                     Icon(
                                       Icons.arrow_forward,
                                       size: screenWidth * 0.06,
-                                      color: AppColors.black,
+                                      color: AppColors.textOnDark,
                                     ),
                                   ],
                                 ),

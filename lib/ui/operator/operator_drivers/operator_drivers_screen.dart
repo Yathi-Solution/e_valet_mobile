@@ -137,7 +137,7 @@ class _OperatorDriversScreenState extends State<OperatorDriversScreen> {
                           TextComponent(
                             labelText: t.getByKey('valetDashboardDescription',
                                 TextConstants.valetDashboardDescription),
-                            color: AppColors.grey,
+                            color: AppColors.mutedText,
                             fontSize: MediaQuery.of(context).size.width *
                                 (Platform.isIOS ? 0.018 : 0.02),
                             maxLines: 1,
@@ -161,7 +161,7 @@ class _OperatorDriversScreenState extends State<OperatorDriversScreen> {
                           hintText: t.getByKey('searchByNameOrPhone',
                               TextConstants.searchByNameOrPhone),
                           hintStyle: TextStyle(
-                            color: AppColors.grey,
+                            color: AppColors.mutedText,
                             fontSize: MediaQuery.of(context).size.width * 0.02,
                           ),
                           prefixIcon: Icon(
@@ -173,7 +173,7 @@ class _OperatorDriversScreenState extends State<OperatorDriversScreen> {
                               ? IconButton(
                                   icon: Icon(
                                     Icons.clear,
-                                    color: AppColors.grey,
+                                    color: AppColors.mutedText,
                                     size: MediaQuery.of(context).size.width *
                                         0.02,
                                   ),

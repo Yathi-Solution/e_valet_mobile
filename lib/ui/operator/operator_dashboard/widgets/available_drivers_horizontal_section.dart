@@ -65,7 +65,7 @@ class AvailableDriversHorizontalSection extends StatelessWidget {
             vertical: MediaQuery.of(context).size.height * 0.01,
           ),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
@@ -180,14 +180,14 @@ class AvailableDriversHorizontalSection extends StatelessWidget {
             Icon(
               Icons.check_circle_outline,
               size: 40,
-              color: AppColors.grey,
+              color: AppColors.mutedText,
             ),
             const SizedBox(height: 8),
             TextComponent(
               labelText: t.getByKey('noAvailableDriversAtTheMoment',
                   TextConstants.noAvailableDrivers),
               fontSize: 14,
-              color: AppColors.grey,
+              color: AppColors.mutedText,
             ),
           ],
         ),

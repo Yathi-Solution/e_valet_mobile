@@ -72,7 +72,7 @@ class QrSuccessWidget extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(screenWidth * 0.03),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(screenWidth * 0.01),
               border: Border.all(
                 color: AppColors.qrSuccessBorderLight,

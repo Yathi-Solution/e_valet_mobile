@@ -41,6 +41,7 @@ class ClockInTooFarScreen extends StatelessWidget {
       appBar: CustomAppBar(
         showLanguageIcon: true,
         showOverflowMenu: true,
+        hideParkedCarsAction: true,
         actions: scannerMode
             ? [
                 const OverflowMenu(scannerMode: true),
@@ -99,7 +100,7 @@ class ClockInTooFarScreen extends StatelessWidget {
                         vertical: screenHeight * 0.025,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.white,
+                        color: AppColors.cardBackground,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: AppColors.grey.withOpacity(0.3),

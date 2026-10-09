@@ -52,10 +52,10 @@ class LoginForm extends StatelessWidget {
               constraints: BoxConstraints(maxWidth: maxCardWidth),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(borderRadius),
                 border: Border.all(
-                  color: AppColors.primary,
+                  color: AppColors.accent,
                   width: 2,
                 ),
               ),
@@ -127,7 +127,7 @@ class LoginForm extends StatelessWidget {
                               : t.getByKey(
                                   'loginButton', TextConstants.loginButton),
                           onPressed: handlePress,
-                          elevatedButtonBackgroundColor: AppColors.accent,
+                          elevatedButtonBackgroundColor: AppColors.primary,
                           radius: 8,
                           fontSize: 16,
                           fontColor: AppColors.white,

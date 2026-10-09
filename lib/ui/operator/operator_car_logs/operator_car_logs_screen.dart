@@ -225,7 +225,7 @@ class _OperatorCarLogsScreenState extends State<OperatorCarLogsScreen> {
                     TextComponent(
                       labelText: t.getByKey('carLogsDescription',
                           TextConstants.carLogsDescription),
-                      color: AppColors.grey,
+                      color: AppColors.mutedText,
                       fontSize: MediaQuery.of(context).size.width * 0.02,
                     ),
                   ],
@@ -325,7 +325,7 @@ class _OperatorCarLogsScreenState extends State<OperatorCarLogsScreen> {
                                       labelText: t.getByKey(
                                           'carLogsDescription',
                                           TextConstants.carLogsDescription),
-                                      color: AppColors.grey,
+                                      color: AppColors.mutedText,
                                       fontSize:
                                           MediaQuery.of(context).size.width *
                                               (Platform.isIOS ? 0.018 : 0.02),
@@ -356,7 +356,7 @@ class _OperatorCarLogsScreenState extends State<OperatorCarLogsScreen> {
                                     hintText: t.getByKey('carLogsSearchHint',
                                         TextConstants.carLogsSearchHint),
                                     hintStyle: TextStyle(
-                                      color: AppColors.grey,
+                                      color: AppColors.mutedText,
                                       fontSize:
                                           MediaQuery.of(context).size.width *
                                               0.02,
@@ -371,7 +371,7 @@ class _OperatorCarLogsScreenState extends State<OperatorCarLogsScreen> {
                                         ? IconButton(
                                             icon: Icon(
                                               Icons.clear,
-                                              color: AppColors.grey,
+                                              color: AppColors.mutedText,
                                               size: MediaQuery.of(context)
                                                       .size
                                                       .width *
@@ -427,7 +427,7 @@ class _OperatorCarLogsScreenState extends State<OperatorCarLogsScreen> {
                                 child: TextComponent(
                                   labelText:
                                       t.get(TextConstants.carLogsNoDataMessage),
-                                  color: AppColors.grey,
+                                  color: AppColors.mutedText,
                                 ),
                               ),
                             )
@@ -481,7 +481,7 @@ class _OperatorCarLogsScreenState extends State<OperatorCarLogsScreen> {
                           const SizedBox(height: 8),
                           TextComponent(
                             labelText: state.message,
-                            color: AppColors.grey,
+                            color: AppColors.mutedText,
                             fontSize: 12,
                           ),
                           const SizedBox(height: 16),
@@ -686,7 +686,7 @@ class _OperatorCarLogsScreenState extends State<OperatorCarLogsScreen> {
                 labelText: pageInfoText,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: AppColors.grey,
+                color: AppColors.mutedText,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -773,7 +773,7 @@ class _OperatorCarLogsScreenState extends State<OperatorCarLogsScreen> {
           labelText: pageInfoText,
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: AppColors.grey,
+          color: AppColors.mutedText,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),

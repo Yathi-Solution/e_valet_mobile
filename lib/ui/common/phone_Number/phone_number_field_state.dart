@@ -46,7 +46,7 @@ class PhoneNumberFieldState extends State<PhoneNumberField> {
       hintText: widget.hintText,
       hintStyle: TextStyle(
         fontSize: 14,
-        color: AppColors.grey.withOpacity(0.6),
+        color: AppColors.mutedText,
       ),
       filled: true,
       fillColor: AppColors.white,
@@ -71,7 +71,7 @@ class PhoneNumberFieldState extends State<PhoneNumberField> {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(
-          color: AppColors.primary,
+          color: AppColors.accent,
           width: 2,
         ),
       ),
@@ -117,13 +117,13 @@ class PhoneNumberFieldState extends State<PhoneNumberField> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppColors.cardBackground,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: _errorMessage != null
                         ? AppColors.error
                         : (_isFocused
-                            ? AppColors.primary
+                            ? AppColors.accent
                             : AppColors.surfaceBorder),
                     width: _isFocused || _errorMessage != null ? 2 : 1,
                   ),

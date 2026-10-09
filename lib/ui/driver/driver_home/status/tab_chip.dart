@@ -31,41 +31,43 @@ class TabChip extends StatelessWidget {
             horizontal: 8,
           ),
           decoration: BoxDecoration(
-            color: isActive ? AppColors.actionButtonYellow : AppColors.white,
+            color: isActive ? AppColors.accentSoft : AppColors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isActive ? AppColors.primary : AppColors.divider,
+              color: isActive ? AppColors.accent : AppColors.divider,
               width: 1,
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: isActive ? AppColors.primary : AppColors.grey,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.white, width: 1),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: isActive ? AppColors.accent : AppColors.grey,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.white, width: 1),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: AppColors.white,
+                    size: 14,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  color: AppColors.white,
-                  size: 14,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: TextComponent(
+                const SizedBox(width: 8),
+                TextComponent(
                   labelText: label,
                   color: AppColors.black,
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

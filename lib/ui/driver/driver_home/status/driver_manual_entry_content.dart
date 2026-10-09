@@ -14,6 +14,7 @@ import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_
 import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_state.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_state.dart';
+import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 import 'package:niloufer_valet_mobile/ui/driver/car_Camera/car_camera_screen.dart';
 
 class DriverManualEntryContent extends StatefulWidget {
@@ -76,6 +77,29 @@ class _DriverManualEntryContentState extends State<DriverManualEntryContent> {
         );
         return;
       }
+
+      if (!TokenStorage.isDriverAssignedCardsLoadedSync()) {
+        final t = context.read<AppTranslationsNotifier>();
+        final msg = t.get(TextConstants.driverCardsLoading);
+        SnackBars.showErrorSnackBar(
+          context,
+          msg.isNotEmpty ? msg : TextConstants.driverCardsLoading,
+        );
+        return;
+      }
+
+      if (!TokenStorage.isDriverCardNumberAllowedSync(cardNumber)) {
+        final t = context.read<AppTranslationsNotifier>();
+        final msg = t.get(TextConstants.driverCardNotAssigned);
+        final baseMsg =
+            msg.isNotEmpty ? msg : TextConstants.driverCardNotAssigned;
+        SnackBars.showErrorSnackBar(
+          context,
+          '$baseMsg Please contact Operator.',
+        );
+        return;
+      }
+
       _submittedCardNumber = cardNumber.toString();
 
       // Get outletId from DriverStatusBloc
@@ -130,7 +154,7 @@ class _DriverManualEntryContentState extends State<DriverManualEntryContent> {
               width: double.infinity,
               padding: EdgeInsets.all(w * 0.04),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(w * 0.04),
                 boxShadow: [
                   BoxShadow(

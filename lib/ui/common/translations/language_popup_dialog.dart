@@ -146,12 +146,12 @@ class _LanguagePopupDialogState extends State<LanguagePopupDialog> {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primarySoft
+                              ? AppColors.accentSoft
                               : AppColors.cardBackground,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: isSelected
-                                ? AppColors.primary.withOpacity(0.5)
+                                ? AppColors.accent.withOpacity(0.5)
                                 : AppColors.surfaceBorder,
                             width: isSelected ? 1.5 : 1,
                           ),
@@ -172,12 +172,12 @@ class _LanguagePopupDialogState extends State<LanguagePopupDialog> {
                               Container(
                                 padding: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
-                                  color: AppColors.secondary.withOpacity(0.15),
+                                  color: AppColors.accentSoft,
                                   shape: BoxShape.circle,
                                 ),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.check_rounded,
-                                  color: AppColors.secondary,
+                                  color: AppColors.accent,
                                   size: 18,
                                 ),
                               ),

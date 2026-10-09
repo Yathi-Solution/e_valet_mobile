@@ -101,7 +101,7 @@ class ScannerHomeScreen extends StatelessWidget {
                         .watch<AppTranslationsNotifier>()
                         .get(TextConstants.scannerTapScanHint),
                     fontSize: screenWidth * 0.04,
-                    color: AppColors.grey,
+                    color: AppColors.mutedText,
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -220,7 +220,7 @@ class ScannerHomeScreen extends StatelessWidget {
                                     .get(TextConstants
                                         .noPendingRetrievalRequests),
                                 fontSize: screenWidth * 0.038,
-                                color: AppColors.grey,
+                                color: AppColors.mutedText,
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -248,7 +248,7 @@ class ScannerHomeScreen extends StatelessWidget {
                                 .watch<AppTranslationsNotifier>()
                                 .get(TextConstants.scannerTapScanHint),
                             fontSize: screenWidth * 0.038,
-                            color: AppColors.grey,
+                            color: AppColors.mutedText,
                             textAlign: TextAlign.center,
                           ),
                         ),

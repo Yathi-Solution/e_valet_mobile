@@ -76,7 +76,7 @@ class QrProcessingWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(screenWidth * 0.02),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(screenWidth * 0.01),
             ),
             child: TextComponent(

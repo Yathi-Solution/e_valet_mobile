@@ -37,7 +37,7 @@ class ProfileInfoRow extends StatelessWidget {
                 labelText: label,
                 fontSize: MediaQuery.of(context).size.width * 0.03,
                 fontWeight: FontWeight.w500,
-                color: AppColors.grey,
+                color: AppColors.mutedText,
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.01,

@@ -10,6 +10,8 @@ import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text_field.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_bloc.dart';
+import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_state.dart';
 import 'package:niloufer_valet_mobile/bloc/qr/qr_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/qr/qr_event.dart';
 import 'package:niloufer_valet_mobile/bloc/qr/qr_state.dart';
@@ -19,6 +21,8 @@ import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_
 import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_state.dart';
 import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
+import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:niloufer_valet_mobile/services/offline_sync/parked_card_availability_service.dart';
 import 'package:niloufer_valet_mobile/ui/driver/qr_reader/qr_reader_widget.dart';
 import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/car_photo_intro_screen.dart';
 import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/tab_chip.dart';
@@ -67,6 +71,10 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
   bool _lastSubmissionWasTagNumber = false;
   String? _lastSubmittedCardNumber;
 
+  /// Holds the driver card ownership mismatch error to show inline right above the Submit button
+  /// (in addition to the bottom snackbar). Cleared on input change, tab switch, fresh QR scan, or success path.
+  String? _cardValidationError;
+
   @override
   void initState() {
     super.initState();
@@ -95,7 +103,17 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
   }
 
   void _onTagFormChanged() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {
+        _cardValidationError = null;
+      });
+    }
+  }
+
+  void _clearCardValidationError() {
+    if (_cardValidationError != null && mounted) {
+      setState(() => _cardValidationError = null);
+    }
   }
 
   Future<void> _startScanIntroTimer() async {
@@ -116,6 +134,7 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
   void _onSelectScanTab(BuildContext? blocContext) {
     if (_selectedTab == 0) return;
     blocContext?.read<QrBloc>().add(const QrCameraActivateRequested());
+    _clearCardValidationError();
     setState(() {
       _selectedTab = 0;
       if (_scanIntroChecked && _hasShownScanIntroOnce) {
@@ -132,6 +151,7 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
   void _onSelectTypeIdTab(BuildContext? blocContext) {
     blocContext?.read<QrBloc>().add(const QrResetRequested());
     _introTimer?.cancel();
+    _clearCardValidationError();
     setState(() {
       _selectedTab = 1;
       _showCamera = false;
@@ -146,20 +166,21 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
     super.dispose();
   }
 
-  void _handleSubmit(BuildContext submitContext) {
+  void _showCardValidationError(BuildContext context, String message) {
+    setState(() => _cardValidationError = message);
+  }
+
+  Future<void> _handleSubmit(BuildContext submitContext) async {
     final qrState = submitContext.read<QrBloc>().state;
+
+    int? cardNumber;
     if (qrState.qrData != null) {
-      _lastSubmissionWasTagNumber = false;
-      _lastSubmittedCardNumber = qrState.qrData!.cardNumber.toString();
-      submitContext.read<TagSubmissionBloc>().add(
-            QrCodeSubmitted(qrState.qrData!),
-          );
-      return;
-    }
-    if (_formKey.currentState?.validate() ?? false) {
+      cardNumber = qrState.qrData!.cardNumber;
+    } else if (_formKey.currentState?.validate() ?? false) {
       final tagNumber = _tagNumberController.text.trim();
-      final cardNumber = int.tryParse(tagNumber);
+      cardNumber = int.tryParse(tagNumber);
       if (cardNumber == null) {
+        _clearCardValidationError();
         SnackBars.showErrorSnackBar(
           submitContext,
           submitContext
@@ -168,6 +189,56 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
         );
         return;
       }
+    }
+
+    if (cardNumber != null) {
+      if (!TokenStorage.isDriverAssignedCardsLoadedSync()) {
+        final t = submitContext.read<AppTranslationsNotifier>();
+        final msg = t.get(TextConstants.driverCardsLoading);
+        _showCardValidationError(
+          submitContext,
+          msg.isNotEmpty ? msg : TextConstants.driverCardsLoading,
+        );
+        return;
+      }
+
+      if (!TokenStorage.isDriverCardNumberAllowedSync(cardNumber)) {
+        final t = submitContext.read<AppTranslationsNotifier>();
+        final msg = t.get(TextConstants.driverCardNotAssigned);
+        final baseMsg =
+            msg.isNotEmpty ? msg : TextConstants.driverCardNotAssigned;
+        final errorMsg = '$baseMsg Please contact Operator.';
+
+        _showCardValidationError(submitContext, errorMsg);
+        return;
+      }
+
+      final connectivityState = submitContext.read<ConnectivityBloc>().state;
+      final isOffline = connectivityState is! ConnectivityOnline;
+      if (isOffline &&
+          await ParkedCardAvailabilityService.isCardNumberAlreadyInUse(
+            cardNumber,
+          )) {
+        final t = submitContext.read<AppTranslationsNotifier>();
+        _showCardValidationError(
+          submitContext,
+          t.get(TextConstants.tagSubmissionError),
+        );
+        return;
+      }
+    }
+
+    _clearCardValidationError();
+
+    if (qrState.qrData != null) {
+      _lastSubmissionWasTagNumber = false;
+      _lastSubmittedCardNumber = qrState.qrData!.cardNumber.toString();
+      submitContext.read<TagSubmissionBloc>().add(
+            QrCodeSubmitted(qrState.qrData!),
+          );
+      return;
+    }
+    if (cardNumber != null) {
       _lastSubmissionWasTagNumber = true;
       _lastSubmittedCardNumber = cardNumber.toString();
       final statusState = submitContext.read<DriverStatusBloc>().state;
@@ -192,6 +263,7 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
           BlocListener<TagSubmissionBloc, TagSubmissionState>(
             listener: (context, submissionState) {
               if (submissionState is TagSubmissionSuccess) {
+                _clearCardValidationError();
                 context.read<QrBloc>().add(const QrResetRequested());
                 // Third screen: parking location form (if tag) or Carphoto.json 2s, then camera
                 Navigator.push(
@@ -221,6 +293,18 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
                   }
                   context.read<QrBloc>().add(const QrCameraActivateRequested());
                 });
+              } else if (submissionState is TagSubmissionError) {
+                _showCardValidationError(
+                  context,
+                  t.get(submissionState.message),
+                );
+              }
+            },
+          ),
+          BlocListener<QrBloc, QrState>(
+            listener: (context, qrState) {
+              if (qrState.qrData != null) {
+                _clearCardValidationError();
               }
             },
           ),
@@ -318,7 +402,7 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.grey,
+        color: AppColors.mutedText,
         borderRadius: BorderRadius.circular(w * 0.04),
       ),
       child: Column(
@@ -371,7 +455,33 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(w * 0.04, 0, w * 0.04, h * 0.018),
-            child: SizedBox(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_cardValidationError != null)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: h * 0.01),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: w * 0.03,
+                        vertical: h * 0.01,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primarySurface,
+                        borderRadius: BorderRadius.circular(w * 0.02),
+                      ),
+                      child: TextComponent(
+                        labelText: _cardValidationError!,
+                        color: AppColors.error,
+                        fontSize: w * 0.035,
+                        fontWeight: FontWeight.w600,
+                        textAlign: TextAlign.center,
+                        maxLines: 4,
+                      ),
+                    ),
+                  ),
+                SizedBox(
               height: h * 0.085,
               child: BlocBuilder<QrBloc, QrState>(
                 buildWhen: (previous, current) =>
@@ -434,6 +544,8 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
                 },
               ),
             ),
+              ],
+            ),
           ),
         ],
       ),
@@ -454,7 +566,7 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
             width: double.infinity,
             padding: EdgeInsets.all(w * 0.04),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(w * 0.03),
               boxShadow: [
                 BoxShadow(
@@ -508,6 +620,18 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
             ),
           ),
           SizedBox(height: h * 0.028),
+          if (_cardValidationError != null)
+            Padding(
+              padding: EdgeInsets.only(bottom: h * 0.012),
+              child: TextComponent(
+                labelText: _cardValidationError!,
+                color: AppColors.error,
+                fontSize: w * 0.035,
+                fontWeight: FontWeight.w600,
+                textAlign: TextAlign.center,
+                maxLines: 4,
+              ),
+            ),
           SizedBox(height: h * 0.02),
           // Submit button – same styling as preview Done button for consistency
           BlocBuilder<TagSubmissionBloc, TagSubmissionState>(

@@ -51,18 +51,28 @@ class ConnectivityBloc extends Bloc<ConnectivityEvent, ConnectivityState> {
     List<ConnectivityResult> results,
     Emitter<ConnectivityState> emit,
   ) async {
-    unawaited(
-      DriverConnectivityLogService.instance.handleConnectivityResults(results),
-    );
-
     final noInterface =
         results.isEmpty || results.every((r) => r == ConnectivityResult.none);
+
     if (noInterface) {
+      unawaited(
+        DriverConnectivityLogService.instance.handleInternetState(
+          isOnline: false,
+          results: results,
+        ),
+      );
       emit(ConnectivityUnavailable());
       return;
     }
 
     final reachable = await _dnsReachable();
+    unawaited(
+      DriverConnectivityLogService.instance.handleInternetState(
+        isOnline: reachable,
+        results: results,
+      ),
+    );
+
     if (reachable) {
       OfflineParkingService.syncPendingData();
       emit(ConnectivityOnline());

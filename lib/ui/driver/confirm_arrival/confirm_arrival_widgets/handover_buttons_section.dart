@@ -5,14 +5,13 @@ import 'package:provider/provider.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
+import 'package:niloufer_valet_mobile/ui/common/widgets/countdown_cta_button.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-
 class HandoverButtonsSection extends StatefulWidget {
   final bool isLoading;
   final VoidCallback onConfirmHandover;
   final Future<void> Function()? onCustomerMissing;
-
-  /// When set, Customer Missing button is disabled until this time; countdown shown in place of icon.
   final DateTime? customerMissingDisabledUntil;
   final DateTime? confirmHandoverDisabledUntil;
 
@@ -38,9 +37,7 @@ class HandoverButtonsSectionState extends State<HandoverButtonsSection> {
   Timer? _confirmHandoverCountdownTimer;
 
   void resetCustomerMissingButton() {
-    setState(() {
-      _customerMissingKey = UniqueKey();
-    });
+    setState(() => _customerMissingKey = UniqueKey());
   }
 
   int _remainingSeconds(DateTime? until) {
@@ -51,8 +48,7 @@ class HandoverButtonsSectionState extends State<HandoverButtonsSection> {
 
   void _startCountdownIfNeeded() {
     _customerMissingCountdownTimer?.cancel();
-    final until = widget.customerMissingDisabledUntil;
-    final remaining = _remainingSeconds(until);
+    final remaining = _remainingSeconds(widget.customerMissingDisabledUntil);
     if (remaining <= 0) {
       if (_customerMissingRemainingSeconds != 0) {
         setState(() => _customerMissingRemainingSeconds = 0);
@@ -78,8 +74,7 @@ class HandoverButtonsSectionState extends State<HandoverButtonsSection> {
 
   void _startConfirmHandoverCountdownIfNeeded() {
     _confirmHandoverCountdownTimer?.cancel();
-    final until = widget.confirmHandoverDisabledUntil;
-    final remaining = _remainingSeconds(until);
+    final remaining = _remainingSeconds(widget.confirmHandoverDisabledUntil);
     if (remaining <= 0) {
       if (_confirmHandoverRemainingSeconds != 0) {
         setState(() => _confirmHandoverRemainingSeconds = 0);
@@ -130,112 +125,68 @@ class HandoverButtonsSectionState extends State<HandoverButtonsSection> {
     super.dispose();
   }
 
-  static Widget _roundCountdown(
-    int seconds, {
-    required Color foregroundColor,
-    required bool bigStyle,
-  }) {
-    final size = bigStyle ? 44.0 : 36.0;
-    final fontSize = bigStyle ? 20.0 : 16.0;
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: foregroundColor.withOpacity(0.2),
-        shape: BoxShape.circle,
-      ),
-      child: TextComponent(
-        labelText: '$seconds',
-        fontSize: fontSize,
-        fontWeight: FontWeight.w700,
-        color: foregroundColor.withOpacity(0.9),
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
+  Widget _dangerButton({
     Key? key,
     required String label,
-    required IconData icon,
-    required Color backgroundColor,
-    required Color foregroundColor,
     required bool isLoading,
     required VoidCallback? onPressed,
-    required bool bigStyle,
-
-    /// When > 0, button is disabled and this number is shown in place of the icon (countdown).
-    int countdownSeconds = 0,
+    required int countdownSeconds,
   }) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDisabledByCountdown = countdownSeconds > 0;
-    final effectiveOnPressed =
-        (isLoading || isDisabledByCountdown) ? null : onPressed;
-
-    final leadingWidget = isDisabledByCountdown
-        ? _roundCountdown(
-            countdownSeconds,
-            foregroundColor: foregroundColor,
-            bigStyle: bigStyle,
-          )
-        : Icon(
-            icon,
-            size: bigStyle ? screenWidth * 0.08 : screenHeight * 0.03,
-            color: foregroundColor,
-          );
-
-    final button = ElevatedButton(
-      onPressed: effectiveOnPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: foregroundColor,
-        disabledBackgroundColor: backgroundColor.withOpacity(0.7),
-        disabledForegroundColor: foregroundColor.withOpacity(0.7),
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      child: isLoading
-          ? Center(
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(foregroundColor),
-                ),
+    final disabled = countdownSeconds > 0;
+    return Builder(
+      builder: (context) {
+        final fontSize = ButtonMetrics.confirmBigFontSize(context);
+        return SizedBox(
+          key: key,
+          width: double.infinity,
+          height: ButtonMetrics.confirmHeight(context),
+          child: ElevatedButton(
+            onPressed: (isLoading || disabled) ? null : onPressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
+              disabledBackgroundColor: AppColors.error.withValues(alpha: 0.7),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(ButtonMetrics.confirmRadius),
               ),
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                leadingWidget,
-                SizedBox(width: bigStyle ? 16 : 10),
-                TextComponent(
-                  labelText: label,
-                  fontSize:
-                      bigStyle ? screenWidth * 0.06 : screenHeight * 0.025,
-                  fontWeight: FontWeight.w600,
-                  color: isDisabledByCountdown
-                      ? foregroundColor.withOpacity(0.7)
-                      : foregroundColor,
-                ),
-              ],
             ),
-    );
-
-    if (bigStyle) {
-      return Expanded(
-        child: SizedBox(key: key, width: double.infinity, child: button),
-      );
-    }
-    return SizedBox(
-      key: key,
-      width: double.infinity,
-      height: screenHeight * 0.07,
-      child: button,
+            child: isLoading
+                ? const SizedBox(
+                    width: ButtonMetrics.countdownBadgeSize,
+                    height: ButtonMetrics.countdownBadgeSize,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.white),
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (disabled)
+                        CountdownCtaButton.countdownBadge(countdownSeconds)
+                      else
+                        const Icon(Icons.warning,
+                            color: AppColors.white, size: 26),
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: TextComponent(
+                          labelText: label,
+                          fontSize: fontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.white,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        );
+      },
     );
   }
 
@@ -247,25 +198,28 @@ class HandoverButtonsSectionState extends State<HandoverButtonsSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildActionButton(
-          label: t.get(TextConstants.slideToConfirmHandover),
-          icon: Icons.handshake,
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.black,
-          // When countdown is active, show countdown instead of spinner.
-          isLoading: widget.isLoading && _confirmHandoverRemainingSeconds <= 0,
-          onPressed: widget.onConfirmHandover,
-          bigStyle: true,
-          countdownSeconds: _confirmHandoverRemainingSeconds,
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return CountdownCtaButton(
+                label: t.get(TextConstants.slideToConfirmHandover),
+                onPressed: widget.onConfirmHandover,
+                isLoading: widget.isLoading &&
+                    _confirmHandoverRemainingSeconds <= 0,
+                countdownSeconds: _confirmHandoverRemainingSeconds,
+                iconWhenEnabled: Icons.handshake,
+                height: constraints.maxHeight,
+                useBigFont: true,
+              );
+            },
+          ),
         ),
         SizedBox(height: screenHeight * 0.02),
-        _buildActionButton(
+        _dangerButton(
           key: _customerMissingKey,
           label: t.get(TextConstants.slideToCustomerMissing),
-          icon: Icons.warning,
-          backgroundColor: AppColors.error,
-          foregroundColor: AppColors.white,
           isLoading: _isCustomerMissingLoading,
+          countdownSeconds: _customerMissingRemainingSeconds,
           onPressed: () async {
             if (_isCustomerMissingLoading) return;
             final onCustomerMissing = widget.onCustomerMissing;
@@ -274,13 +228,9 @@ class HandoverButtonsSectionState extends State<HandoverButtonsSection> {
             try {
               await onCustomerMissing();
             } finally {
-              if (mounted) {
-                setState(() => _isCustomerMissingLoading = false);
-              }
+              if (mounted) setState(() => _isCustomerMissingLoading = false);
             }
           },
-          bigStyle: true,
-          countdownSeconds: _customerMissingRemainingSeconds,
         ),
       ],
     );

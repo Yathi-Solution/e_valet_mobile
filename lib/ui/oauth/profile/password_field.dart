@@ -21,7 +21,7 @@ class ProfilePasswordField extends StatelessWidget {
           labelText: label,
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: AppColors.grey,
+          color: AppColors.mutedText,
         ),
         const SizedBox(height: 4),
         TextField(
@@ -30,7 +30,7 @@ class ProfilePasswordField extends StatelessWidget {
           decoration: InputDecoration(
             isDense: true,
             filled: true,
-            fillColor: AppColors.white,
+            fillColor: AppColors.cardBackground,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
@@ -48,7 +48,7 @@ class ProfilePasswordField extends StatelessWidget {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(
-                color: AppColors.primary,
+                color: AppColors.accent,
                 width: 2,
               ),
             ),

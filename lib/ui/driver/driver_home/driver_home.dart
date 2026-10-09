@@ -343,7 +343,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     if (suppressUntil != null && DateTime.now().isBefore(suppressUntil)) {
       return true;
     }
-    if (OfflineParkingService.hasPendingPhotoForSessionSync(sessionId)) {
+    if (OfflineParkingService.hasPendingSyncForSession(sessionId)) {
       return true;
     }
     return false;

@@ -248,7 +248,7 @@ class _BlockDropdownWidgetState extends State<BlockDropdownWidget> {
         maxHeight: 300,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          color: AppColors.white,
+          color: AppColors.cardBackground,
           boxShadow: [
             BoxShadow(
               color: AppColors.shadow10,

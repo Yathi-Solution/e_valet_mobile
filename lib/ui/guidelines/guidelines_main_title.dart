@@ -14,10 +14,10 @@ class GuidelinesMainTitle extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.primarySoft,
+        color: AppColors.accentSoft,
         borderRadius: BorderRadius.circular(12),
         border: Border(
-          left: BorderSide(color: AppColors.primary, width: 4),
+          left: BorderSide(color: AppColors.accent, width: 4),
         ),
       ),
       child: TextComponent(

@@ -27,7 +27,7 @@ class RetrivalRequestBloc
       final sessions = await AssignedSessionsApiService.fetchAssignedSessions();
       emit(RetrivalRequestLoaded(sessions));
     } catch (e) {
-      final msg = (e is Exception) ? e.toString() : 'Failed to load requests';
+      final msg = getDisplayErrorMessage(e);
       emit(RetrivalRequestError(msg));
     }
   }
@@ -40,8 +40,8 @@ class RetrivalRequestBloc
   }
 
   static String _messageOf(Object e) {
-    if (e is ApiException) return e.message;
-    return e is Exception ? e.toString() : 'Failed to accept request';
+    if (e is ApiException) return e.displayMessage;
+    return getDisplayErrorMessage(e);
   }
 
   static bool _isAlreadyAcceptedCase(String raw) {

@@ -1,12 +1,17 @@
+import 'dart:async';
 import 'dart:developer';
-import 'package:niloufer_valet_mobile/api/driver/pre_break_info_api_service.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:niloufer_valet_mobile/api/driver/pre_break_info_api_service.dart';
+import 'package:niloufer_valet_mobile/api/driver/my_cards_api_service.dart';
 import 'package:niloufer_valet_mobile/api/driver/driver_status_api_service.dart';
+import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
 import 'package:niloufer_valet_mobile/api/driver/sessions_pending_api.dart';
 import 'package:niloufer_valet_mobile/api/oauth/logout_api_service.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_state.dart';
 import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
+import 'package:niloufer_valet_mobile/models/driver/parked/my_parked_sessions_response.dart';
 import 'package:niloufer_valet_mobile/models/driver/status/clock_out_request.dart';
 import 'package:niloufer_valet_mobile/services/location/location_service.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
@@ -124,13 +129,31 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     }
   }
 
+  Future<MyParkedSessionsResponse?> _fetchParkedCarsData({
+    MyParkedSessionsResponse? prefetched,
+  }) async {
+    try {
+      return await MyParkedSessionsApiService.loadParkedSessionsForDisplay(
+        prefetched: prefetched,
+      );
+    } catch (_) {
+      return prefetched ??
+          await MyParkedSessionsApiService.getCachedParkedSessions();
+    }
+  }
+
   Future<void> _onDriverHomeStarted(
     DriverHomeStarted event,
     Emitter<DriverMenuState> emit,
   ) async {
+    unawaited(MyCardsApiService.refreshAssignedCardsInBackground());
+
     final firstName = await TokenStorage.getFirstName() ?? '';
     final driverName =
         firstName.isNotEmpty ? firstName : TextConstants.driverFallbackName;
+
+    final parkedCarsData = await _fetchParkedCarsData();
+    final parkedCarsCount = parkedCarsData?.sessionCount ?? 0;
 
     // Fetch pending sessions
     try {
@@ -141,6 +164,8 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
         isOnBreak: false,
         isOnline: true,
         pendingSessions: pendingSessions,
+        parkedCarsCount: parkedCarsCount,
+        parkedCarsData: parkedCarsData,
       ));
     } catch (e) {
       // If API call fails, still emit loaded state without pending sessions
@@ -149,6 +174,8 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
         driverName: driverName,
         isOnBreak: false,
         isOnline: true,
+        parkedCarsCount: parkedCarsCount,
+        parkedCarsData: parkedCarsData,
       ));
     }
   }
@@ -163,13 +190,24 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     }
 
     final currentState = state as DriverHomeLoaded;
+    final parkedCarsData = await _fetchParkedCarsData(
+      prefetched: currentState.parkedCarsData,
+    );
+    final parkedCarsCount = parkedCarsData?.sessionCount ?? 0;
     try {
       final pendingSessions =
           await SessionsPendingApiService.getPendingSessions();
-      emit(currentState.copyWith(pendingSessions: pendingSessions));
+      emit(currentState.copyWith(
+        pendingSessions: pendingSessions,
+        parkedCarsCount: parkedCarsCount,
+        parkedCarsData: parkedCarsData,
+      ));
     } catch (e) {
-      // Keep existing state if refresh fails
-      emit(currentState);
+      // Keep existing pending sessions if refresh fails; still update parked data
+      emit(currentState.copyWith(
+        parkedCarsCount: parkedCarsCount,
+        parkedCarsData: parkedCarsData,
+      ));
     }
   }
 

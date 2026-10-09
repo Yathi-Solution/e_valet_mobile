@@ -73,7 +73,7 @@ class _ResetPasswordDialogState extends State<ResetPasswordDialog> {
           final errorMessage = state.errorMessage;
 
           return Dialog(
-            backgroundColor: AppColors.white,
+            backgroundColor: AppColors.primarySurface,
             child: GestureDetector(
               onTap: () {
                 // Dismiss keyboard when tapping outside input fields
@@ -220,7 +220,7 @@ class _ResetPasswordDialogState extends State<ResetPasswordDialog> {
                                 ? null
                                 : () => Navigator.of(context).pop(),
                             fontSize: MediaQuery.of(context).size.width * 0.04,
-                            fontColor: AppColors.grey,
+                            fontColor: AppColors.mutedText,
                             fontWeight: FontWeight.w500,
                             padding: EdgeInsets.symmetric(
                               horizontal:
@@ -237,7 +237,7 @@ class _ResetPasswordDialogState extends State<ResetPasswordDialog> {
                             onPressed: isLoading
                                 ? () {}
                                 : () => _handleUpdate(context),
-                            elevatedButtonBackgroundColor: AppColors.accent,
+                            elevatedButtonBackgroundColor: AppColors.primary,
                             radius: 8,
                             fontSize: MediaQuery.of(context).size.width * 0.04,
                             fontColor: AppColors.white,

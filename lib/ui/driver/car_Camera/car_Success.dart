@@ -1,12 +1,18 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
+import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
+import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
+import 'package:niloufer_valet_mobile/ui/common/widgets/countdown_cta_button.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/footer.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:niloufer_valet_mobile/ui/common/widgets/vehicle_photo_placeholder.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
 import 'package:niloufer_valet_mobile/ui/driver/driver_home/driver_home.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
@@ -40,6 +46,14 @@ class _CarSuccessScreenState extends State<CarSuccessScreen> {
     TokenStorage.clearSessionId();
     TokenStorage.clearSessionIdFromGetApi();
     // Deferred retrieval ids stay in Hive until Confirm Arrival / handover completes.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      try {
+        context
+            .read<DriverMenuBloc>()
+            .add(const DriverPendingSessionsRefresh());
+      } catch (_) {}
+    });
     _autoReturnTimer = Timer(_autoReturnDuration, _navigateToHome);
   }
 
@@ -65,132 +79,79 @@ class _CarSuccessScreenState extends State<CarSuccessScreen> {
   @override
   Widget build(BuildContext context) {
     final t = context.watch<AppTranslationsNotifier>();
-    final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-
-    // Determine background color and image to show
-    final backgroundColor = widget.isLocationBasedParking
-        ? AppColors.headerYellow
-        : AppColors.primary;
+    final hasImage =
+        widget.imagePath != null && widget.imagePath!.trim().isNotEmpty;
 
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: backgroundColor,
-        appBar: CustomAppBar(
-          showOverflowMenu: true,
-          backgroundColor: backgroundColor,
-        ),
+        backgroundColor: AppColors.primarySurface,
+        appBar: const CustomAppBar(showOverflowMenu: true),
         body: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Successfully Parked text
               Padding(
-                padding: EdgeInsets.only(
-                  top: screenHeight * 0.06,
-                  bottom: screenHeight * 0.04,
-                ),
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
                 child: TextComponent(
                   labelText: t.get(TextConstants.successfullyParked),
-                  color: AppColors.white,
-                  fontSize: screenWidth * 0.055,
-                  fontWeight: FontWeight.w500,
+                  color: AppColors.headerDark,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  textAlign: TextAlign.center,
                 ),
               ),
-
-              // Car image - show car.png for location-based parking, otherwise show captured image
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(screenWidth * 0.03),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(screenWidth * 0.04),
-                    child: widget.isLocationBasedParking
-                        ? // Show car.png image with full display (no cropping)
-                        Image.asset(
-                            'assets/images/car.png',
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                  child: hasImage
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            File(widget.imagePath!),
                             width: double.infinity,
-                            height: double.infinity,
                             fit: BoxFit.contain,
-                          )
-                        : // Show captured image for normal photo flow
-                        (widget.imagePath != null
-                            ? Image.file(
-                                File(widget.imagePath!),
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  // Fallback to static logo if image loading fails
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                        screenWidth * 0.04),
-                                    child: Image.asset(
-                                      'assets/images/car.png',
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  );
-                                },
-                              )
-                            : // Fallback if no image path provided
-                            Image.asset(
+                            errorBuilder: (context, error, stackTrace) {
+                              return VehiclePhotoPlaceholder(
+                                caption: t.get(
+                                    TextConstants.tapToCaptureVehiclePhoto),
+                                minHeight: 200,
+                              );
+                            },
+                          ),
+                        )
+                      : widget.isLocationBasedParking
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
                                 'assets/images/car.png',
                                 width: double.infinity,
-                                height: double.infinity,
                                 fit: BoxFit.contain,
-                              )),
-                  ),
-                ),
-              ),
-
-              // Return To Home button
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.1,
-                  vertical: screenHeight * 0.03,
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: screenHeight * 0.07,
-                  child: ElevatedButton(
-                    onPressed: _isReturningHome
-                        ? null
-                        : () {
-                            _autoReturnTimer?.cancel();
-                            _autoReturnTimer = null;
-                            _navigateToHome();
-                          },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: _isReturningHome
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  AppColors.black),
+                              ),
+                            )
+                          : VehiclePhotoPlaceholder(
+                              caption: t.get(
+                                  TextConstants.tapToCaptureVehiclePhoto),
+                              minHeight: 200,
                             ),
-                          )
-                        : TextComponent(
-                            labelText: t.get(TextConstants.returnToHome),
-                            color: AppColors.black,
-                            fontSize: screenWidth * 0.06,
-                            fontWeight: FontWeight.w600,
-                          ),
-                  ),
                 ),
               ),
-
-              // Footer
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+                child: CountdownCtaButton(
+                  label: t.get(TextConstants.returnToHome),
+                  isLoading: _isReturningHome,
+                  useBigFont: true,
+                  height: ButtonMetrics.returnHomeHeight(context),
+                  onPressed: () {
+                    _autoReturnTimer?.cancel();
+                    _autoReturnTimer = null;
+                    _navigateToHome();
+                  },
+                ),
+              ),
               const Footer(),
-              SizedBox(height: screenHeight * 0.02),
             ],
           ),
         ),

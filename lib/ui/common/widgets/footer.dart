@@ -8,44 +8,17 @@ class Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        final horizontalPadding =
-            isTablet ? 24.0 : MediaQuery.of(context).size.width * 0.05;
-        final verticalPadding =
-            isTablet ? 12.0 : MediaQuery.of(context).size.height * 0.02;
-        final poweredByFontSize =
-            isTablet ? 12.0 : MediaQuery.of(context).size.width * 0.03;
-        final spacerWidth =
-            isTablet ? 12.0 : MediaQuery.of(context).size.width * 0.02;
-        final logoHeight =
-            MediaQuery.of(context).size.width * (isTablet ? 0.02 : 0.04);
-
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: horizontalPadding,
-            vertical: verticalPadding,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextComponent(
-                labelText: TextConstants.poweredBy,
-                fontSize: poweredByFontSize,
-                color: AppColors.mutedText,
-              ),
-              SizedBox(width: spacerWidth),
-              // Yathi logo
-              Image.asset(
-                'assets/images/YathiLogo.png',
-                height: logoHeight,
-                fit: BoxFit.contain,
-              ),
-            ],
-          ),
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Center(
+        child: TextComponent(
+          labelText: '${TextConstants.poweredBy} Yathi Solutions',
+          fontSize: 10,
+          fontWeight: FontWeight.w400,
+          color: AppColors.mutedText,
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }

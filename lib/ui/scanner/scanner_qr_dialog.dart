@@ -112,7 +112,7 @@ class _ScannerQrDialogState extends State<ScannerQrDialog> {
         builder: (context, state) {
           final isProcessing = state is ScannerQrProcessing;
           return Dialog(
-            backgroundColor: AppColors.white,
+            backgroundColor: AppColors.primarySurface,
             insetPadding: EdgeInsets.symmetric(
               horizontal: size.width * 0.05,
               vertical: size.height * 0.1,
@@ -230,7 +230,7 @@ class _ScannerQrDialogState extends State<ScannerQrDialog> {
                   child: TextComponent(
                     labelText: t.get(TextConstants.scanWhatsAppQrInstruction),
                     fontSize: 12,
-                    color: AppColors.grey,
+                    color: AppColors.mutedText,
                     textAlign: TextAlign.center,
                   ),
                 ),

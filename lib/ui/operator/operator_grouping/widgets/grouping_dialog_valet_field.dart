@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
@@ -104,7 +105,7 @@ class GroupingDialogValetField extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextComponent(
-                        labelText: assignedSnap.error.toString(),
+                        labelText: getDisplayErrorMessage(assignedSnap.error),
                         color: AppColors.error,
                         fontWeight: FontWeight.w600,
                         maxLines: 3,
@@ -154,7 +155,7 @@ class GroupingDialogValetField extends StatelessWidget {
                 'noAvailableMembers',
                 'No available drivers',
               ),
-              color: AppColors.grey,
+              color: AppColors.mutedText,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -172,7 +173,7 @@ class GroupingDialogValetField extends StatelessWidget {
             ),
             suffixIcon: const Icon(
               Icons.arrow_drop_down,
-              color: AppColors.grey,
+              color: AppColors.mutedText,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -182,7 +183,7 @@ class GroupingDialogValetField extends StatelessWidget {
             final picked = await showModalBottomSheet<List<ValetResponse>>(
               context: context,
               isScrollControlled: true,
-              backgroundColor: AppColors.white,
+              backgroundColor: AppColors.primarySurface,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(16),

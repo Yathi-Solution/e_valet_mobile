@@ -134,7 +134,7 @@ class ValetCard extends StatelessWidget {
                         TextComponent(
                           labelText: valet!.phone,
                           fontSize: phoneFontSize,
-                          color: AppColors.grey,
+                          color: AppColors.mutedText,
                           maxLines: 2,
                           overflow: TextOverflow.visible,
                         ),
@@ -260,7 +260,7 @@ class ValetCard extends StatelessWidget {
     final container = Container(
       padding: const EdgeInsets.all(padding),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.grey.withOpacity(0.3)),
       ),

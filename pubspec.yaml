@@ -68,7 +68,7 @@ dependencies:
   flutter_image_compress: ^2.1.0
   path_provider: ^2.1.2
   connectivity_plus: ^7.0.0
-  workmanager: ^0.5.2
+  workmanager: 0.7.0
   url_launcher: ^6.3.0
   vibration: ^2.0.0
   audioplayers: ^6.6.0
@@ -145,8 +145,8 @@ flutter_launcher_icons:
   web:
     generate: true
     image_path: "assets/images/app.png"
-    background_color: "#ffffff"
-    theme_color: "#ffffff"
+    background_color: "#1C1C1E"
+    theme_color: "#1C1C1E"
   windows:
     generate: true
     image_path: "assets/images/app.png"

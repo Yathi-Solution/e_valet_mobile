@@ -16,6 +16,9 @@ class SubmitPhotoRequested extends PreviewCarEvent {
   final double? accuracy;
   final String? parkingLocation;
   final String? vehicleNumber;
+  final int? cardNumber;
+  /// When true, scanner/check-in API already succeeded; only park API should sync.
+  final bool checkinSubmittedOnServer;
 
   const SubmitPhotoRequested({
     this.imagePath,
@@ -26,6 +29,8 @@ class SubmitPhotoRequested extends PreviewCarEvent {
     this.accuracy,
     this.parkingLocation,
     this.vehicleNumber,
+    this.cardNumber,
+    this.checkinSubmittedOnServer = false,
   }) : assert(
           imagePath != null || parkingLocation != null,
           'Either imagePath or parkingLocation must be provided',
@@ -41,6 +46,8 @@ class SubmitPhotoRequested extends PreviewCarEvent {
         accuracy,
         parkingLocation,
         vehicleNumber,
+        cardNumber,
+        checkinSubmittedOnServer,
       ];
 }
 

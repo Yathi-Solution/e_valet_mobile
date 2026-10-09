@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:niloufer_valet_mobile/api/driver/config_api_service.dart';
 import 'package:niloufer_valet_mobile/api/driver/driver_status_api_service.dart';
+import 'package:niloufer_valet_mobile/api/driver/my_cards_api_service.dart';
+import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
 import 'package:niloufer_valet_mobile/api/oauth/login_api_service.dart';
 import 'package:niloufer_valet_mobile/api/outlet/outlet_api_service.dart';
 import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
@@ -18,6 +20,7 @@ import 'package:niloufer_valet_mobile/services/notification/firebase_messaging_s
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 import 'package:niloufer_valet_mobile/services/connectivity/driver_connectivity_log_service.dart';
 import 'package:niloufer_valet_mobile/services/websocket/websocket_helper.dart';
+import 'package:niloufer_valet_mobile/api/driver/connectivity_settings_api_service.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
 import 'login_event.dart';
 import 'login_state.dart';
@@ -106,6 +109,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       _pendingIsDriver = roles.any((r) => r.contains('driver'));
       _pendingIsOperator = roles.any((r) => r.contains('operator'));
       _pendingIsScanner = roles.any((r) => r.contains('scanner'));
+
+      if (_pendingIsDriver) {
+        await TokenStorage.clearDriverAssignedCardNumbersIfPresent();
+        await TokenStorage.markDriverAssignedCardsLoading();
+        await MyParkedSessionsApiService.clearCache();
+      }
 
       // Fetch outlets so the user can pick one before clock-in / verify-location
       final outlets = await OutletApiService.getOutlets();
@@ -211,6 +220,25 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         await _fetchAndStoreConfig();
 
+        // Fetch assigned cards in the background; stored locally for scan validation.
+        unawaited(MyCardsApiService.refreshAssignedCardsInBackground());
+
+        try {
+          final parkedResponse =
+              await MyParkedSessionsApiService.refreshParkedSessionsForDisplay();
+          log(
+            'Driver parked cars refreshed on (re)login: ${parkedResponse.sessionCount} sessions',
+          );
+        } catch (e) {
+          log('Failed to refresh parked cars on (re)login (non-fatal): $e');
+        }
+
+        // IMPORTANT:
+        // Fetch driver connectivity settings after every successful login.
+        // This calls the correct GET /connectivity/settings/me?outletId=...
+        // We clear any previously stored settings first, then store the fresh response.
+        await _fetchDriverConnectivitySettings(outletId: outlet.id);
+
         emit(LoginSuccess(profile));
         return;
       }
@@ -312,6 +340,44 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     } catch (e) {
       // Non-blocking by design: login should continue with env defaults.
       log('Failed to fetch config after login: $e');
+    }
+  }
+
+  /// Fetches driver connectivity settings after every successful driver login.
+  ///
+  /// Uses the correct endpoint: GET /connectivity/settings/me?outletId=...
+  ///
+  /// Behavior:
+  /// - First clears any previously stored connectivity settings from local storage.
+  /// - Then calls the API.
+  /// - If successful, stores the fresh outletId + isEnabled locally.
+  /// - This is non-fatal: login continues even if the call fails or returns null.
+  Future<void> _fetchDriverConnectivitySettings({
+    required int outletId,
+  }) async {
+    try {
+      // Clear previous data on every new login (silent)
+      await TokenStorage.clearDriverConnectivitySettings();
+
+      final settings = await ConnectivitySettingsApiService.getDriverConnectivitySettings(
+        outletId: outletId,
+      );
+
+      if (settings != null) {
+        // Persist the fresh data from this login (silent on success)
+        await TokenStorage.saveDriverConnectivitySettings(
+          outletId: settings.outletId,
+          isEnabled: settings.isEnabled,
+        );
+        await DriverConnectivityLogService.instance.onDriverLoginSessionStarted(
+          isEnabled: settings.isEnabled,
+        );
+      }
+      // On null or any non-error path: completely silent
+    } catch (e, st) {
+      // Only log on real unexpected failure
+      log('[Login] Failed to fetch driver connectivity settings (non-fatal): $e');
+      log(st.toString());
     }
   }
 

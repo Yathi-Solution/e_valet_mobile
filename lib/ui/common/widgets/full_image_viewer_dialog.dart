@@ -76,7 +76,7 @@ class FullImageViewerDialog extends StatelessWidget {
                         Icon(
                           Icons.error_outline,
                           size: 48,
-                          color: AppColors.grey,
+                          color: AppColors.mutedText,
                         ),
                         const SizedBox(height: 8),
                         TextComponent(

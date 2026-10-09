@@ -224,7 +224,7 @@ class _OperatorCardsScreenState extends State<OperatorCardsScreen> {
                                   'cardsAssignToEachValet',
                                   TextConstants.cardsAssignToEachValet,
                                 ),
-                                color: AppColors.grey,
+                                color: AppColors.mutedText,
                                 fontSize: (width * 0.03).clamp(12.0, 14.0),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -242,7 +242,7 @@ class _OperatorCardsScreenState extends State<OperatorCardsScreen> {
                                 TextConstants.searchByNameOrCardNumber,
                               ),
                               hintStyle: TextStyle(
-                                color: AppColors.grey,
+                                color: AppColors.mutedText,
                                 fontSize: width * 0.02,
                               ),
                               prefixIcon: const Icon(
@@ -253,7 +253,7 @@ class _OperatorCardsScreenState extends State<OperatorCardsScreen> {
                                   ? IconButton(
                                       icon: const Icon(
                                         Icons.clear,
-                                        color: AppColors.grey,
+                                        color: AppColors.mutedText,
                                       ),
                                       onPressed: () {
                                         _searchController.clear();
@@ -312,7 +312,7 @@ class _OperatorCardsScreenState extends State<OperatorCardsScreen> {
                                   child: TextComponent(
                                     labelText:
                                         t.get(TextConstants.noValetsFound),
-                                    color: AppColors.grey,
+                                    color: AppColors.mutedText,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -426,7 +426,7 @@ class _DriverCardAllocationTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   TextComponent(
                     labelText: valet.phone,
-                    color: AppColors.grey,
+                    color: AppColors.mutedText,
                     fontSize: subTextSize,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

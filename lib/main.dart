@@ -14,24 +14,24 @@ import 'package:niloufer_valet_mobile/services/notification/firebase_messaging_s
 import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 import 'package:niloufer_valet_mobile/services/version/version_service.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/park_flow_signals.dart';
 import 'package:niloufer_valet_mobile/ui/oauth/splash/splash.dart';
 import 'package:niloufer_valet_mobile/services/background/background_sync_service.dart';
 import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
 import 'package:niloufer_valet_mobile/models/driver/session/checkin_request_adapter.dart';
+import 'package:niloufer_valet_mobile/models/driver/session/offline_checkin_request.dart';
 import 'package:niloufer_valet_mobile/models/driver/park/offline_parking_photo.dart';
 import 'package:provider/provider.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_event.dart';
-import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/no_internet_overlay.dart';
 import 'package:niloufer_valet_mobile/api/oauth/refresh_api_service.dart';
 import 'package:niloufer_valet_mobile/services/permissions/permissions_service.dart';
 import 'package:niloufer_valet_mobile/ui/oauth/login/login.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
 import 'package:niloufer_valet_mobile/ui/driver/driver_home/driver_home_route_observer.dart';
 import 'package:niloufer_valet_mobile/ui/permissions/permissions_screen.dart';
+import 'package:niloufer_valet_mobile/ui/common/colors.dart';
+import 'package:niloufer_valet_mobile/ui/common/typography.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +48,10 @@ void main() async {
   final offlineParkingPhotoAdapter = OfflineParkingPhotoAdapter();
   if (!Hive.isAdapterRegistered(offlineParkingPhotoAdapter.typeId)) {
     Hive.registerAdapter(offlineParkingPhotoAdapter);
+  }
+  final offlineCheckinRequestAdapter = OfflineCheckinRequestAdapter();
+  if (!Hive.isAdapterRegistered(offlineCheckinRequestAdapter.typeId)) {
+    Hive.registerAdapter(offlineCheckinRequestAdapter);
   }
   await OfflineParkingService.init();
   await TokenStorage.init();
@@ -129,40 +133,56 @@ class MyApp extends StatelessWidget {
           ),
         ],
         child: MaterialApp(
-          title: dotenv.env['APP_NAME'] ?? 'Cafe Niloufer E-Valet',
+          title: dotenv.env['APP_NAME'] ?? 'ValetLink',
           navigatorKey: FirebaseMessagingService.navigatorKey,
           navigatorObservers: [DriverHomeRouteObserver()],
           home: const SplashScreen(),
           debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            fontFamily: AppTypography.primaryFamily,
+            fontFamilyFallback: AppTypography.fallbackFamilies,
+            scaffoldBackgroundColor: AppColors.primarySurface,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.headerDark,
+              primary: AppColors.headerDark,
+              onPrimary: AppColors.textOnDark,
+              surface: AppColors.primarySurface,
+              onSurface: AppColors.bodyText,
+              onSurfaceVariant: AppColors.mutedText,
+            ),
+            cardTheme: const CardThemeData(
+              color: AppColors.primarySurface,
+              surfaceTintColor: Colors.transparent,
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: AppColors.headerDark,
+              foregroundColor: AppColors.textOnDark,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              shadowColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.headerDark,
+                foregroundColor: AppColors.textOnDark,
+                elevation: 0,
+              ),
+            ),
+            textTheme: TextTheme(
+              displayLarge: AppTypography.heroStyle,
+              headlineMedium: AppTypography.sectionStyle,
+              titleMedium: AppTypography.subheadingStyle,
+              bodyMedium: AppTypography.bodyStyle,
+              labelSmall: AppTypography.labelStyle,
+            ).apply(
+              bodyColor: AppColors.bodyText,
+              displayColor: AppColors.bodyText,
+            ),
+          ),
           builder: (context, child) {
-            return BlocBuilder<ConnectivityBloc, ConnectivityState>(
-              builder: (context, state) {
-                if (state is ConnectivityOnline) {
-                  ScaffoldMessenger.of(context).clearMaterialBanners();
-                }
-
-                final showNoInternet = state is ConnectivityUnavailable &&
-                    !ParkFlowSignals.isCarPhotoParkFlowActive;
-
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    _AppLifecycleHandler(
-                      child: child ?? const SizedBox.shrink(),
-                    ),
-                    if (showNoInternet)
-                      Positioned.fill(
-                        child: NoInternetOverlay(
-                          onRetry: () {
-                            context
-                                .read<ConnectivityBloc>()
-                                .add(CheckConnectivity());
-                          },
-                        ),
-                      ),
-                  ],
-                );
-              },
+            return _AppLifecycleHandler(
+              child: child ?? const SizedBox.shrink(),
             );
           },
         ),

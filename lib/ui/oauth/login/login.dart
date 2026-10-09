@@ -188,8 +188,8 @@ class _LoginScreenState extends State<LoginScreen> {
           behavior: HitTestBehavior.translucent,
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
-            backgroundColor: AppColors.white,
-            appBar: const CustomAppBar(),
+            backgroundColor: AppColors.primarySurface,
+            appBar: const CustomAppBar(hideParkedCarsAction: true),
             body: SafeArea(
               child: Column(
                 children: [

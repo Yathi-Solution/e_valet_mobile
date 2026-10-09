@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/car_log.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
@@ -109,7 +110,7 @@ class _CarLogDetailsPopupState extends State<CarLogDetailsPopup> {
       // Show error if needed
       SnackBars.showErrorSnackBar(
         context,
-        TextConstants.failedToUpdateStatus(e.toString()),
+        TextConstants.failedToUpdateStatus(getDisplayErrorMessage(e)),
       );
     } finally {
       setState(() {
@@ -144,7 +145,7 @@ class _CarLogDetailsPopupState extends State<CarLogDetailsPopup> {
                   maxHeight: screenSize.height * 0.8,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppColors.cardBackground,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -236,7 +237,7 @@ class _CarLogDetailsPopupState extends State<CarLogDetailsPopup> {
                             onPressed: () => widget.onClose(),
                             child: TextComponent(
                               labelText: t.get(TextConstants.cancelButton),
-                              color: AppColors.grey,
+                              color: AppColors.mutedText,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

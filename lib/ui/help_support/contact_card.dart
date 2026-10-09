@@ -65,7 +65,7 @@ class ContactCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: AppColors.primarySoft,

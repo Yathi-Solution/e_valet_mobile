@@ -27,6 +27,9 @@ class ApiConfig {
 
   static Map<String, String> authorizedHeaders(String accessToken) {
     final headers = <String, String>{
+
+
+      
       ...defaultJsonHeaders,
       'Authorization': 'Bearer $accessToken',
     };

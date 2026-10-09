@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
+import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
@@ -9,11 +10,7 @@ class PreviewSubmitButton extends StatelessWidget {
   final VoidCallback onSubmit;
   final bool isReparking;
   final bool isLoading;
-
-  /// When false, button is disabled (e.g. until parking location is entered).
   final bool isEnabled;
-
-  /// When set, shown instead of Submit / Submit Re-Park (e.g. 'Done').
   final String? overrideLabel;
 
   const PreviewSubmitButton({
@@ -28,56 +25,79 @@ class PreviewSubmitButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.watch<AppTranslationsNotifier>();
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final canPress = isEnabled && !isLoading;
+    final buttonHeight = ButtonMetrics.submitHeight(context);
+    final textSize = ButtonMetrics.submitFontSize(context);
+    final radius = ButtonMetrics.submitRadius(context);
 
-    final buttonHeight = screenHeight * 0.085;
-    final textSize = screenWidth * 0.072;
+    final bgColor = AppColors.primary;
 
-    return SizedBox(
-      width: double.infinity,
-      height: buttonHeight,
-      child: ElevatedButton(
-        onPressed: (isLoading || !isEnabled) ? null : onSubmit,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(screenWidth * 0.025),
+    return Semantics(
+      button: true,
+      enabled: canPress,
+      label: overrideLabel ??
+          (isReparking
+              ? t.get(TextConstants.submitRePark)
+              : t.getByKey('submitButton', TextConstants.submitButton)),
+      child: SizedBox(
+        width: double.infinity,
+        height: buttonHeight,
+        child: ElevatedButton(
+          onPressed: canPress ? onSubmit : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: bgColor,
+            foregroundColor: AppColors.white,
+            disabledBackgroundColor: AppColors.disabledBackground,
+            disabledForegroundColor: AppColors.disabledText,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(radius),
+            ),
+            elevation: 0,
           ),
-          elevation: 0,
-        ),
-        child: isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextComponent(
-                    labelText: overrideLabel ??
-                        (isReparking
-                            ? t.get(TextConstants.submitRePark)
-                            : t.getByKey(
-                                'submitButton', TextConstants.submitButton)),
-                    fontSize: textSize,
-                    color: AppColors.white,
+          child: isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
                   ),
-                  if (overrideLabel == null) ...[
-                    SizedBox(width: screenWidth * 0.02),
-                    Icon(
-                      Icons.arrow_forward,
-                      color: AppColors.white,
-                      size: textSize,
+                )
+              : Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextComponent(
+                        labelText: overrideLabel ??
+                            (isReparking
+                                ? t.get(TextConstants.submitRePark)
+                                : t.getByKey('submitButton',
+                                    TextConstants.submitButton)),
+                        fontSize: textSize,
+                        fontWeight: FontWeight.w600,
+                        color: canPress
+                            ? AppColors.white
+                            : AppColors.disabledText,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
+                    if (overrideLabel == null && !isReparking)
+                      Positioned(
+                        right: 0,
+                        child: Icon(
+                          Icons.arrow_forward,
+                          color: canPress
+                              ? AppColors.white
+                              : AppColors.disabledText,
+                          size: textSize,
+                        ),
+                      ),
                   ],
-                ],
-              ),
+                ),
+        ),
       ),
     );
   }

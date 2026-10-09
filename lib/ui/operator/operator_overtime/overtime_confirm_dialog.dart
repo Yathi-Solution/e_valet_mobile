@@ -70,7 +70,7 @@ class OvertimeConfirmDialog {
           OutlinedButton(
             onPressed: () => Navigator.pop(dialogContext),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.grey,
+              foregroundColor: AppColors.mutedText,
               side: BorderSide(color: AppColors.grey.withOpacity(0.5)),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -81,7 +81,7 @@ class OvertimeConfirmDialog {
               labelText: t.get(TextConstants.cancelText),
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: AppColors.grey,
+              color: AppColors.mutedText,
             ),
           ),
           ElevatedButton(

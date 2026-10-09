@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group_member.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
@@ -45,7 +46,7 @@ class GroupingGroupListCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppColors.grey.withValues(alpha: 0.2),
@@ -85,7 +86,7 @@ class GroupingGroupListCard extends StatelessWidget {
                       TextComponent(
                         labelText:
                             '${t.getByKey(TextConstants.i18nKeyMembers, TextConstants.groupMembersCountLabel)}: ${g.memberCount}',
-                        color: AppColors.grey,
+                        color: AppColors.mutedText,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
@@ -158,8 +159,8 @@ class GroupingGroupListCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         TextComponent(
-                          labelText: membersSnap.error.toString(),
-                          color: AppColors.grey,
+                          labelText: getDisplayErrorMessage(membersSnap.error),
+                          color: AppColors.mutedText,
                           fontSize: 12,
                           maxLines: 3,
                         ),
@@ -192,7 +193,7 @@ class GroupingGroupListCard extends StatelessWidget {
                         'groupMembersEmpty',
                         'No members found',
                       ),
-                      color: AppColors.grey,
+                      color: AppColors.mutedText,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -237,7 +238,7 @@ class GroupingGroupListCard extends StatelessWidget {
                                   const SizedBox(height: 2),
                                   TextComponent(
                                     labelText: m.phone,
-                                    color: AppColors.grey,
+                                    color: AppColors.mutedText,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                     maxLines: 1,
@@ -253,7 +254,7 @@ class GroupingGroupListCard extends StatelessWidget {
                               ),
                               onPressed: () => onRemoveMember(m),
                               style: IconButton.styleFrom(
-                                backgroundColor: AppColors.white,
+                                backgroundColor: AppColors.primarySurface,
                                 foregroundColor: AppColors.error,
                                 padding: const EdgeInsets.all(8),
                                 minimumSize: const Size(40, 40),

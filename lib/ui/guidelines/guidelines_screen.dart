@@ -24,7 +24,7 @@ class GuidelinesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.watch<AppTranslationsNotifier>();
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.primarySurface,
       appBar: CustomAppBar(
         showOverflowMenu: true,
         leading: IconButton(

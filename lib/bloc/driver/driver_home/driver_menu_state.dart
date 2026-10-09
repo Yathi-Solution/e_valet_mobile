@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:niloufer_valet_mobile/models/driver/pre_break/pre_break_info_response.dart';
+import 'package:niloufer_valet_mobile/models/driver/parked/my_parked_sessions_response.dart';
 import 'package:niloufer_valet_mobile/models/driver/session/pending_sessions_response.dart';
 import 'package:niloufer_valet_mobile/models/oauth/logout_response.dart';
 
@@ -65,12 +66,16 @@ class DriverHomeLoaded extends DriverMenuState {
   final bool isOnBreak;
   final bool isOnline;
   final PendingSessionsResponse? pendingSessions;
+  final int parkedCarsCount;
+  final MyParkedSessionsResponse? parkedCarsData;
 
   const DriverHomeLoaded({
     required this.driverName,
     required this.isOnBreak,
     required this.isOnline,
     this.pendingSessions,
+    this.parkedCarsCount = 0,
+    this.parkedCarsData,
   });
 
   DriverHomeLoaded copyWith({
@@ -78,12 +83,16 @@ class DriverHomeLoaded extends DriverMenuState {
     bool? isOnBreak,
     bool? isOnline,
     PendingSessionsResponse? pendingSessions,
+    int? parkedCarsCount,
+    MyParkedSessionsResponse? parkedCarsData,
   }) {
     return DriverHomeLoaded(
       driverName: driverName ?? this.driverName,
       isOnBreak: isOnBreak ?? this.isOnBreak,
       isOnline: isOnline ?? this.isOnline,
       pendingSessions: pendingSessions ?? this.pendingSessions,
+      parkedCarsCount: parkedCarsCount ?? this.parkedCarsCount,
+      parkedCarsData: parkedCarsData ?? this.parkedCarsData,
     );
   }
 
@@ -93,5 +102,7 @@ class DriverHomeLoaded extends DriverMenuState {
         isOnBreak,
         isOnline,
         pendingSessions,
+        parkedCarsCount,
+        parkedCarsData,
       ];
 }

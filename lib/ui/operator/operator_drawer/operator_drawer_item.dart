@@ -39,19 +39,38 @@ class OperatorDrawerItem extends StatelessWidget {
                 children: [
                   if (isSelected)
                     Positioned.fill(
-                      left: 20,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Container(
-                          height: rowHeight,
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(22),
-                              bottomLeft: Radius.circular(22),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 4,
+                            decoration: BoxDecoration(
+                              color: AppColors.accent,
+                              borderRadius: const BorderRadius.horizontal(
+                                left: Radius.circular(4),
+                              ),
                             ),
                           ),
-                        ),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Container(
+                                height: rowHeight,
+                                margin: const EdgeInsets.only(left: 16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.cardBackground,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(22),
+                                    bottomLeft: Radius.circular(22),
+                                  ),
+                                  border: Border.all(
+                                    color: AppColors.accent.withOpacity(0.35),
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   Container(
@@ -73,14 +92,16 @@ class OperatorDrawerItem extends StatelessWidget {
               Icon(
                 iconData,
                 size: iconSize,
-                color: isSelected ? AppColors.black : AppColors.white,
+                // Icons sit on the dark drawer strip (right of the pill), not on
+                // the white selected background — keep them white when selected.
+                color: AppColors.white,
               )
             else if (asset != null)
               Image.asset(
                 asset!,
                 width: iconSize,
                 height: iconSize,
-                color: isSelected ? AppColors.black : AppColors.white,
+                color: AppColors.white,
               ),
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.02,

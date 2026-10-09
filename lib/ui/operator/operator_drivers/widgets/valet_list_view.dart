@@ -8,6 +8,7 @@ import 'package:niloufer_valet_mobile/bloc/operator/operator_valet/operator_vale
 import 'package:niloufer_valet_mobile/bloc/operator/operator_valet/operator_valets/valet_list_state.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 import 'package:niloufer_valet_mobile/api/operator/operator_valet/valet_logout_api_service.dart';
 import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
@@ -153,7 +154,7 @@ class ValetListView extends StatelessWidget {
             return Center(
               child: TextComponent(
                 labelText: t.get(TextConstants.noValetsFound),
-                color: AppColors.grey,
+                color: AppColors.mutedText,
               ),
             );
           }
@@ -190,12 +191,7 @@ class ValetListView extends StatelessWidget {
               print('   code: ${e.code}');
 
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(e.message),
-                    backgroundColor: AppColors.error,
-                  ),
-                );
+                SnackBars.showErrorSnackBar(context, e.displayMessage);
               }
             } catch (e) {
               print('🔴 OPERATOR VALET FORCE LOGOUT unknown error: $e');

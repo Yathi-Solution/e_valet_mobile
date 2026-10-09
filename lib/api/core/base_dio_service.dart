@@ -389,6 +389,8 @@ class BaseDioService {
 
   ApiException _mapDioError(DioException e) {
     if (e.error is SocketException) {
+      // Keep a reasonably descriptive internal message; the UI will use displayMessage
+      // (or getDisplayErrorMessage helper) which turns this into a short friendly string.
       return ApiException(
         'No internet connection. Please check your network and try again.',
         code: 'network_error',

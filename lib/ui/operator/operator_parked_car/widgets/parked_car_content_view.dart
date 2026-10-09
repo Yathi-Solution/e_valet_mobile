@@ -73,7 +73,7 @@ class _ParkedCarContentViewState extends State<ParkedCarContentView> {
             TextComponent(
               labelText:
                   t.get(TextConstants.showingResultsFor(widget.searchQuery)),
-              color: AppColors.grey,
+              color: AppColors.mutedText,
               fontSize: screenWidth * 0.013,
               fontWeight: FontWeight.w500,
             ),
@@ -123,7 +123,7 @@ class _ParkedCarContentViewState extends State<ParkedCarContentView> {
                 Icon(
                   Icons.check_circle_outline,
                   size: MediaQuery.of(context).size.width * 0.06,
-                  color: AppColors.grey,
+                  color: AppColors.mutedText,
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.02,
@@ -131,7 +131,7 @@ class _ParkedCarContentViewState extends State<ParkedCarContentView> {
                 TextComponent(
                   labelText: t.get(TextConstants.noCarsParked),
                   fontSize: MediaQuery.of(context).size.width * 0.018,
-                  color: AppColors.grey,
+                  color: AppColors.mutedText,
                 ),
               ],
             ),

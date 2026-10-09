@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:niloufer_valet_mobile/api/oauth/refresh_api_service.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 import 'package:niloufer_valet_mobile/services/websocket/websocket_service.dart';
 import 'websocket_event.dart';
@@ -391,7 +392,7 @@ class WebSocketBloc extends Bloc<WebSocketEvent, WebSocketState> {
     } catch (e) {
       print('Error refreshing token and reconnecting: $e');
       emit(
-          WebSocketError(message: 'Token refresh failed', error: e.toString()));
+          WebSocketError(message: 'Token refresh failed', error: getDisplayErrorMessage(e)));
     } finally {
       _isRefreshingToken = false;
     }

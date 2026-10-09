@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:niloufer_valet_mobile/api/driver/driver_status_api_service.dart';
+import 'package:niloufer_valet_mobile/api/driver/my_cards_api_service.dart';
+import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
 import 'package:niloufer_valet_mobile/api/oauth/profile_api_service.dart';
 import 'package:niloufer_valet_mobile/api/outlet/outlet_api_service.dart';
 import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
@@ -98,6 +100,32 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       } catch (e) {
         // If status fetch fails (e.g. network), still allow navigation to driver home
         print('Splash: Driver status fetch failed: $e');
+      }
+    }
+
+    // On splash restore for a driver (app reopen while session still valid for the business day),
+    // treat it like a re-login for cards purposes: clear previous allocation data, then fetch
+    // the latest cards from GET /drivers/my-cards and store them locally. This keeps the
+    // tag/QR submit ownership validation up-to-date without requiring a full logout+login.
+    if (isDriver) {
+      try {
+        final cardsResponse =
+            await MyCardsApiService.refreshAssignedCardsLocally();
+        print(
+          'Driver cards refreshed on splash restore: ${cardsResponse.cards.length} cards',
+        );
+      } catch (e) {
+        print('Splash: Failed to refresh driver cards on restore (non-fatal): $e');
+      }
+
+      try {
+        final parkedResponse =
+            await MyParkedSessionsApiService.refreshParkedSessionsForDisplay();
+        print(
+          'Driver parked cars refreshed on splash restore: ${parkedResponse.sessionCount} sessions',
+        );
+      } catch (e) {
+        print('Splash: Failed to refresh parked cars on restore (non-fatal): $e');
       }
     }
 

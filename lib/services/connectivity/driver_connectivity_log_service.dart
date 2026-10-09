@@ -1,34 +1,33 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:niloufer_valet_mobile/api/driver/connectivity_log_api_service.dart';
 import 'package:niloufer_valet_mobile/models/driver/connectivity/connectivity_log_batch_request.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 
-/// Logs driver connectivity transitions locally and POSTs batches on a 5h cadence
+/// Logs driver internet on/off transitions locally and POSTs batches every 3h from login
 /// (or immediately when back online if a flush was due while offline).
 ///
 /// Payload enums (backend / Prisma): `ConnectivityStatus` CONNECTED | DISCONNECTED;
-/// `NetworkType` WIFI | MOBILE_DATA | NONE.
+/// `NetworkType` WIFI | MOBILE_DATA.
 class DriverConnectivityLogService {
   DriverConnectivityLogService._();
   static final DriverConnectivityLogService instance = DriverConnectivityLogService._();
 
-  static const Duration _flushInterval = Duration(hours: 5);
+  static const Duration _flushInterval = Duration(hours: 3);
   static const String _statusConnected = 'CONNECTED';
   static const String _statusDisconnected = 'DISCONNECTED';
 
-  /// [NetworkType] — only these three strings are sent.
   static const String _netWifi = 'WIFI';
   static const String _netMobileData = 'MOBILE_DATA';
-  static const String _netNone = 'NONE';
 
   bool? _baselineRecorded;
   bool? _lastOnline;
-  String? _lastNetworkLabel;
+  String? _lastWifiOrMobileLabel;
 
-  /// Call after a successful clock-in so shift/outlet context exists and the first flush is scheduled.
+  /// Call after a successful clock-in so shift/outlet context exists for batch POSTs.
   Future<void> onShiftActiveAfterClockIn({
     required int shiftId,
     required int outletId,
@@ -38,12 +37,26 @@ class DriverConnectivityLogService {
       shiftId: shiftId,
       outletId: outletId,
     );
+  }
+
+  /// Call after driver login when connectivity settings are fetched.
+  /// Clears any prior session events and starts the 3h flush window from login time.
+  Future<void> onDriverLoginSessionStarted({
+    required bool isEnabled,
+  }) async {
+    _baselineRecorded = null;
+    _lastOnline = null;
+    _lastWifiOrMobileLabel = null;
+
+    if (!isEnabled) {
+      await TokenStorage.clearConnectivityPendingEvents();
+      return;
+    }
+
+    await TokenStorage.clearConnectivityPendingEvents();
     await TokenStorage.saveConnectivityNextFlushDue(
       DateTime.now().toUtc().add(_flushInterval),
     );
-    _baselineRecorded = null;
-    _lastOnline = null;
-    _lastNetworkLabel = null;
   }
 
   /// Sync shift/outlet from GET /drivers/me/status (e.g. after app restart).
@@ -69,14 +82,18 @@ class DriverConnectivityLogService {
     await TokenStorage.clearDriverConnectivityLogData();
     _baselineRecorded = null;
     _lastOnline = null;
-    _lastNetworkLabel = null;
+    _lastWifiOrMobileLabel = null;
   }
 
   /// POSTs queued connectivity events **before** tokens are cleared (e.g. logout).
-  /// Ignores the 5-hour schedule. No-op if offline, no shift, or nothing queued.
+  /// Ignores the 3-hour schedule. No-op if offline, no shift, or nothing queued.
   Future<void> flushPendingIgnoringSchedule() async {
     final shiftId = await TokenStorage.getDriverConnectivityShiftId();
     if (shiftId == null || shiftId <= 0) return;
+
+    // If admin disabled connectivity logging for this driver, skip flushing.
+    final connectivityEnabled = await TokenStorage.getDriverConnectivityEnabled();
+    if (!connectivityEnabled) return;
 
     final outletId = await TokenStorage.getDriverConnectivityOutletId();
     if (outletId == null || outletId <= 0) return;
@@ -84,9 +101,7 @@ class DriverConnectivityLogService {
     final events = await _loadEvents();
     if (events.isEmpty) return;
 
-    final connectivity = Connectivity();
-    final results = await connectivity.checkConnectivity();
-    if (!_isOnline(results)) {
+    if (!await _isInternetReachable()) {
       log(
         'DriverConnectivityLogService: pre-logout flush skipped (device offline)',
       );
@@ -113,42 +128,41 @@ class DriverConnectivityLogService {
     }
   }
 
-  /// Connectivity stream callback. Logs CONNECTED / DISCONNECTED transitions for drivers on shift.
-  Future<void> handleConnectivityResults(List<ConnectivityResult> results) async {
+  /// Logs CONNECTED / DISCONNECTED transitions when actual internet reachability changes.
+  Future<void> handleInternetState({
+    required bool isOnline,
+    required List<ConnectivityResult> results,
+  }) async {
     final shiftId = await TokenStorage.getDriverConnectivityShiftId();
     if (shiftId == null || shiftId <= 0) {
       _baselineRecorded = null;
       _lastOnline = null;
-      _lastNetworkLabel = null;
+      _lastWifiOrMobileLabel = null;
       return;
     }
 
-    final online = _isOnline(results);
-    final label = _networkTypeLabel(results);
+    final connectivityEnabled = await TokenStorage.getDriverConnectivityEnabled();
+    if (!connectivityEnabled) {
+      return;
+    }
+
+    final networkType = _resolveWifiOrMobileLabel(results);
 
     if (_baselineRecorded != true) {
-      _lastOnline = online;
-      _lastNetworkLabel = label;
+      _lastOnline = isOnline;
+      _lastWifiOrMobileLabel = networkType;
       _baselineRecorded = true;
       return;
     }
 
-    if (online == _lastOnline && label == _lastNetworkLabel) {
+    if (isOnline == _lastOnline && networkType == _lastWifiOrMobileLabel) {
       return;
     }
 
-    _lastOnline = online;
-    _lastNetworkLabel = label;
+    _lastOnline = isOnline;
+    _lastWifiOrMobileLabel = networkType;
 
-    late final String status;
-    late final String networkType;
-    if (online) {
-      status = _statusConnected;
-      networkType = label;
-    } else {
-      status = _statusDisconnected;
-      networkType = _netNone;
-    }
+    final status = isOnline ? _statusConnected : _statusDisconnected;
 
     await _appendEvent(
       ConnectivityLogEventItem(
@@ -158,7 +172,7 @@ class DriverConnectivityLogService {
       ),
     );
 
-    if (online) {
+    if (isOnline) {
       await tryFlushIfDue();
     }
   }
@@ -168,9 +182,11 @@ class DriverConnectivityLogService {
     final shiftId = await TokenStorage.getDriverConnectivityShiftId();
     if (shiftId == null || shiftId <= 0) return;
 
-    final connectivity = Connectivity();
-    final results = await connectivity.checkConnectivity();
-    if (!_isOnline(results)) {
+    // Respect driver connectivity settings flag.
+    final connectivityEnabled = await TokenStorage.getDriverConnectivityEnabled();
+    if (!connectivityEnabled) return;
+
+    if (!await _isInternetReachable()) {
       return;
     }
 
@@ -254,27 +270,27 @@ class DriverConnectivityLogService {
   }
 
   static String _formatOccurredAt(DateTime utc) {
-    // e.g. 2026-05-07T09:39:18.000Z
     return utc.toIso8601String();
   }
 
-  static bool _isOnline(List<ConnectivityResult> results) {
-    return results.isNotEmpty &&
-        results.any((r) => r != ConnectivityResult.none);
+  Future<bool> _isInternetReachable() async {
+    try {
+      await InternetAddress.lookup('cloudflare.com').timeout(
+        const Duration(seconds: 4),
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
-  /// Maps [ConnectivityResult] to API [NetworkType]: WIFI | MOBILE_DATA | NONE.
-  static String _networkTypeLabel(List<ConnectivityResult> results) {
-    if (results.isEmpty ||
-        results.every((r) => r == ConnectivityResult.none)) {
-      return _netNone;
-    }
+  /// Maps interface to API [NetworkType]: WIFI | MOBILE_DATA (never NONE).
+  String _resolveWifiOrMobileLabel(List<ConnectivityResult> results) {
     if (results.contains(ConnectivityResult.wifi)) return _netWifi;
     if (results.contains(ConnectivityResult.mobile)) return _netMobileData;
-    // ethernet, vpn, bluetooth, other: no separate enum — treat as cellular-style access
     if (results.any((r) => r != ConnectivityResult.none)) {
       return _netMobileData;
     }
-    return _netNone;
+    return _lastWifiOrMobileLabel ?? _netWifi;
   }
 }

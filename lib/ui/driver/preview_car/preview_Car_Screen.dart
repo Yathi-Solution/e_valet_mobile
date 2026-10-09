@@ -19,11 +19,14 @@ import 'package:niloufer_valet_mobile/api/driver/sessions_pending_api.dart';
 import 'package:niloufer_valet_mobile/models/driver/session/pending_sessions_response.dart';
 import 'package:niloufer_valet_mobile/ui/driver/driver_home/driver_home.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
+import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/preview_car/preview_car_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/preview_car/preview_car_event.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/preview_car/preview_car_state.dart';
 import 'package:niloufer_valet_mobile/services/location/location_service.dart';
 import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
+import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
 
 class PreviewCarScreen extends StatefulWidget {
   /// Photo path when coming from Scan; null when coming from Type Parking Number only.
@@ -99,19 +102,29 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
           ? _parkingLocationController.text.trim()
           : _currentParkingLocation;
 
+      final sessionId = widget.sessionId;
+      final parsedCardNumber = int.tryParse(widget.cardNumber?.trim() ?? '');
+      final cardNumber = parsedCardNumber ??
+          OfflineParkingService.cardNumberFromOfflineSessionId(sessionId);
+      final checkinSubmittedOnServer = sessionId != null &&
+          sessionId.isNotEmpty &&
+          !OfflineParkingService.isOfflineSessionId(sessionId);
+
       context.read<PreviewCarBloc>().add(
             SubmitPhotoRequested(
               imagePath: (widget.parkingLocation == null ||
                       widget.parkingLocation!.isEmpty)
                   ? widget.imagePath
                   : null,
-              sessionId: widget.sessionId,
+              sessionId: sessionId,
               isReparking: widget.isReparking,
               latitude: coordinates['latitude']!,
               longitude: coordinates['longitude']!,
               accuracy: coordinates['accuracy'],
               parkingLocation: parkingLocation,
               vehicleNumber: _currentVehicleNumber,
+              cardNumber: cardNumber,
+              checkinSubmittedOnServer: checkinSubmittedOnServer,
             ),
           );
     } on ApiException catch (e) {
@@ -128,15 +141,22 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
     }
   }
 
+  void _refreshParkedCarsCount(BuildContext context) {
+    try {
+      context.read<DriverMenuBloc>().add(const DriverPendingSessionsRefresh());
+    } catch (_) {}
+  }
+
   Future<void> _handlePostParkNavigation(BuildContext context) async {
     if (_hasNavigatedAfterSuccess) return;
     _hasNavigatedAfterSuccess = true;
+
+    _refreshParkedCarsCount(context);
 
     PendingSessionsResponse? pending;
     try {
       pending = await SessionsPendingApiService.getPendingSessions();
     } catch (_) {
-      // If pending session API fails, keep normal success flow.
       pending = null;
     }
 
@@ -145,16 +165,11 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
     final hasPending = pending != null && pending.sessions.isNotEmpty;
 
     if (hasPending) {
-      // Mirror CarSuccessScreen cleanup: otherwise the pending-session watchdog in
-      // DriverOnlineContent can interpret the old id as "cancelled" and pop the
-      // user back to Home right after they tap Park Vehicle again.
       try {
         await TokenStorage.clearSessionId();
         await TokenStorage.clearSessionIdFromGetApi();
       } catch (_) {}
 
-      // Skip success screen; DriverHome already contains the single source of truth
-      // for "pending session → correct screen" navigation.
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const DriverHomeScreen()),
         (route) => false,
@@ -162,7 +177,6 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
       return;
     }
 
-    // Normal flow: show success screen, then it returns to home automatically.
     final isLocationBased =
         widget.parkingLocation != null && widget.parkingLocation!.isNotEmpty;
     Navigator.of(context).pushReplacement(
@@ -215,20 +229,20 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                     hintText: t.getByKey('parkingLocationHint',
                         TextConstants.parkingLocationHint),
                     hintStyle: TextStyle(
-                      color: AppColors.grey.withOpacity(0.6),
+                      color: AppColors.mutedText,
                       fontSize: screenWidth * 0.04,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(
-                        color: AppColors.primary,
+                        color: AppColors.surfaceBorder,
                         width: 1,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(
-                        color: AppColors.primary,
+                        color: AppColors.accent,
                         width: 2,
                       ),
                     ),
@@ -254,20 +268,20 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                   decoration: InputDecoration(
                     hintText: t.get(TextConstants.enterVehicleNumberHint),
                     hintStyle: TextStyle(
-                      color: AppColors.grey.withOpacity(0.6),
+                      color: AppColors.mutedText,
                       fontSize: screenWidth * 0.04,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(
-                        color: AppColors.primary,
+                        color: AppColors.surfaceBorder,
                         width: 1,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(
-                        color: AppColors.primary,
+                        color: AppColors.accent,
                         width: 2,
                       ),
                     ),
@@ -282,7 +296,7 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
               child: TextComponent(
                 labelText: t.get(TextConstants.cancel),
                 fontSize: screenWidth * 0.038,
-                color: AppColors.grey,
+                color: AppColors.mutedText,
               ),
             ),
             ElevatedButton(
@@ -378,59 +392,24 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     PreviewHeader(
-                                        isReparking: widget.isReparking),
+                                        isReparking: widget.isReparking,
+                                        cardNumber: widget.cardNumber,
+                                      ),
                                     SizedBox(height: screenHeight * 0.02),
                                     PreviewImageCard(
                                       imagePath: widget.imagePath!,
                                       onRetake: () => Navigator.pop(context),
                                     ),
                                     SizedBox(height: screenHeight * 0.02),
-                                    if (widget.cardNumber != null &&
-                                        widget.cardNumber!.trim().isNotEmpty)
-                                      Container(
-                                        width: double.infinity,
-                                        padding:
-                                            EdgeInsets.all(screenWidth * 0.04),
-                                        margin: EdgeInsets.only(
-                                            bottom: screenHeight * 0.02),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: AppColors.primary,
-                                            width: 1.5,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.badge,
-                                              color: AppColors.primary,
-                                              size: screenWidth * 0.05,
-                                            ),
-                                            SizedBox(width: screenWidth * 0.02),
-                                            Expanded(
-                                              child: TextComponent(
-                                                labelText:
-                                                    '${t.get(TextConstants.cardNumber)}: ${widget.cardNumber!}',
-                                                fontSize: screenWidth * 0.038,
-                                                fontWeight: FontWeight.w600,
-                                                color: AppColors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
                                     Container(
                                       width: double.infinity,
                                       padding:
                                           EdgeInsets.all(screenWidth * 0.04),
                                       decoration: BoxDecoration(
-                                        color: AppColors.white,
+                                        color: AppColors.cardBackground,
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
-                                          color: AppColors.primary,
+                                          color: AppColors.accent,
                                           width: 1.5,
                                         ),
                                       ),
@@ -445,7 +424,7 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                         keyboardType: TextInputType.text,
                                         textInputAction: TextInputAction.done,
                                         fontSize: screenWidth * 0.04,
-                                        labelFontSize: screenWidth * 0.04,
+                                        labelFontSize: 13,
                                         contentPadding: EdgeInsets.symmetric(
                                           horizontal: screenWidth * 0.04,
                                           vertical: screenHeight * 0.018,
@@ -488,7 +467,9 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   PreviewHeader(
-                                      isReparking: widget.isReparking),
+                                    isReparking: widget.isReparking,
+                                    cardNumber: widget.cardNumber,
+                                  ),
                                   SizedBox(height: screenHeight * 0.02),
 
                                   // Parking Location Display (if provided) - container expands till bottom of screen, OK button inside at bottom
@@ -500,11 +481,11 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                         padding:
                                             EdgeInsets.all(screenWidth * 0.04),
                                         decoration: BoxDecoration(
-                                          color: AppColors.white,
+                                          color: AppColors.cardBackground,
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           border: Border.all(
-                                            color: AppColors.primary,
+                                            color: AppColors.accent,
                                             width: 1.5,
                                           ),
                                         ),
@@ -521,7 +502,7 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                                   children: [
                                                     Icon(
                                                       Icons.location_on,
-                                                      color: AppColors.primary,
+                                                      color: AppColors.accent,
                                                       size: screenWidth * 0.05,
                                                     ),
                                                     SizedBox(
@@ -547,13 +528,12 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                                     padding: EdgeInsets.all(
                                                         screenWidth * 0.02),
                                                     decoration: BoxDecoration(
-                                                      color: AppColors.primary
-                                                          .withOpacity(0.1),
+                                                      color: AppColors.accentSoft,
                                                       shape: BoxShape.circle,
                                                     ),
                                                     child: Icon(
                                                       Icons.edit,
-                                                      color: AppColors.primary,
+                                                      color: AppColors.accent,
                                                       size: screenWidth * 0.045,
                                                     ),
                                                   ),
@@ -580,7 +560,7 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                                 children: [
                                                   Icon(
                                                     Icons.badge,
-                                                    color: AppColors.primary,
+                                                    color: AppColors.accent,
                                                     size: screenWidth * 0.045,
                                                   ),
                                                   SizedBox(
@@ -614,7 +594,7 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                                 children: [
                                                   Icon(
                                                     Icons.directions_car,
-                                                    color: AppColors.primary,
+                                                    color: AppColors.accent,
                                                     size: screenWidth * 0.045,
                                                   ),
                                                   SizedBox(
@@ -667,12 +647,18 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                                       ElevatedButton.styleFrom(
                                                     backgroundColor:
                                                         AppColors.primary,
+                                                    foregroundColor:
+                                                        AppColors.white,
+                                                    disabledBackgroundColor:
+                                                        AppColors
+                                                            .disabledBackground,
+                                                    disabledForegroundColor:
+                                                        AppColors.disabledText,
                                                     shape:
                                                         RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              screenWidth *
-                                                                  0.028),
+                                                              12),
                                                     ),
                                                     elevation: 0,
                                                   ),

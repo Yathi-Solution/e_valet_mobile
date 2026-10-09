@@ -38,7 +38,7 @@ class OperatorMenuBloc extends Bloc<OperatorMenuEvent, OperatorMenuState> {
           '🔵 OPERATOR LOGOUT ERROR: Logout API failed with unknown error: $e');
       // Ensure local logout even if API fails
 
-      emit(OperatorMenuLogoutFailure('Logout failed: ${e.toString()}'));
+      emit(OperatorMenuLogoutFailure('Logout failed: ${getDisplayErrorMessage(e)}'));
     }
   }
 

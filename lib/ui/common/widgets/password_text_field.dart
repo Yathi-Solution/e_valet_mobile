@@ -74,17 +74,17 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
           onFieldSubmitted: widget.onFieldSubmitted,
           style: const TextStyle(
             fontSize: 14,
-            color: AppColors.black,
+            color: AppColors.bodyText,
           ),
           decoration: InputDecoration(
             hintText:
                 widget.hintText ?? t.get(TextConstants.defaultPasswordHint),
-            hintStyle: TextStyle(
+            hintStyle: const TextStyle(
               fontSize: 14,
-              color: AppColors.grey.withOpacity(0.6),
+              color: AppColors.mutedText,
             ),
             filled: true,
-            fillColor: AppColors.white,
+            fillColor: AppColors.cardBackground,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: AppColors.surfaceBorder, width: 1),
@@ -95,7 +95,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.accent, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),

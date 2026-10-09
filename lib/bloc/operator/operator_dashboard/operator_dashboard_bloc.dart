@@ -211,7 +211,7 @@ class OperatorDashboardBloc
         digitalKeyRack: digitalKeyRack,
       ));
     } catch (e) {
-      emit(OperatorDashboardError(e.toString()));
+      emit(OperatorDashboardError(getDisplayErrorMessage(e)));
     }
   }
 
@@ -308,7 +308,7 @@ class OperatorDashboardBloc
         emit(previousLoaded);
       }
     } catch (e) {
-      emit(AssignmentError(e.toString()));
+      emit(AssignmentError(getDisplayErrorMessage(e)));
       if (previousLoaded != null) {
         emit(previousLoaded);
       }
@@ -412,7 +412,7 @@ class OperatorDashboardBloc
       ));
     } catch (e) {
       // Show a business-friendly error message for card not found
-      String errorMessage = e is ApiException ? e.message : e.toString();
+      String errorMessage = e is ApiException ? e.displayMessage : getDisplayErrorMessage(e);
       final cardNotFoundRegExp =
           RegExp(r'Card #[0-9]+ not found in outlet [0-9]+');
       final match = cardNotFoundRegExp.firstMatch(errorMessage);

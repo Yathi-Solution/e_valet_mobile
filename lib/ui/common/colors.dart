@@ -1,67 +1,83 @@
 import 'package:flutter/material.dart';
 
-/// App Color Scheme
+/// App Color Scheme — design-system tokens.
 class AppColors {
-  AppColors._(); // Private constructor to prevent instantiation
+  AppColors._();
 
-  // Primary Color
-  static const Color primary = Color(0xFFF9B231);
-  static const Color primaryDark = Color(0xFFC79100);
-  static const Color primarySoft = Color(0xFFFFF1D6); // light chip/border
-  static const Color accent =
-      Color(0xFFFF7A00); // vivid accent used in tabs/buttons
-  static const Color headerYellow = Color(0xFFF7B32B); // QR screen header color
+  // Dark / header — top bar, primary buttons (#1C1C1E).
+  static const Color headerDark = Color(0xFF1C1C1E);
+  static const Color nearBlack = headerDark;
 
-  // Secondary Color
+  // Brand — charcoal for headers/primary CTAs; coral for logo, highlights, active UI.
+  static const Color primary = headerDark;
+  static const Color primaryDark = headerDark;
+
+  /// Accent — logo highlights, key highlights, active states only (#D85A30).
+  static const Color coral = Color(0xFFD85A30);
+  static const Color orange = coral;
+  static const Color accent = coral;
+  static const Color actionButtonYellow = coral;
+  static const Color accentSoft = Color(0x1AD85A30);
+  static const Color primarySoft = accentSoft;
+  static const Color coralLight = Color(0x33D85A30);
+
+  /// Legacy alias — prefer [headerDark] for app bars.
+  static const Color headerYellow = headerDark;
+
+  // Neutrals
+  static const Color offWhite = Color(0xFFF5F5F0);
+  static const Color trackGray = Color(0xFFE8E8E4);
+  /// Muted text — secondary labels, hints, captions (#6B7280).
+  static const Color mutedText = Color(0xFF6B7280);
+  static const Color secondaryLabel = mutedText;
+  /// @deprecated Prefer [mutedText] for secondary labels.
+  static const Color footerGray = mutedText;
+  static const Color disabledBackground = trackGray;
+  static const Color disabledText = mutedText;
+
+  // Semantic
+  static const Color infoBlue = Color(0xFF378ADD);
   static const Color secondary = Color(0xFF39756A);
 
   // Surfaces
-  static const Color background = Color(0xFFF7F7F9);
-  static const Color lightBeigeBackground =
-      Color(0xFFF5F5EC); // Light beige (home screen)
-  static const Color surface = Colors.white;
-  static const Color cardBackground = Color(0xFFFCFCFC); // Home screen cards
-  static const Color actionButtonYellow =
-      Color(0xFFFBBF24); // Park/Retrieve buttons
-  static const Color surfaceBorder = Color(0xFFEAEAEA);
+  /// Primary surface — page backgrounds and cards (#FFFFFF).
+  static const Color primarySurface = Color(0xFFFFFFFF);
+  static const Color background = primarySurface;
+  static const Color lightBeigeBackground = primarySurface;
+  static const Color surface = primarySurface;
+  static const Color cardBackground = primarySurface;
+  static const Color surfaceBorder = trackGray;
   static const Color divider = Color(0xFFE5E7EB);
-  static const Color shadow10 = Color(0x1A000000); // 10% black
-  static const Color mutedText = Color(0xFF6B7280);
+  static const Color shadow10 = Color(0x1A000000);
 
-  // Grey shades
-  static const Color greyLight = Color(0xFFE0E0E0); // Colors.grey.shade300
+  /// Body text on white / light surfaces (#1C1C1E).
+  static const Color bodyText = headerDark;
 
+  /// Text on dark surfaces — app bar titles, primary button labels (#FFFFFF).
+  static const Color textOnDark = Color(0xFFFFFFFF);
+
+  static const Color greyLight = Color(0xFFE0E0E0);
   static const Color success = Colors.green;
   static const Color error = Colors.red;
-
-  /// Vibrant red-orange for cancel/dismiss actions (e.g. cancel assignment icon)
   static const Color cancelAssignmentIcon = Color(0xFFFF5722);
-  static const Color black = Colors.black;
+  static const Color black = bodyText;
   static const Color grey = Colors.grey;
-  static const Color white = Colors.white;
+  static const Color white = textOnDark;
   static const Color blue = Colors.blue;
   static const Color purple = Colors.purple;
   static const Color transparent = Colors.transparent;
 
-  // QR Scanner specific colors
-  static const Color qrSuccessBackground =
-      Color(0x1A4CAF50); // green.withOpacity(0.1)
-  static const Color qrSuccessBorder = Color(0xFF4CAF50); // Colors.green
-  static const Color qrSuccessText = Color(0xFF4CAF50); // Colors.green
-  static const Color qrErrorBackground =
-      Color(0x1AF44336); // red.withOpacity(0.1)
-  static const Color qrProcessingOverlay =
-      Color(0x80000000); // black.withOpacity(0.5)
-  static const Color qrSuccessBorderLight =
-      Color(0x4D4CAF50); // green.withOpacity(0.3)
+  // QR Scanner
+  static const Color qrSuccessBackground = Color(0x1A4CAF50);
+  static const Color qrSuccessBorder = Color(0xFF4CAF50);
+  static const Color qrSuccessText = Color(0xFF4CAF50);
+  static const Color qrErrorBackground = Color(0x1AF44336);
+  static const Color qrProcessingOverlay = Color(0x80000000);
+  static const Color qrSuccessBorderLight = Color(0x4D4CAF50);
+  static const Color qrSuccessColor = Color(0xFF10B981);
+  static const Color qrErrorColor = Color(0xFFEF4444);
+  static const Color qrSuccessBg = Color(0xFFECFDF5);
+  static const Color qrErrorBg = Color(0xFFFEF2F2);
 
-  // Additional QR Scanner colors
-  static const Color qrSuccessColor = Color(0xFF10B981); // Bright green
-  static const Color qrErrorColor = Color(0xFFEF4444); // Bright red
-  static const Color qrSuccessBg = Color(0xFFECFDF5); // Light green background
-  static const Color qrErrorBg = Color(0xFFFEF2F2); // Light red background
-
-  // Manual Request
   static const Color manualRequestFillColor = Color(0xFFE0E0E0);
-  static const Color orange = Color(0xFFFFA500);
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
+import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 
 class ElevatedButtonComponent extends StatefulWidget {
@@ -47,10 +49,12 @@ class _ElevatedButtonComponentState extends State<ElevatedButtonComponent> {
         onPressed: widget.onPressed,
         style: ElevatedButton.styleFrom(
           padding: widget.padding,
-          backgroundColor: widget.elevatedButtonBackgroundColor,
+          backgroundColor:
+              widget.elevatedButtonBackgroundColor ?? AppColors.primary,
+          foregroundColor: widget.fontColor ?? AppColors.textOnDark,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
-              widget.radius ?? 8.0,
+              widget.radius ?? ButtonMetrics.authRadius,
             ),
           ),
         ),
@@ -62,7 +66,7 @@ class _ElevatedButtonComponentState extends State<ElevatedButtonComponent> {
                   TextComponent(
                     labelText: widget.labelText,
                     fontSize: widget.fontSize,
-                    color: widget.fontColor,
+                    color: widget.fontColor ?? AppColors.textOnDark,
                     fontWeight: widget.fontWeight,
                     maxLines: widget.maxLines,
                     overflow: widget.overflow,
@@ -77,7 +81,7 @@ class _ElevatedButtonComponentState extends State<ElevatedButtonComponent> {
             : TextComponent(
                 labelText: widget.labelText,
                 fontSize: widget.fontSize,
-                color: widget.fontColor,
+                color: widget.fontColor ?? AppColors.textOnDark,
                 fontWeight: widget.fontWeight,
                 maxLines: widget.maxLines,
                 overflow: widget.overflow,

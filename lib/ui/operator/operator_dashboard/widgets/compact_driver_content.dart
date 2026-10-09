@@ -63,7 +63,7 @@ class CompactDriverContent extends StatelessWidget {
                 TextComponent(
                   labelText: driver.phone,
                   fontSize: 12,
-                  color: AppColors.grey,
+                  color: AppColors.mutedText,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

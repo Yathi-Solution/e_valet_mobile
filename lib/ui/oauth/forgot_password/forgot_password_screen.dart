@@ -67,8 +67,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           behavior: HitTestBehavior.translucent,
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
-            backgroundColor: AppColors.white,
-            appBar: const CustomAppBar(),
+            backgroundColor: AppColors.primarySurface,
+            appBar: const CustomAppBar(hideParkedCarsAction: true),
             body: SafeArea(
               child: Column(
                 children: [
@@ -90,7 +90,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 MediaQuery.of(context).size.width * 0.05,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.white,
+                                color: AppColors.cardBackground,
                                 borderRadius: BorderRadius.circular(
                                   MediaQuery.of(context).size.width * 0.05,
                                 ),
@@ -137,7 +137,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                         MediaQuery.of(context).size.width *
                                             0.04,
                                     fontWeight: FontWeight.w400,
-                                    color: AppColors.grey,
+                                    color: AppColors.mutedText,
                                     textAlign: TextAlign.center,
                                   ),
                                   SizedBox(
@@ -212,7 +212,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                                             .sendResetInstructions),
                                                 onPressed: handlePress,
                                                 elevatedButtonBackgroundColor:
-                                                    AppColors.accent, // Orange
+                                                    AppColors.primary,
                                                 radius: 8,
                                                 fontSize: 16,
                                                 fontColor: AppColors.white,

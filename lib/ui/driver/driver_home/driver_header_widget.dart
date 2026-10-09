@@ -42,7 +42,7 @@ class DriverHeaderWidget extends StatelessWidget {
       width: screenWidth,
       height: contentHeight,
       decoration: const BoxDecoration(
-        color: AppColors.primary, // Orange/gold background
+        color: AppColors.headerDark,
       ),
       child: BlocBuilder<DriverStatusBloc, DriverStatusState>(
         builder: (context, statusState) {

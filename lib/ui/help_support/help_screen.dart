@@ -74,7 +74,7 @@ class _HelpScreenState extends State<HelpScreen> {
     // Always use backend translation for title (Hindi/Telugu)
     final title = t.getByKey('help', TextConstants.help);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.primarySurface,
       appBar: CustomAppBar(
         showOverflowMenu: true,
         leading: IconButton(

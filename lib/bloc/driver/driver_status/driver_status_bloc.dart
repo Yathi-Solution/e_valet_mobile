@@ -187,7 +187,7 @@ class DriverStatusBloc extends Bloc<DriverStatusEvent, DriverStatusState> {
       }
     } catch (e) {
       // Handle location errors or other exceptions
-      final errorMessage = e.toString();
+      final errorMessage = getDisplayErrorMessage(e);
       String errorMsg;
       if (errorMessage.contains('location') ||
           errorMessage.contains('permission') ||

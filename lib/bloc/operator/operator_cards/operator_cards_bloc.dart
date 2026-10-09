@@ -3,6 +3,7 @@ import 'package:niloufer_valet_mobile/api/operator/operator_cards/card_assignmen
 import 'package:niloufer_valet_mobile/api/operator/operator_valet/valet_list_api_service.dart';
 import 'package:niloufer_valet_mobile/bloc/operator/operator_cards/operator_cards_event.dart';
 import 'package:niloufer_valet_mobile/bloc/operator/operator_cards/operator_cards_state.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_cards/card_assignments_response.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
 
@@ -87,7 +88,7 @@ class OperatorCardsBloc extends Bloc<OperatorCardsEvent, OperatorCardsState> {
         dataRevision: preserveDataRevision + 1,
       ));
     } catch (e) {
-      emit(OperatorCardsLoadFailure(message: e.toString()));
+      emit(OperatorCardsLoadFailure(message: getDisplayErrorMessage(e)));
     }
   }
 }

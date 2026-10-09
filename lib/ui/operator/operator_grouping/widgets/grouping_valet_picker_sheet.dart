@@ -136,7 +136,7 @@ class _GroupingValetPickerSheetState extends State<GroupingValetPickerSheet> {
                       ),
                       subtitle: TextComponent(
                         labelText: v.phone,
-                        color: AppColors.grey,
+                        color: AppColors.mutedText,
                         fontSize: 12,
                       ),
                       controlAffinity: ListTileControlAffinity.leading,

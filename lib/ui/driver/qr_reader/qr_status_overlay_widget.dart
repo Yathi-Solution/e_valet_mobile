@@ -116,7 +116,7 @@ class QrStatusOverlayWidget extends StatelessWidget {
                 vertical: screenHeight * 0.015,
               ),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(screenWidth * 0.015),
                 border: Border.all(
                   color: successColor.withOpacity(0.3),

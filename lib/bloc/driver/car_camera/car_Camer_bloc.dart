@@ -5,6 +5,7 @@ import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/car_camera/car_camera_event.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/car_camera/car_Camera_State.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/driver/image_validation/validation_result.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
 
@@ -226,7 +227,7 @@ class CarCameraBloc extends Bloc<CarCameraEvent, CarCameraState> {
       await _disposeCameraResources();
 
       // Extract error message, handling null check operator errors
-      String errorMessage = e.toString();
+      String errorMessage = getDisplayErrorMessage(e);
       if (errorMessage.contains('Null check operator used on a null value')) {
         errorMessage =
             'Camera service is not ready yet. Please wait a moment and try again.';
@@ -292,7 +293,7 @@ class CarCameraBloc extends Bloc<CarCameraEvent, CarCameraState> {
       }
     } catch (e) {
       emit(CarCameraValidationError(
-        message: '${TextConstants.errorValidatingImage}: ${e.toString()}',
+        message: '${TextConstants.errorValidatingImage}: ${getDisplayErrorMessage(e)}',
         result: ImageValidationResult.failure(
           hasVehicle: false,
           hasNumberPlate: false,
@@ -350,7 +351,7 @@ class CarCameraBloc extends Bloc<CarCameraEvent, CarCameraState> {
       return ImageValidationResult.failure(
         hasVehicle: false,
         hasNumberPlate: false,
-        errorMessage: '${TextConstants.errorProcessingImage}: ${e.toString()}',
+        errorMessage: '${TextConstants.errorProcessingImage}: ${getDisplayErrorMessage(e)}',
       );
     }
   }

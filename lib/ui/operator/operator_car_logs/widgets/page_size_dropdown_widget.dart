@@ -27,7 +27,7 @@ class PageSizeDropdownWidget extends StatelessWidget {
               'paginationShowLabel', TextConstants.paginationShowLabel),
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: AppColors.grey,
+          color: AppColors.mutedText,
         ),
         const SizedBox(width: 12),
         Container(
@@ -57,7 +57,7 @@ class PageSizeDropdownWidget extends StatelessWidget {
             icon: Icon(
               Icons.arrow_drop_down,
               size: 20,
-              color: AppColors.grey,
+              color: AppColors.mutedText,
             ),
             isDense: true,
           ),

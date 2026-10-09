@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:niloufer_valet_mobile/ui/common/typography.dart';
 
 class TextComponent extends StatefulWidget {
   const TextComponent({
@@ -52,14 +50,7 @@ class TextComponent extends StatefulWidget {
 }
 
 class _TextComponentState extends State<TextComponent> {
-  /// Translate text if translation service is available
-  /// For now, this returns the text as-is
-  /// TODO: Implement translation service integration when available
-  String _translateText(String text) {
-    // Placeholder for future translation implementation
-    // Example: return LanguageService.translate(text);
-    return text;
-  }
+  String _translateText(String text) => text;
 
   @override
   Widget build(BuildContext context) {
@@ -67,43 +58,12 @@ class _TextComponentState extends State<TextComponent> {
     final displayText =
         shouldTranslate ? _translateText(widget.labelText) : widget.labelText;
 
-    // Check if running on iOS
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return Text(
-        displayText,
-        maxLines: widget.maxLines,
-        overflow: widget.overflow,
-        textAlign: widget.textAlign,
-        softWrap: widget.softWrap,
-        style: GoogleFonts.jost(
-          height: widget.height,
-          fontSize: widget.fontSize,
-          color: widget.color,
-          fontWeight: widget.fontWeight,
-          backgroundColor: widget.textBackgroundColor,
-          fontStyle: widget.fontStyle,
-          letterSpacing: widget.letterSpacing,
-          wordSpacing: widget.wordSpacing,
-          decoration: widget.textDecoration,
-          decorationColor: widget.textDecorationColor,
-          decorationStyle: widget.textDecorationStyle,
-          decorationThickness: widget.textDecorationThickness,
-          shadows: widget.shadows,
-        ),
-      );
-    }
-
-    // Default Material Design Text for other platforms
-    return Text(
-      displayText,
-      maxLines: widget.maxLines,
-      overflow: widget.overflow,
-      textAlign: widget.textAlign,
-      softWrap: widget.softWrap,
-      style: GoogleFonts.jost(
+    final defaultColor = Theme.of(context).colorScheme.onSurface;
+    final style = AppTypography.merge(
+      TextStyle(
         height: widget.height,
         fontSize: widget.fontSize,
-        color: widget.color,
+        color: widget.color ?? defaultColor,
         fontWeight: widget.fontWeight,
         backgroundColor: widget.textBackgroundColor,
         fontStyle: widget.fontStyle,
@@ -115,6 +75,15 @@ class _TextComponentState extends State<TextComponent> {
         decorationThickness: widget.textDecorationThickness,
         shadows: widget.shadows,
       ),
+    );
+
+    return Text(
+      displayText,
+      maxLines: widget.maxLines,
+      overflow: widget.overflow,
+      textAlign: widget.textAlign,
+      softWrap: widget.softWrap,
+      style: style,
     );
   }
 }

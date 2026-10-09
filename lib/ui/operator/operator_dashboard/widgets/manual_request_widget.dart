@@ -146,7 +146,7 @@ class _ManualRequestWidgetState extends State<ManualRequestWidget> {
                   labelText: isLoading
                       ? t.get(TextConstants.processingText)
                       : t.get(TextConstants.manualRequest),
-                  fontColor: AppColors.black,
+                  fontColor: AppColors.textOnDark,
                   fontSize: MediaQuery.of(context).size.width * 0.015,
                   elevatedButtonBackgroundColor:
                       isDisabled ? AppColors.grey : AppColors.primary,

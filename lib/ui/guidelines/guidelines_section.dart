@@ -27,25 +27,25 @@ class GuidelinesSection extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.primarySoft,
-                AppColors.primarySoft.withOpacity(0.6),
+                AppColors.accentSoft,
+                AppColors.accentSoft.withOpacity(0.6),
               ],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
             borderRadius: BorderRadius.circular(10),
             border:
-                Border.all(color: AppColors.primary.withOpacity(0.4), width: 1),
+                Border.all(color: AppColors.accent.withOpacity(0.4), width: 1),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.accent.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, size: 20, color: AppColors.primaryDark),
+                child: Icon(icon, size: 20, color: AppColors.accent),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -53,7 +53,7 @@ class GuidelinesSection extends StatelessWidget {
                   labelText: title,
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.primaryDark,
+                  color: AppColors.nearBlack,
                 ),
               ),
             ],

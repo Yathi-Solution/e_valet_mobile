@@ -46,7 +46,7 @@ class DriverCardContent extends StatelessWidget {
               TextComponent(
                 labelText: driver.phone,
                 fontSize: MediaQuery.of(context).size.width * 0.013,
-                color: AppColors.grey,
+                color: AppColors.mutedText,
               ),
             ],
           ),

@@ -196,7 +196,7 @@ class _OperatorOverTimeScreenState extends State<OperatorOverTimeScreen> {
             },
             child: Scaffold(
               key: _scaffoldKey,
-              backgroundColor: AppColors.white,
+              backgroundColor: AppColors.primarySurface,
               endDrawer: OperatorDrawer(
                 selectedIndex: 4,
                 onItemSelected: _onMenuItemSelected,
@@ -259,7 +259,7 @@ class _OperatorOverTimeScreenState extends State<OperatorOverTimeScreen> {
                                       labelText: t.getByKey(
                                           'overtimeDescription',
                                           TextConstants.overtimeDescription),
-                                      color: AppColors.grey,
+                                      color: AppColors.mutedText,
                                       fontSize: headerDescriptionFontSize,
                                     ),
                                   ],
@@ -323,7 +323,7 @@ class _OperatorOverTimeScreenState extends State<OperatorOverTimeScreen> {
                                                 .overtimeNoAvailableDrivers),
                                         fontSize: 20,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColors.grey,
+                                        color: AppColors.mutedText,
                                         textAlign: TextAlign.center,
                                         maxLines: 3,
                                       ),

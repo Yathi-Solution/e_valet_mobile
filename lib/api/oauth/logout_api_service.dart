@@ -6,6 +6,7 @@ import 'package:niloufer_valet_mobile/models/oauth/logout_response.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 import 'package:niloufer_valet_mobile/services/connectivity/driver_connectivity_log_service.dart';
 import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
+import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
 
 class LogoutApiService {
   LogoutApiService._();
@@ -14,6 +15,10 @@ class LogoutApiService {
   static String get _apiKey => ApiConfig.authApiKey;
 
   static Future<LogoutResponse> logout() async {
+    // Clear locally cached driver cards and parked cars before the logout API call.
+    await TokenStorage.clearDriverAssignedCardNumbersIfPresent();
+    await MyParkedSessionsApiService.clearCache();
+
     final refreshToken = await TokenStorage.getRefreshToken();
 
     final headers = <String, String>{

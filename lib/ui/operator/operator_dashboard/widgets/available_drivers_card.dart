@@ -31,7 +31,7 @@ class AvailableDriversCard extends StatelessWidget {
         vertical: MediaQuery.of(context).size.height * 0.008,
       ),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
         border: isRecommended
             ? Border.all(color: AppColors.primary, width: 1.5)
@@ -83,7 +83,7 @@ class AvailableDriversCard extends StatelessWidget {
                 vertical: MediaQuery.of(context).size.height * 0.008,
               ),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
@@ -133,7 +133,7 @@ class AvailableDriversCard extends StatelessWidget {
         vertical: MediaQuery.of(context).size.height * 0.01,
       ),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
         border: null,
         boxShadow: [
@@ -172,7 +172,7 @@ class AvailableDriversCard extends StatelessWidget {
               vertical: MediaQuery.of(context).size.height * 0.01,
             ),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(

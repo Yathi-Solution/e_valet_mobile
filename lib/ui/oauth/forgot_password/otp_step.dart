@@ -96,7 +96,7 @@ class _OtpStepState extends State<OtpStep> {
       }
     } on ApiException catch (e) {
       if (mounted) {
-        SnackBars.showErrorSnackBar(context, e.message);
+        SnackBars.showErrorSnackBar(context, e.displayMessage);
       }
     } catch (_) {
       if (mounted) {
@@ -126,7 +126,7 @@ class _OtpStepState extends State<OtpStep> {
           labelText: t.get(TextConstants.otpSentTo(widget.phoneNumber)),
           fontSize: widget.size.width * 0.04,
           fontWeight: FontWeight.w400,
-          color: AppColors.grey,
+          color: AppColors.mutedText,
           textAlign: TextAlign.center,
         ),
         SizedBox(height: widget.size.height * 0.03),
@@ -170,7 +170,7 @@ class _OtpStepState extends State<OtpStep> {
             labelText: _formatTime(_remainingSeconds),
             fontSize: widget.size.width * 0.04,
             fontWeight: FontWeight.w500,
-            color: AppColors.grey,
+            color: AppColors.mutedText,
             textAlign: TextAlign.center,
           ),
         SizedBox(height: widget.size.height * 0.03),
@@ -189,7 +189,7 @@ class _OtpStepState extends State<OtpStep> {
                           .read<PasswordResetOtpBloc>()
                           .add(const PasswordResetOtpVerifySubmitted());
                     },
-              elevatedButtonBackgroundColor: AppColors.accent,
+              elevatedButtonBackgroundColor: AppColors.primary,
               radius: 8,
               fontSize: 16,
               fontColor: AppColors.white,

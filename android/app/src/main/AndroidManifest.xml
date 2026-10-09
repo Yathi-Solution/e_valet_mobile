@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
-        android:label="Cafe Niloufer E-Valet"
+        android:label="ValetLink"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

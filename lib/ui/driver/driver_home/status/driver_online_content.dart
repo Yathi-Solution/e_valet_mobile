@@ -15,6 +15,7 @@ import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_vehicl
 import 'package:niloufer_valet_mobile/ui/driver/retrival_request/pending_retrieval_requests_screen.dart';
 import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
 import 'package:niloufer_valet_mobile/ui/oauth/login/login.dart';
 
 class DriverOnlineContent extends StatefulWidget {
@@ -72,6 +73,7 @@ class _DriverOnlineContentState extends State<DriverOnlineContent>
     if (!mounted || _handlingPendingCancellation) return;
     final sessionId = await TokenStorage.getSessionId();
     if (sessionId == null || sessionId.isEmpty) return;
+    if (OfflineParkingService.isOfflineSessionId(sessionId)) return;
 
     try {
       final pending = await SessionsPendingApiService.getPendingSessions();

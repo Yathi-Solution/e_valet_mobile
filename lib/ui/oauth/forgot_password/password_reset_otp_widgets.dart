@@ -44,7 +44,7 @@ class PasswordResetOtpCard extends StatelessWidget {
       constraints: BoxConstraints(maxWidth: size.width * 1),
       padding: EdgeInsets.all(size.width * 0.05),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(size.width * 0.05),
         border: Border.all(
           color: AppColors.primary,

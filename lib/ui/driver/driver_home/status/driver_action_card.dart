@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 
-/// Action card (Park Vehicle / Retrieve Vehicle) that fits height to its content.
+/// Action card (Park Vehicle / Retrieve Vehicle) per design system.
 class DriverActionCard extends StatelessWidget {
   final String imagePath;
   final String buttonLabel;
@@ -27,96 +28,102 @@ class DriverActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final w = screenWidth;
-    final h = screenHeight;
     final isTappable = onTap != null;
+    // Match login card outline (coral accent, 2px).
+    final cardRadius = BorderRadius.circular(
+      (screenWidth * 0.05).clamp(12.0, 20.0),
+    );
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(w * 0.045),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow10,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: cardRadius,
+        border: Border.all(
+          color: AppColors.accent,
+          width: 2,
+        ),
       ),
       child: Material(
         color: AppColors.transparent,
         child: InkWell(
           onTap: isTappable ? onTap : null,
-          borderRadius: BorderRadius.circular(w * 0.045),
+          borderRadius: cardRadius,
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: w * 0.045,
-              vertical: h * 0.014,
-            ),
+            padding: const EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: h * 0.22),
+                  constraints: const BoxConstraints(minHeight: 120),
                   child: Image.asset(
                     imagePath,
                     width: double.infinity,
                     fit: BoxFit.contain,
                   ),
                 ),
-                Container(
+                const SizedBox(height: 16),
+                SizedBox(
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(vertical: h * 0.018),
-                  decoration: BoxDecoration(
-                    color: AppColors.actionButtonYellow,
-                    borderRadius: BorderRadius.circular(w * 0.025),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextComponent(
-                        labelText: buttonLabel,
-                        fontSize: isDesktop
-                            ? w * 0.018
-                            : isTablet
-                                ? w * 0.028
-                                : w * 0.048,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.white,
+                  child: ElevatedButton(
+                    onPressed: isTappable ? onTap : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.textOnDark,
+                      elevation: 0,
+                      padding: ButtonMetrics.actionBarPadding(context),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          ButtonMetrics.actionBarRadius(context),
+                        ),
                       ),
-                      if (notificationCount > 0) ...[
-                        SizedBox(width: w * 0.018),
-                        Container(
-                          constraints: BoxConstraints(
-                            minWidth: w * 0.06,
-                            minHeight: h * 0.03,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextComponent(
+                          labelText: buttonLabel,
+                          fontSize: ButtonMetrics.actionBarFontSize(
+                            context,
+                            isTablet: isTablet,
+                            isDesktop: isDesktop,
                           ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: w * 0.015,
-                            vertical: h * 0.003,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.error,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Center(
-                            child: TextComponent(
-                              labelText: notificationCount > 99
-                                  ? '99+'
-                                  : notificationCount.toString(),
-                              fontSize: isDesktop
-                                  ? w * 0.010
-                                  : isTablet
-                                      ? w * 0.016
-                                      : w * 0.028,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.white,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textOnDark,
+                        ),
+                        if (notificationCount > 0) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            constraints: const BoxConstraints(
+                              minWidth: 24,
+                              minHeight: 24,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.error,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Center(
+                              child: TextComponent(
+                                labelText: notificationCount > 99
+                                    ? '99+'
+                                    : notificationCount.toString(),
+                                fontSize: isDesktop
+                                    ? 10
+                                    : isTablet
+                                        ? 12
+                                        : 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.white,
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ],

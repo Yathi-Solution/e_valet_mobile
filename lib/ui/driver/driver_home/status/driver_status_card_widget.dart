@@ -42,7 +42,7 @@ class DriverStatusCardWidget extends StatelessWidget {
               vertical: 0,
             ),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(screenWidth * 0.03),
             ),
             child: Center(

@@ -23,9 +23,9 @@ class CodeInputField extends StatelessWidget {
       width: screenWidth * 0.15,
       height: screenWidth * 0.15,
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         border: Border.all(
-          color: isFocused ? AppColors.secondary : AppColors.primarySoft,
+          color: isFocused ? AppColors.accent : AppColors.accentSoft,
           width: isFocused ? 2 : 1.5,
         ),
         borderRadius: BorderRadius.circular(8),

@@ -30,6 +30,33 @@ class TokenStorage {
     }
   }
 
+  static const String _cachedParkedSessionsJsonKey = 'cached_parked_sessions_json';
+
+  static Future<void> saveCachedParkedSessionsJson(String json) async {
+    try {
+      await _box.put(_cachedParkedSessionsJsonKey, json);
+    } catch (e) {
+      print('[TokenStorage] Error saving cached parked sessions: $e');
+    }
+  }
+
+  static Future<String?> getCachedParkedSessionsJson() async {
+    try {
+      return _box.get(_cachedParkedSessionsJsonKey) as String?;
+    } catch (e) {
+      print('[TokenStorage] Error reading cached parked sessions: $e');
+      return null;
+    }
+  }
+
+  static Future<void> clearCachedParkedSessions() async {
+    try {
+      await _box.delete(_cachedParkedSessionsJsonKey);
+    } catch (e) {
+      print('[TokenStorage] Error clearing cached parked sessions: $e');
+    }
+  }
+
   static const String _boxName = 'authBox';
 
   // Public getter so other classes can reuse the same box name
@@ -90,6 +117,14 @@ class TokenStorage {
   static const String _connectivityNextFlushDueUtcMillisKey =
       'connectivity_next_flush_due_utc_millis';
 
+  /// Whether connectivity logging / features are enabled for this driver (from GET /connectivity/settings/me).
+  static const String _driverConnectivityEnabledKey =
+      'driver_connectivity_enabled_v1';
+
+  /// OutletId returned by the latest /connectivity/settings/me call.
+  static const String _driverConnectivitySettingsOutletIdKey =
+      'driver_connectivity_settings_outlet_id_v1';
+
   /// Legacy single id (migrated into [_collectKeysInTransitSessionIdsKey]).
   static const String _collectKeysInTransitSessionIdKey =
       'collect_keys_in_transit_session_id';
@@ -105,6 +140,13 @@ class TokenStorage {
       'retrieval_confirm_flow_cooldown_until';
 
   static const Duration _retrievalConfirmFlowCooldown = Duration(seconds: 45);
+
+  /// Card numbers allocated to this driver (from GET /drivers/my-cards).
+  /// Used to restrict tag/QR entry at park time to only the driver's own cards.
+  static const String _driverAssignedCardNumbersKey =
+      'driver_assigned_card_numbers_v1';
+  static const String _driverAssignedCardsLoadedKey =
+      'driver_assigned_cards_loaded_v1';
 
   /// Must be called once at app start (after Hive.initFlutter()).
   static Future<void> init() async {
@@ -1216,12 +1258,108 @@ class TokenStorage {
     } catch (_) {}
   }
 
+  // Driver assigned cards (for park-time ownership check against local allocation)
+  static Future<void> saveDriverAssignedCardNumbers(List<int> cardNumbers) async {
+    try {
+      await _box.put(_driverAssignedCardNumbersKey, cardNumbers);
+      await _box.put(_driverAssignedCardsLoadedKey, true);
+    } catch (e) {
+      print('[TokenStorage] Error saving driver assigned cards: $e');
+    }
+  }
+
+  static Future<List<int>> getDriverAssignedCardNumbers() async {
+    try {
+      final raw = _box.get(_driverAssignedCardNumbersKey);
+      if (raw is List) {
+        return raw.whereType<int>().toList(growable: false);
+      }
+      return const <int>[];
+    } catch (e) {
+      print('[TokenStorage] Error reading driver assigned cards: $e');
+      return const <int>[];
+    }
+  }
+
+  /// Sync getter for use in submit guards and other non-async contexts.
+  static List<int> getDriverAssignedCardNumbersSync() {
+    try {
+      if (!Hive.isBoxOpen(_boxName)) return const <int>[];
+      final raw = Hive.box(_boxName).get(_driverAssignedCardNumbersKey);
+      if (raw is List) {
+        return raw.whereType<int>().toList(growable: false);
+      }
+      return const <int>[];
+    } catch (_) {
+      return const <int>[];
+    }
+  }
+
+  /// Returns true only if the card number is in the driver's locally stored allocation list.
+  /// An empty list blocks all cards until cards are fetched and saved (login, splash, or My Cards sync).
+  static bool isDriverCardNumberAllowedSync(int cardNumber) {
+    final cards = getDriverAssignedCardNumbersSync();
+    if (cards.isEmpty) return false;
+    return cards.contains(cardNumber);
+  }
+
+  /// False while GET /drivers/my-cards is still running after login.
+  static bool isDriverAssignedCardsLoadedSync() {
+    try {
+      if (!Hive.isBoxOpen(_boxName)) return false;
+      return (Hive.box(_boxName).get(_driverAssignedCardsLoadedKey) as bool?) ??
+          false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<void> markDriverAssignedCardsLoading() async {
+    try {
+      await _box.put(_driverAssignedCardsLoadedKey, false);
+    } catch (e) {
+      print('[TokenStorage] Error marking driver cards loading: $e');
+    }
+  }
+
+  static Future<bool> hasDriverAssignedCardNumbers() async {
+    final cards = await getDriverAssignedCardNumbers();
+    return cards.isNotEmpty;
+  }
+
+  /// Clears locally stored card allocation only when data from a prior session exists.
+  static Future<bool> clearDriverAssignedCardNumbersIfPresent() async {
+    if (!await hasDriverAssignedCardNumbers()) return false;
+    await clearDriverAssignedCardNumbers();
+    return true;
+  }
+
+  static Future<void> clearDriverAssignedCardNumbers() async {
+    try {
+      await _box.delete(_driverAssignedCardNumbersKey);
+      await _box.delete(_driverAssignedCardsLoadedKey);
+    } catch (e) {
+      print('[TokenStorage] Error clearing driver assigned cards: $e');
+    }
+  }
+
+  static void clearDriverAssignedCardNumbersSync() {
+    try {
+      if (!Hive.isBoxOpen(_boxName)) return;
+      final box = Hive.box(_boxName);
+      box.delete(_driverAssignedCardNumbersKey);
+      box.delete(_driverAssignedCardsLoadedKey);
+    } catch (_) {}
+  }
+
   static Future<void> clearDriverConnectivityLogData() async {
     try {
       await _box.delete(_driverConnectivityShiftIdKey);
       await _box.delete(_driverConnectivityOutletIdKey);
       await _box.delete(_connectivityPendingEventsJsonKey);
       await _box.delete(_connectivityNextFlushDueUtcMillisKey);
+      await _box.delete(_driverConnectivityEnabledKey);
+      await _box.delete(_driverConnectivitySettingsOutletIdKey);
     } catch (e) {
       print('[TokenStorage] Error clearing driver connectivity log: $e');
     }
@@ -1258,6 +1396,69 @@ class TokenStorage {
       return int.tryParse(v?.toString() ?? '');
     } catch (e) {
       print('[TokenStorage] Error reading driver connectivity outletId: $e');
+      return null;
+    }
+  }
+
+  /// Persists whether connectivity features are enabled for this driver (from the settings API).
+  static Future<void> saveDriverConnectivityEnabled(bool isEnabled) async {
+    try {
+      await _box.put(_driverConnectivityEnabledKey, isEnabled);
+      print('[TokenStorage] Saved driverConnectivityEnabled = $isEnabled');
+    } catch (e) {
+      print('[TokenStorage] Error saving driver connectivity enabled flag: $e');
+    }
+  }
+
+  /// Returns the last known value of driver connectivity enabled flag.
+  /// Defaults to true if never fetched.
+  static Future<bool> getDriverConnectivityEnabled() async {
+    try {
+      final v = _box.get(_driverConnectivityEnabledKey);
+      if (v is bool) return v;
+      // Default to true if not present (fail open for logging)
+      return true;
+    } catch (e) {
+      print('[TokenStorage] Error reading driver connectivity enabled flag: $e');
+      return true;
+    }
+  }
+
+  /// Saves the full response data from GET /connectivity/settings/me.
+  /// This should be called after every successful driver login (after clearing previous data).
+  static Future<void> saveDriverConnectivitySettings({
+    required int outletId,
+    required bool isEnabled,
+  }) async {
+    try {
+      await _box.put(_driverConnectivityEnabledKey, isEnabled);
+      await _box.put(_driverConnectivitySettingsOutletIdKey, outletId);
+      // Silent on success — only errors are printed
+    } catch (e) {
+      print('[TokenStorage] Error saving driver connectivity settings: $e');
+    }
+  }
+
+  /// Clears only the connectivity settings data fetched from /connectivity/settings/me.
+  /// Called on every new driver login before storing fresh data.
+  static Future<void> clearDriverConnectivitySettings() async {
+    try {
+      await _box.delete(_driverConnectivityEnabledKey);
+      await _box.delete(_driverConnectivitySettingsOutletIdKey);
+      // Silent clear on every login — only errors are printed
+    } catch (e) {
+      print('[TokenStorage] Error clearing driver connectivity settings: $e');
+    }
+  }
+
+  /// Optional: get the outletId that was returned by the last /connectivity/settings/me call.
+  static Future<int?> getDriverConnectivitySettingsOutletId() async {
+    try {
+      final v = _box.get(_driverConnectivitySettingsOutletIdKey);
+      if (v is int) return v;
+      return int.tryParse(v?.toString() ?? '');
+    } catch (e) {
+      print('[TokenStorage] Error reading driver connectivity settings outletId: $e');
       return null;
     }
   }
@@ -1371,6 +1572,8 @@ class TokenStorage {
     await clearSelectedOutlet();
     await clearCurrentLocation();
     await clearDriverConnectivityLogData();
+    await clearDriverAssignedCardNumbers();
+    await clearCachedParkedSessions();
     await _box.delete(_confirmArrivalDisableSecondsKey);
     await _box.delete(_confirmArrivalDisabledUntilBySessionKey);
     await _box.delete(_confirmArrivalTimerStartedBySessionKey);

@@ -130,7 +130,7 @@ class _NewPasswordStepState extends State<NewPasswordStep> {
                               );
                         }
                       : () {},
-                  elevatedButtonBackgroundColor: AppColors.accent,
+                  elevatedButtonBackgroundColor: AppColors.primary,
                   radius: 8,
                   fontSize: 16,
                   fontColor: AppColors.white,

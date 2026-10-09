@@ -6,8 +6,8 @@ import 'package:niloufer_valet_mobile/services/translations/app_translations_not
 import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_event.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_state.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 
 class DriverBreakToggleWidget extends StatelessWidget {
   final double screenWidth;
@@ -21,78 +21,128 @@ class DriverBreakToggleWidget extends StatelessWidget {
     required this.isDesktop,
   });
 
+  double get _labelFontSize => isDesktop
+      ? screenWidth * 0.012
+      : isTablet
+          ? screenWidth * 0.02
+          : screenWidth * 0.035;
+
   @override
   Widget build(BuildContext context) {
     final t = context.watch<AppTranslationsNotifier>();
     return BlocBuilder<DriverStatusBloc, DriverStatusState>(
       builder: (context, statusState) {
-        // Get break status from API, fallback to false if not loaded yet
         final isOnBreak = statusState is DriverStatusLoaded
             ? statusState.status.isOnBreak
             : statusState is DriverBreakToggleLoading
                 ? statusState.previousStatus?.isOnBreak ?? false
                 : false;
 
-        // Check if we're in a loading state (updating break status)
         final isLoading = statusState is DriverStatusLoading ||
             statusState is DriverBreakToggleLoading;
+
+        final label = isOnBreak
+            ? t.getByKey('onBreakScreen', TextConstants.headerOnBreak)
+            : t.getByKey(
+                TextConstants.i18nKeyAvailable, TextConstants.availableLabel);
 
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextComponent(
-              labelText:
-                  t.getByKey('onBreakScreen', TextConstants.headerOnBreak),
-              fontSize: isDesktop
-                  ? screenWidth * 0.012
-                  : isTablet
-                      ? screenWidth * 0.02
-                      : screenWidth * 0.035,
-              fontWeight: FontWeight.w400,
-              color: AppColors.white,
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: TextComponent(
+                key: ValueKey<String>(label),
+                labelText: label,
+                fontSize: _labelFontSize,
+                fontWeight: FontWeight.w400,
+                color: AppColors.white,
+              ),
             ),
             SizedBox(width: screenWidth * 0.02),
-            // Show loader when updating break status, otherwise show switch
             isLoading
                 ? SizedBox(
-                    width: isDesktop
-                        ? screenWidth * 0.025
-                        : isTablet
-                            ? screenWidth * 0.035
-                            : screenWidth * 0.045,
-                    height: isDesktop
-                        ? screenWidth * 0.025
-                        : isTablet
-                            ? screenWidth * 0.035
-                            : screenWidth * 0.045,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.white,
+                    width: 44,
+                    height: 44,
+                    child: Center(
+                      child: SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppColors.white,
+                          ),
+                        ),
                       ),
                     ),
                   )
-                : Transform.scale(
-                    scale: isDesktop
-                        ? 0.6
-                        : isTablet
-                            ? 0.7
-                            : 0.75,
-                    child: Switch(
-                      value: isOnBreak,
-                      onChanged: (value) {
-                        context.read<DriverStatusBloc>().add(
-                              DriverBreakToggled(value),
-                            );
-                      },
-                      activeColor: AppColors.white,
-                      inactiveThumbColor: AppColors.grey,
-                      inactiveTrackColor: AppColors.greyLight,
+                : Semantics(
+                    button: true,
+                    label: isOnBreak ? 'On break, tap to go available' : 'Available, tap to go on break',
+                    child: SizedBox(
+                      width: 44,
+                      height: 44,
+                      child: Center(
+                        child: _BreakToggle(
+                          value: isOnBreak,
+                          onChanged: (value) {
+                            context.read<DriverStatusBloc>().add(
+                                  DriverBreakToggled(value),
+                                );
+                          },
+                        ),
+                      ),
                     ),
                   ),
           ],
         );
       },
+    );
+  }
+}
+
+class _BreakToggle extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _BreakToggle({
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const trackWidth = 48.0;
+    const trackHeight = 28.0;
+    const thumbSize = 22.0;
+
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        width: trackWidth,
+        height: trackHeight,
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: value ? AppColors.coral : AppColors.trackGray,
+          borderRadius: BorderRadius.circular(trackHeight / 2),
+        ),
+        child: AnimatedAlign(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            width: thumbSize,
+            height: thumbSize,
+            decoration: const BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

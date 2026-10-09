@@ -58,7 +58,7 @@ class AssignmentConfirmationDialog extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close),
                   iconSize: MediaQuery.of(context).size.width * 0.02,
-                  color: AppColors.grey,
+                  color: AppColors.mutedText,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -115,7 +115,7 @@ class AssignmentConfirmationDialog extends StatelessWidget {
                                   Icons.phone_outlined,
                                   size:
                                       MediaQuery.of(context).size.width * 0.014,
-                                  color: AppColors.grey,
+                                  color: AppColors.mutedText,
                                 ),
                                 SizedBox(
                                     width: MediaQuery.of(context).size.width *
@@ -124,7 +124,7 @@ class AssignmentConfirmationDialog extends StatelessWidget {
                                   labelText: driver.phone,
                                   fontSize:
                                       MediaQuery.of(context).size.width * 0.014,
-                                  color: AppColors.grey,
+                                  color: AppColors.mutedText,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ],
@@ -184,7 +184,7 @@ class AssignmentConfirmationDialog extends StatelessWidget {
                                     Icons.directions_car,
                                     size: MediaQuery.of(context).size.width *
                                         0.035,
-                                    color: AppColors.grey,
+                                    color: AppColors.mutedText,
                                   ),
                                 );
                               },
@@ -199,7 +199,7 @@ class AssignmentConfirmationDialog extends StatelessWidget {
                               child: Icon(
                                 Icons.directions_car,
                                 size: MediaQuery.of(context).size.width * 0.035,
-                                color: AppColors.grey,
+                                color: AppColors.mutedText,
                               ),
                             ),
                     ),
@@ -212,7 +212,7 @@ class AssignmentConfirmationDialog extends StatelessWidget {
                         TextComponent(
                           labelText: t.get(TextConstants.cardNumberLabel),
                           fontSize: MediaQuery.of(context).size.width * 0.012,
-                          color: AppColors.grey,
+                          color: AppColors.mutedText,
                         ),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.003),
@@ -242,7 +242,7 @@ class AssignmentConfirmationDialog extends StatelessWidget {
                       padding: EdgeInsets.symmetric(
                         vertical: MediaQuery.of(context).size.height * 0.018,
                       ),
-                      side: BorderSide(color: AppColors.grey, width: 1.5),
+                      side: BorderSide(color: AppColors.mutedText, width: 1.5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -250,7 +250,7 @@ class AssignmentConfirmationDialog extends StatelessWidget {
                     child: TextComponent(
                       labelText: t.get(TextConstants.cancelText),
                       fontSize: MediaQuery.of(context).size.width * 0.016,
-                      color: AppColors.grey,
+                      color: AppColors.mutedText,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

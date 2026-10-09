@@ -10,6 +10,10 @@ class OfflineParkingPhoto {
   final String? sessionId;
   final bool isReparking;
   final String timestamp;
+  /// Card number for this park (used for local parked-cars list and offline check-in sync).
+  final int? cardNumber;
+  /// True when scanner/check-in submit already reached the server; only park API remains.
+  final bool checkinSubmittedOnServer;
 
   OfflineParkingPhoto({
     this.imagePath,
@@ -21,6 +25,8 @@ class OfflineParkingPhoto {
     this.sessionId,
     required this.isReparking,
     required this.timestamp,
+    this.cardNumber,
+    this.checkinSubmittedOnServer = false,
   });
 }
 
@@ -34,6 +40,8 @@ class OfflineParkingPhotoAdapter extends TypeAdapter<OfflineParkingPhoto> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
+    final sessionId = fields[5] as String?;
+    final offlineSession = (sessionId ?? '').trim().startsWith('offline-');
     return OfflineParkingPhoto(
       imagePath: fields[0] as String?,
       latitude: fields[1] as double,
@@ -41,16 +49,20 @@ class OfflineParkingPhotoAdapter extends TypeAdapter<OfflineParkingPhoto> {
       accuracy: fields[3] as double?,
       parkingLocation: fields[4] as String?,
       vehicleNumber: fields[8] as String?,
-      sessionId: fields[5] as String?,
+      sessionId: sessionId,
       isReparking: fields[6] as bool,
       timestamp: fields[7] as String,
+      cardNumber: fields.containsKey(9) ? fields[9] as int? : null,
+      checkinSubmittedOnServer: fields.containsKey(10)
+          ? (fields[10] as bool? ?? false)
+          : !offlineSession,
     );
   }
 
   @override
   void write(BinaryWriter writer, OfflineParkingPhoto obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.imagePath)
       ..writeByte(1)
@@ -68,6 +80,10 @@ class OfflineParkingPhotoAdapter extends TypeAdapter<OfflineParkingPhoto> {
       ..writeByte(7)
       ..write(obj.timestamp)
       ..writeByte(8)
-      ..write(obj.vehicleNumber);
+      ..write(obj.vehicleNumber)
+      ..writeByte(9)
+      ..write(obj.cardNumber)
+      ..writeByte(10)
+      ..write(obj.checkinSubmittedOnServer);
   }
 }

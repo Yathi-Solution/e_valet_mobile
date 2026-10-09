@@ -77,7 +77,7 @@ class PreviewCarBloc extends Bloc<PreviewCarEvent, PreviewCarState> {
     } catch (e) {
       debugPrint('[PreviewCarBloc] Park API error: $e');
       // If vehicle is already parked or session already in progress, treat as success
-      final msg = (e is ApiException ? e.message : e.toString()).toUpperCase();
+      final msg = (e is ApiException ? e.displayMessage : getDisplayErrorMessage(e)).toUpperCase();
       if ((msg.contains('PARKED') && msg.contains('CHECKED_IN')) ||
           (msg.contains('ALREADY') && msg.contains('CHECKED'))) {
         debugPrint('Park/session already in progress, treating as success');
@@ -90,7 +90,7 @@ class PreviewCarBloc extends Bloc<PreviewCarEvent, PreviewCarState> {
       try {
         // Save photo to offline storage
         final offlinePhoto = OfflineParkingPhoto(
-          imagePath: imagePathToUse, // Use the compressed path
+          imagePath: imagePathToUse,
           latitude: event.latitude,
           longitude: event.longitude,
           accuracy: event.accuracy,
@@ -99,6 +99,8 @@ class PreviewCarBloc extends Bloc<PreviewCarEvent, PreviewCarState> {
           sessionId: event.sessionId,
           isReparking: event.isReparking,
           timestamp: DateTime.now().toIso8601String(),
+          cardNumber: event.cardNumber,
+          checkinSubmittedOnServer: event.checkinSubmittedOnServer,
         );
 
         await OfflineParkingService.saveParkingPhoto(offlinePhoto);

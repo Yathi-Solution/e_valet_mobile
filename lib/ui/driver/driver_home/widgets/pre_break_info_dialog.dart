@@ -355,9 +355,9 @@ class _PreBreakInfoDialogState extends State<PreBreakInfoDialog> {
               : _onSelectDriverTap,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
-            foregroundColor: AppColors.black,
+            foregroundColor: AppColors.textOnDark,
             disabledBackgroundColor: AppColors.greyLight,
-            disabledForegroundColor: AppColors.grey,
+            disabledForegroundColor: AppColors.mutedText,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -369,7 +369,8 @@ class _PreBreakInfoDialogState extends State<PreBreakInfoDialog> {
                   width: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.black),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColors.textOnDark),
                   ),
                 )
               : TextComponent(
@@ -378,7 +379,7 @@ class _PreBreakInfoDialogState extends State<PreBreakInfoDialog> {
                     TextConstants.pendingWorkSelectDriver,
                   ),
                   fontWeight: FontWeight.w700,
-                  color: AppColors.black,
+                  color: AppColors.textOnDark,
                 ),
         ),
       ],

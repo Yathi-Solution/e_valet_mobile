@@ -24,7 +24,7 @@ class OutletSelectionDialog extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.primarySurface,
         child: ConstrainedBox(
           constraints: const BoxConstraints(
             maxWidth: 480,

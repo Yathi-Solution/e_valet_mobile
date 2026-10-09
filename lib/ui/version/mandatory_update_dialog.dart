@@ -97,7 +97,7 @@ class MandatoryUpdateDialog extends StatelessWidget {
                 onPressed: _openStore,
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.black,
+                  foregroundColor: AppColors.textOnDark,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -108,6 +108,7 @@ class MandatoryUpdateDialog extends StatelessWidget {
                       t.get(TextConstants.mandatoryUpdateDialogUpdateNow),
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: AppColors.textOnDark,
                 ),
               ),
             ),

@@ -23,7 +23,7 @@ class SessionCard extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
@@ -54,7 +54,7 @@ class SessionCard extends StatelessWidget {
                         TextComponent(
                           labelText: t.get(TextConstants.cardNumber),
                           fontSize: screenWidth * 0.028,
-                          color: AppColors.grey,
+                          color: AppColors.mutedText,
                         ),
                         Spacer(),
                         TextComponent(

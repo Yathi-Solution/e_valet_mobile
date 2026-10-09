@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:niloufer_valet_mobile/api/operator/operator_overtime/grant_overtime_api_service.dart';
 import 'package:niloufer_valet_mobile/api/operator/operator_valet/valet_list_api_service.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_overtime/grant_overtime_request.dart';
 import 'package:niloufer_valet_mobile/bloc/operator/operator_overtime/operator_overtime_event.dart';
 import 'package:niloufer_valet_mobile/bloc/operator/operator_overtime/operator_overtime_state.dart';
@@ -22,7 +23,7 @@ class OperatorOvertimeBloc
           await ValetListApiService.getValets(outletId: event.outletId);
       emit(OperatorOvertimeLoaded(valets: response.valets));
     } catch (e) {
-      emit(OperatorOvertimeLoadError(message: e.toString()));
+      emit(OperatorOvertimeLoadError(message: getDisplayErrorMessage(e)));
     }
   }
 
@@ -59,7 +60,7 @@ class OperatorOvertimeBloc
     } catch (e) {
       emit(OperatorOvertimeGrantError(
         valets: valets,
-        message: e.toString(),
+        message: getDisplayErrorMessage(e),
       ));
       emit(OperatorOvertimeLoaded(valets: valets));
     }

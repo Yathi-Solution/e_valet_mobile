@@ -203,12 +203,12 @@ class _RetrievalRequestCardState extends State<RetrievalRequestCard>
         builder: (context, child) {
           final pulse = widget.isHighlighted ? _highlightAnimation.value : 0.0;
           final baseBorderColor = (_manualDragDropEnabled && _isDraggingOver)
-              ? AppColors.primary
+              ? AppColors.accent
               : _statusColor();
           final baseBackgroundColor =
               (_manualDragDropEnabled && _isDraggingOver)
-                  ? AppColors.primary.withOpacity(0.05)
-                  : AppColors.white;
+                  ? AppColors.accentSoft
+                  : AppColors.cardBackground;
           final highlightBorderColor =
               Color.lerp(baseBorderColor, AppColors.accent, pulse) ??
                   baseBorderColor;
@@ -219,7 +219,7 @@ class _RetrievalRequestCardState extends State<RetrievalRequestCard>
               ) ??
               baseBackgroundColor;
           final baseShadowColor = (_manualDragDropEnabled && _isDraggingOver)
-              ? AppColors.primary.withOpacity(0.3)
+              ? AppColors.accent.withOpacity(0.3)
               : AppColors.grey.withOpacity(0.1);
           final highlightShadowColor = Color.lerp(
                 baseShadowColor,
@@ -287,7 +287,7 @@ class _RetrievalRequestCardState extends State<RetrievalRequestCard>
                                   Icons.directions_car,
                                   size:
                                       MediaQuery.of(context).size.width * 0.04,
-                                  color: AppColors.grey,
+                                  color: AppColors.mutedText,
                                 ),
                               );
                             },
@@ -299,7 +299,7 @@ class _RetrievalRequestCardState extends State<RetrievalRequestCard>
                             child: Icon(
                               Icons.directions_car,
                               size: MediaQuery.of(context).size.width * 0.04,
-                              color: AppColors.grey,
+                              color: AppColors.mutedText,
                             ),
                           ),
                   ),
@@ -444,7 +444,7 @@ class _RetrievalRequestCardState extends State<RetrievalRequestCard>
                             labelText:
                                 '${t.get(TextConstants.requestedAt)} ${RetrievalRequestUtils.formatTime(widget.request.requestedAt)}',
                             fontSize: MediaQuery.of(context).size.width * 0.014,
-                            color: AppColors.grey,
+                            color: AppColors.mutedText,
                             fontWeight: FontWeight.w500,
                           ),
                         ],
@@ -457,7 +457,7 @@ class _RetrievalRequestCardState extends State<RetrievalRequestCard>
                           TextComponent(
                             labelText: t.get(TextConstants.parkedByLabel),
                             fontSize: MediaQuery.of(context).size.width * 0.014,
-                            color: AppColors.grey,
+                            color: AppColors.mutedText,
                           ),
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.004,
@@ -482,7 +482,7 @@ class _RetrievalRequestCardState extends State<RetrievalRequestCard>
                             child: Icon(
                               Icons.phone_outlined,
                               size: MediaQuery.of(context).size.width * 0.016,
-                              color: AppColors.grey,
+                              color: AppColors.mutedText,
                             ),
                           ),
                         ],
@@ -497,7 +497,7 @@ class _RetrievalRequestCardState extends State<RetrievalRequestCard>
                               labelText: t.get(TextConstants.assignedToLabel),
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.014,
-                              color: AppColors.grey,
+                              color: AppColors.mutedText,
                             ),
                             TextComponent(
                               labelText: widget.request.assignedTo.name,
@@ -520,7 +520,7 @@ class _RetrievalRequestCardState extends State<RetrievalRequestCard>
                               child: Icon(
                                 Icons.phone_outlined,
                                 size: MediaQuery.of(context).size.width * 0.016,
-                                color: AppColors.grey,
+                                color: AppColors.mutedText,
                               ),
                             ),
                           ],

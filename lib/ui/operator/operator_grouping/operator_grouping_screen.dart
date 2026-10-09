@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:niloufer_valet_mobile/api/operator/operator_grouping/operator_driver_groups_api_service.dart';
 import 'package:niloufer_valet_mobile/api/operator/operator_valet/valet_list_api_service.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group_member.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
@@ -10,6 +11,7 @@ import 'package:niloufer_valet_mobile/services/translations/app_translations_not
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
+import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 import 'package:niloufer_valet_mobile/ui/guidelines/guidelines_screen.dart';
 import 'package:niloufer_valet_mobile/ui/help_support/help_screen.dart';
@@ -131,7 +133,7 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
                   'removeMemberConfirm',
                   'Are you sure you want to remove this driver from this group?',
                 ),
-                color: AppColors.grey,
+                color: AppColors.mutedText,
                 fontSize: 16,
                 maxLines: 4,
               ),
@@ -192,16 +194,7 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: AppColors.error,
-          content: TextComponent(
-            labelText: e.toString(),
-            color: AppColors.white,
-            maxLines: 3,
-          ),
-        ),
-      );
+      SnackBars.showErrorSnackBar(context, getDisplayErrorMessage(e));
     }
   }
 
@@ -293,7 +286,7 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.primarySurface,
         endDrawer: OperatorDrawer(
           selectedIndex: 9,
           onItemSelected: _onMenuItemSelected,
@@ -354,7 +347,7 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
                             ],
                             TextConstants.driversGroupSubtitle,
                           ),
-                          color: AppColors.grey,
+                          color: AppColors.mutedText,
                           fontSize: headerDescriptionFontSize,
                         ),
                       ],
@@ -421,8 +414,8 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
                               ),
                               const SizedBox(height: 8),
                               TextComponent(
-                                labelText: snapshot.error.toString(),
-                                color: AppColors.grey,
+                                labelText: getDisplayErrorMessage(snapshot.error),
+                                color: AppColors.mutedText,
                                 fontSize: 12,
                                 textAlign: TextAlign.center,
                                 maxLines: 4,
@@ -452,7 +445,7 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
                               'groupingNoGroups',
                               'No groups found',
                             ),
-                            color: AppColors.grey,
+                            color: AppColors.mutedText,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             textAlign: TextAlign.center,
