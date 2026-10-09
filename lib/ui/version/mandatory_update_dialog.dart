@@ -10,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// Play Store link for Niloufer Valet app.
 const String kPlayStoreUrl =
-    'https://play.google.com/store/apps/details?id=com.niloufer.valet&pcampaignid=web_share';
+    'https://play.google.com/store/apps/details?id=com.yathi.evalet&pcampaignid=web_share';
 
 /// App Store link for Niloufer Valet app (iOS).
 const String kAppStoreUrl =
