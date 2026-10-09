@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:niloufer_valet_mobile/api/operator/operator_grouping/operator_driver_groups_api_service.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group_member.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
@@ -226,7 +227,7 @@ class _OperatorGroupMembersScreenState
                             ),
                             const SizedBox(height: 8),
                             TextComponent(
-                              labelText: snapshot.error.toString(),
+                              labelText: getDisplayErrorMessage(snapshot.error),
                               color: AppColors.mutedText,
                               fontSize: 12,
                               textAlign: TextAlign.center,

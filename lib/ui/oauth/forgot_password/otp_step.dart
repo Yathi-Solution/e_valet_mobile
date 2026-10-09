@@ -96,7 +96,7 @@ class _OtpStepState extends State<OtpStep> {
       }
     } on ApiException catch (e) {
       if (mounted) {
-        SnackBars.showErrorSnackBar(context, e.message);
+        SnackBars.showErrorSnackBar(context, e.displayMessage);
       }
     } catch (_) {
       if (mounted) {

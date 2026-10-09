@@ -14,7 +14,6 @@ import 'package:niloufer_valet_mobile/services/notification/firebase_messaging_s
 import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 import 'package:niloufer_valet_mobile/services/version/version_service.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/park_flow_signals.dart';
 import 'package:niloufer_valet_mobile/ui/oauth/splash/splash.dart';
 import 'package:niloufer_valet_mobile/services/background/background_sync_service.dart';
 import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
@@ -25,8 +24,6 @@ import 'package:provider/provider.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_event.dart';
-import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/no_internet_overlay.dart';
 import 'package:niloufer_valet_mobile/api/oauth/refresh_api_service.dart';
 import 'package:niloufer_valet_mobile/services/permissions/permissions_service.dart';
 import 'package:niloufer_valet_mobile/ui/oauth/login/login.dart';
@@ -184,34 +181,8 @@ class MyApp extends StatelessWidget {
             ),
           ),
           builder: (context, child) {
-            return BlocBuilder<ConnectivityBloc, ConnectivityState>(
-              builder: (context, state) {
-                if (state is ConnectivityOnline) {
-                  ScaffoldMessenger.of(context).clearMaterialBanners();
-                }
-
-                final showNoInternet = state is ConnectivityUnavailable &&
-                    !ParkFlowSignals.shouldSuppressNoInternetOverlay;
-
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    _AppLifecycleHandler(
-                      child: child ?? const SizedBox.shrink(),
-                    ),
-                    if (showNoInternet)
-                      Positioned.fill(
-                        child: NoInternetOverlay(
-                          onRetry: () {
-                            context
-                                .read<ConnectivityBloc>()
-                                .add(CheckConnectivity());
-                          },
-                        ),
-                      ),
-                  ],
-                );
-              },
+            return _AppLifecycleHandler(
+              child: child ?? const SizedBox.shrink(),
             );
           },
         ),

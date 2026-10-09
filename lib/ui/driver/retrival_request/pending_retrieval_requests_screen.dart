@@ -10,6 +10,7 @@ import 'package:niloufer_valet_mobile/bloc/driver/pass_available_drivers/pass_av
 import 'package:niloufer_valet_mobile/bloc/retrival_request/retrival_request_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/retrival_request/retrival_request_event.dart';
 import 'package:niloufer_valet_mobile/bloc/retrival_request/retrival_requesy_state.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/driver/session/assigned_session.dart';
 import 'package:niloufer_valet_mobile/models/driver/session/pending_session.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
@@ -428,7 +429,7 @@ class _PendingRetrievalRequestsScreenState
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: TextComponent(
-                labelText: _error.toString(),
+                labelText: getDisplayErrorMessage(_error),
                 textAlign: TextAlign.center,
                 color: AppColors.error,
               ),

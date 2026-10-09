@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
@@ -104,7 +105,7 @@ class GroupingDialogValetField extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextComponent(
-                        labelText: assignedSnap.error.toString(),
+                        labelText: getDisplayErrorMessage(assignedSnap.error),
                         color: AppColors.error,
                         fontWeight: FontWeight.w600,
                         maxLines: 3,

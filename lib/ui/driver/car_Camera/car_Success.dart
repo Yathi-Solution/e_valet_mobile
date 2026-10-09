@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
+import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/ui/common/colors.dart';
 import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
@@ -37,8 +40,20 @@ class _CarSuccessScreenState extends State<CarSuccessScreen> {
   @override
   void initState() {
     super.initState();
+    // After a successful park, the previous "pending session" id must be cleared.
+    // Otherwise, the pending-session watchdog in `DriverOnlineContent` will detect
+    // it as "cancelled" on the next Park attempt and pop the user back to Home.
     TokenStorage.clearSessionId();
     TokenStorage.clearSessionIdFromGetApi();
+    // Deferred retrieval ids stay in Hive until Confirm Arrival / handover completes.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      try {
+        context
+            .read<DriverMenuBloc>()
+            .add(const DriverPendingSessionsRefresh());
+      } catch (_) {}
+    });
     _autoReturnTimer = Timer(_autoReturnDuration, _navigateToHome);
   }
 
