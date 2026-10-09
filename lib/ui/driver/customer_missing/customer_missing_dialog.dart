@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/initiate_repark/initiate_repark_bloc.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/initiate_repark/initiate_repark_event.dart';
 import 'package:niloufer_valet_mobile/bloc/driver/initiate_repark/initiate_repark_state.dart';
@@ -217,7 +218,7 @@ class _CustomerMissingDialogState extends State<CustomerMissingDialog> {
                               setState(() => _isProcessing = false);
                               SnackBars.showErrorSnackBar(
                                 context,
-                                'Failed to get location: ${e.toString()}',
+                                'Failed to get location: ${getDisplayErrorMessage(e)}',
                               );
                             }
                           },

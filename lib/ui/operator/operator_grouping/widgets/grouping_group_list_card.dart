@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group_member.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
@@ -158,7 +159,7 @@ class GroupingGroupListCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         TextComponent(
-                          labelText: membersSnap.error.toString(),
+                          labelText: getDisplayErrorMessage(membersSnap.error),
                           color: AppColors.mutedText,
                           fontSize: 12,
                           maxLines: 3,

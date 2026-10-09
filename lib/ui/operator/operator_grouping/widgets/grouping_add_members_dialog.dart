@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:niloufer_valet_mobile/api/operator/operator_grouping/operator_driver_groups_api_service.dart';
+import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_grouping/add_group_member_request.dart';
 import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
@@ -66,7 +67,7 @@ class GroupingAddMembersDialog {
       } catch (e) {
         if (!dialogCtx.mounted) return;
         setLocalState(() {
-          errorText = e.toString();
+          errorText = getDisplayErrorMessage(e);
           isSubmitting = false;
         });
       }

@@ -6,8 +6,9 @@ import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 import 'package:niloufer_valet_mobile/ui/operator/operator_cards/card_numbers_input.dart';
 
 /// Dialog to enter physical **card numbers** for one driver (not a total count).
-/// On Save, calls [CardAssignmentsApiService.submitCardAssignments], then pops
-/// with the saved list on success.
+/// On Save, calls [CardAssignmentsApiService.assignCardNumbersToDriver] (PATCH),
+/// which sets the complete desired list for the driver (handles adds and removes),
+/// then pops with the saved list on success.
 class CardAllocationEditDialog extends StatefulWidget {
   final String driverName;
   final String driverUserId;
@@ -87,22 +88,17 @@ class _CardAllocationEditDialogState extends State<CardAllocationEditDialog> {
       final initialSet = widget.initialCardNumbers.toSet();
       final editedSet = parsed.numbers.toSet();
 
-      final removedCards = initialSet.difference(editedSet).toList()..sort();
-      for (final cardNumber in removedCards) {
-        await CardAssignmentsApiService.unassignCardNumber(
-          outletId: widget.outletId,
-          cardNumber: cardNumber,
-        );
-      }
-
-      final hasAnyCardsAfterEdit = parsed.numbers.isNotEmpty;
+      final removedCards = initialSet.difference(editedSet).toList();
       final addedCards = editedSet.difference(initialSet);
       final hasChanged = removedCards.isNotEmpty || addedCards.isNotEmpty;
-      if (hasAnyCardsAfterEdit && hasChanged) {
-        await CardAssignmentsApiService.submitCardAssignments(
-          outletId: widget.outletId,
+
+      if (hasChanged) {
+        // Use the PATCH endpoint to set the full desired cardNumbers for this driver.
+        // The server computes added/removed internally.
+        await CardAssignmentsApiService.assignCardNumbersToDriver(
           driverUserId: widget.driverUserId,
-          cardIds: parsed.numbers,
+          outletId: widget.outletId,
+          cardNumbers: parsed.numbers,
         );
       }
 
@@ -118,7 +114,7 @@ class _CardAllocationEditDialogState extends State<CardAllocationEditDialog> {
       if (!mounted) return;
       setState(() {
         _isSubmitting = false;
-        _apiError = e.toString();
+        _apiError = getDisplayErrorMessage(e);
       });
     }
   }
