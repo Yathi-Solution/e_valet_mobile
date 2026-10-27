@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:niloufer_valet_mobile/models/notification/notification_type.dart';
 import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -235,7 +236,7 @@ class FirebaseMessagingService implements NotificationService {
 
       // Retrieval request arrived while app is in foreground — start vibration
       // immediately and trigger the same session-refresh that background taps use.
-      if (data['type'] == 'retrieval_request') {
+      if (isRetrievalAlertType(data['type'] as String?)) {
         VibrationController.startRetrievalAlert();
         _retrievalNotificationTapController.add(null);
       }
@@ -303,7 +304,7 @@ class FirebaseMessagingService implements NotificationService {
     try {
       // Always emit retrieval-tap event and start vibration, even if navigator
       // is not yet ready.
-      if (type == 'retrieval_request') {
+      if (isRetrievalAlertType(type)) {
         VibrationController.startRetrievalAlert();
         _retrievalNotificationTapController.add(null);
       }
@@ -315,6 +316,7 @@ class FirebaseMessagingService implements NotificationService {
       log('Navigating based on notification type: $type');
       switch (type) {
         case 'retrieval_request':
+        case 'retrieval_assigned':
           _navigateToRetrievalRequest(data);
           break;
         case 'driver_assigned':

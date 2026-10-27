@@ -30,7 +30,7 @@ class LanguageApiService {
     try {
       final response = await base.get(
         _path,
-        retryOn401: false,
+        endSessionOn401: false,
       );
 
       final data = response.data;

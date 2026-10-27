@@ -7,38 +7,21 @@ import 'package:niloufer_valet_mobile/models/oauth/profile_response.dart';
 class ProfileApiService {
   ProfileApiService._();
 
-  static String get _baseUrl => ApiConfig.authBaseUrl;
-  static String get _apiKey => ApiConfig.authApiKey;
+  static String get _baseUrl => ApiConfig.valetBaseUrl;
 
+  /// GET /auth/me (Client token).
   static Future<ProfileResponse> getProfile() async {
     final accessToken = await TokenStorage.getAccessToken();
-    final refreshToken = await TokenStorage.getRefreshToken();
     if (accessToken == null || accessToken.isEmpty) {
       throw ApiException('Access token not found. Please login again.',
           code: 'no_token');
     }
 
-    final cookieParts = <String>[];
-    if (refreshToken != null && refreshToken.isNotEmpty) {
-      cookieParts.add('refreshToken=$refreshToken');
-    }
-    cookieParts.add('accessToken=$accessToken');
-
-    final base = BaseDioService(_baseUrl, {
-      'Accept': 'application/json, text/plain, */*',
-      'x-api-key': _apiKey,
-      'Cookie': cookieParts.join('; '),
-    });
-
-    try {
-      final response =
-          await base.get('/auth/profile'); // wrapper from BaseDioService
-
-      final data = response.data as Map<String, dynamic>;
-      final profileResponse = ProfileResponse.fromJson(data);
-      return profileResponse;
-    } on ApiException {
-      rethrow;
-    }
+    final base = BaseDioService(
+      _baseUrl,
+      ApiConfig.authorizedHeaders(accessToken),
+    );
+    final response = await base.get('/auth/me');
+    return ProfileResponse.fromMe(response.data as Map<String, dynamic>);
   }
 }

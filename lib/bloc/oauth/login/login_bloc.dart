@@ -12,6 +12,7 @@ import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
 import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/models/driver/status/clock_in_request.dart';
 import 'package:niloufer_valet_mobile/models/oauth/phone_password_login_request.dart';
+import 'package:niloufer_valet_mobile/models/oauth/login_result.dart';
 import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
 import 'package:niloufer_valet_mobile/models/outlet/verify_location_request.dart';
 import 'package:niloufer_valet_mobile/models/outlet/verify_location_response.dart';
@@ -36,6 +37,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginIdChanged>(_onLoginIdChanged);
     on<PinChanged>(_onPinChanged);
     on<LoginSubmitted>(_onLoginSubmitted);
+    on<ClientSelected>(_onClientSelected);
     on<OutletSelected>(_onOutletSelected);
     on<LoginReset>(_onLoginReset);
   }
@@ -85,47 +87,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         password: _pin,
       );
 
-      final profile = await LoginApiService.verifyPhonePasswordLogin(request);
+      final LoginResult result = await LoginApiService.login(request);
 
-      if (profile.roles.isEmpty) {
-        emit(
-          const LoginFailure(
-            'No roles are assigned to your account. Please contact your administrator to request access.',
-          ),
-        );
+      if (result.needsClientSelection) {
+        if (result.clients.isEmpty) {
+          emit(const LoginFailure(
+            'No active client is available for your account. Please contact your administrator.',
+          ));
+          return;
+        }
+        emit(LoginNeedsClientSelection(result.clients));
         return;
       }
 
-      // Register FCM token after successful login
-      try {
-        await firebaseMessagingService?.registerFcmTokenAfterLogin();
-        log('FCM token registration initiated after login');
-      } catch (e) {
-        log('Failed to register FCM token after login: $e');
-      }
-
-      final roles = profile.roles.map((r) => r.toLowerCase()).toList();
-      _pendingProfile = profile;
-      _pendingIsDriver = roles.any((r) => r.contains('driver'));
-      _pendingIsOperator = roles.any((r) => r.contains('operator'));
-      _pendingIsScanner = roles.any((r) => r.contains('scanner'));
-
-      if (_pendingIsDriver) {
-        await TokenStorage.clearDriverAssignedCardNumbersIfPresent();
-        await TokenStorage.markDriverAssignedCardsLoading();
-        await MyParkedSessionsApiService.clearCache();
-      }
-
-      // Fetch outlets so the user can pick one before clock-in / verify-location
-      final outlets = await OutletApiService.getOutlets();
-
-      emit(LoginSuccessNeedsOutletSelection(
-        profile: profile,
-        outlets: outlets,
-        isDriver: _pendingIsDriver,
-        isOperator: _pendingIsOperator,
-        isScanner: _pendingIsScanner,
-      ));
+      await _continueAfterProfile(result.profile!, emit);
     } on ApiException catch (e) {
       emit(LoginFailure(e.message));
     } catch (_) {
@@ -133,6 +108,71 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         const LoginFailure('Something went wrong. Please try again.'),
       );
     }
+  }
+
+  Future<void> _onClientSelected(
+    ClientSelected event,
+    Emitter<LoginState> emit,
+  ) async {
+    emit(const LoginLoading());
+    try {
+      final profile = await LoginApiService.selectClient(event.clientId);
+      await _continueAfterProfile(profile, emit);
+    } on ApiException catch (e) {
+      emit(LoginFailure(e.message));
+    } catch (_) {
+      emit(
+        const LoginFailure('Something went wrong. Please try again.'),
+      );
+    }
+  }
+
+  /// Shared by direct Client login and the Client-select step.
+  Future<void> _continueAfterProfile(
+    Profile profile,
+    Emitter<LoginState> emit,
+  ) async {
+    if (profile.roles.isEmpty) {
+      emit(
+        const LoginFailure(
+          'No roles are assigned to your account. Please contact your administrator to request access.',
+        ),
+      );
+      return;
+    }
+
+    // Register FCM token after successful login
+    try {
+      await firebaseMessagingService?.registerFcmTokenAfterLogin();
+      log('FCM token registration initiated after login');
+    } catch (e) {
+      log('Failed to register FCM token after login: $e');
+    }
+
+    final roles = profile.roles.map((r) => r.toLowerCase()).toList();
+    _pendingProfile = profile;
+    _pendingIsDriver = roles.any((r) => r.contains('driver'));
+    // CLIENT_ADMIN can use every Operator API, so it gets the operator desk.
+    _pendingIsOperator =
+        roles.any((r) => r.contains('operator') || r.contains('admin'));
+    _pendingIsScanner = roles.any((r) => r.contains('scanner'));
+
+    if (_pendingIsDriver) {
+      await TokenStorage.clearDriverAssignedCardNumbersIfPresent();
+      await TokenStorage.markDriverAssignedCardsLoading();
+      await MyParkedSessionsApiService.clearCache();
+    }
+
+    // Fetch outlets so the user can pick one before clock-in / verify-location
+    final outlets = await OutletApiService.getOutlets();
+
+    emit(LoginSuccessNeedsOutletSelection(
+      profile: profile,
+      outlets: outlets,
+      isDriver: _pendingIsDriver,
+      isOperator: _pendingIsOperator,
+      isScanner: _pendingIsScanner,
+    ));
   }
 
   Future<void> _onOutletSelected(

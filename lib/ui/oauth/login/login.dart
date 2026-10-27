@@ -16,6 +16,7 @@ import 'package:niloufer_valet_mobile/ui/oauth/login/login_form.dart';
 import 'package:niloufer_valet_mobile/ui/oauth/login/login_outlet_too_far_page.dart';
 import 'package:niloufer_valet_mobile/ui/oauth/login/login_role_navigation.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/outlet_selection_dialog.dart';
+import 'package:niloufer_valet_mobile/models/oauth/client_summary.dart';
 import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -102,6 +103,31 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  void _showClientDialog(BuildContext context, List<ClientSummary> clients) {
+    final bloc = context.read<LoginBloc>();
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => SimpleDialog(
+        title: const Text('Select client'),
+        children: [
+          for (final c in clients)
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                bloc.add(ClientSelected(c.id));
+              },
+              child: Text(c.name),
+            ),
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
   bool _profileHasScannerRole(Profile profile) {
     return profile.roles.any((r) => r.toLowerCase().contains('scanner'));
   }
@@ -129,7 +155,9 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
-          if (state is LoginSuccessNeedsOutletSelection) {
+          if (state is LoginNeedsClientSelection) {
+            _showClientDialog(context, state.clients);
+          } else if (state is LoginSuccessNeedsOutletSelection) {
             _showOutletDialog(context, state);
           } else if (state is LoginSuccess) {
             navigateToHomeForAuthenticatedProfile(context, state.profile);

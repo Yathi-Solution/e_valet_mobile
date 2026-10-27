@@ -107,7 +107,8 @@ class CardAssignmentsApiService {
   }
 
   /// Unassigns a single physical card number from its current driver.
-  /// Endpoint: DELETE /operators/card-assignments/{cardNumber}?outletId=...
+  /// The API deletes by card id, so the id is looked up from the outlet's
+  /// assignments first. DELETE /operators/card-assignments/{cardId}?outletId=...
   static Future<void> unassignCardNumber({
     required String outletId,
     required int cardNumber,
@@ -125,8 +126,28 @@ class CardAssignmentsApiService {
       ApiConfig.authorizedHeaders(accessToken),
     );
 
+    final list = await base.get(
+      '/operators/card-assignments',
+      queryParameters: {'outletId': outletId},
+    );
+    final assignments =
+        (list.data as Map<String, dynamic>)['assignments'] as List<dynamic>? ??
+            const [];
+    final match = assignments.whereType<Map<String, dynamic>>().firstWhere(
+          (a) => a['cardNumber'] == cardNumber,
+          orElse: () => const <String, dynamic>{},
+        );
+    final cardId = match['cardId'];
+    if (cardId == null) {
+      throw ApiException(
+        'Card $cardNumber is not assigned.',
+        code: 'card_not_assigned',
+        statusCode: 404,
+      );
+    }
+
     await base.delete(
-      '/operators/card-assignments/$cardNumber',
+      '/operators/card-assignments/$cardId',
       queryParameters: {'outletId': outletId},
     );
   }

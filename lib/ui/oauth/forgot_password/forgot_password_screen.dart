@@ -13,7 +13,6 @@ import 'package:niloufer_valet_mobile/ui/common/phone_Number/phone_number_field.
 import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
 import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/forgot_password/password_reset_otp_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -49,15 +48,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         listener: (context, state) {
           if (state is ForgotPasswordSuccess) {
             SnackBars.showSuccessSnackBar(context, state.message);
-            Future.delayed(const Duration(milliseconds: 300), () {
+            // The user finishes the reset from the emailed / WhatsApp link.
+            Future.delayed(const Duration(milliseconds: 600), () {
               if (!mounted) return;
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PasswordResetOtpScreen(
-                    phoneNumber: state.phoneNumber,
-                  ),
-                ),
-              );
+              Navigator.of(context).maybePop();
             });
           } else if (state is ForgotPasswordFailure) {
             SnackBars.showErrorSnackBar(context, state.message);

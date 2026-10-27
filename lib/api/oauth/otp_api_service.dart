@@ -2,28 +2,24 @@ import 'dart:convert';
 import 'package:niloufer_valet_mobile/api/core/api_config.dart';
 import 'package:niloufer_valet_mobile/api/core/base_http_service.dart';
 import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/oauth/request_otp_request.dart';
 
 class OtpApiService {
   OtpApiService._();
 
-  static String get _baseUrl => ApiConfig.authBaseUrl;
-  static String get _apiKey => ApiConfig.authApiKey;
+  static String get _baseUrl => ApiConfig.valetBaseUrl;
 
   static final _http = BaseHttpService(
     baseUrl: _baseUrl,
-    defaultHeaders: ApiConfig.apiKeyHeaders(_apiKey),
+    defaultHeaders: ApiConfig.defaultJsonHeaders,
   );
 
   static Future<String> requestPasswordResetOtp(String identifier) async {
-    final body = RequestOtpRequest(
-      identifier: identifier,
-      purpose: 'PASSWORD_RESET',
-    ).toJson();
+    // POST /auth/forgot-password always answers 202; the user gets a reset link.
+    final body = {'identifier': identifier};
 
     try {
       final response = await _http.postJson(
-        '/auth/request-otp',
+        '/auth/forgot-password',
         body: body,
       );
 
@@ -34,7 +30,7 @@ class OtpApiService {
         return decoded['message'] as String;
       }
 
-      return 'OTP sent successfully.';
+      return 'If the account exists, a reset link has been sent.';
     } on ApiException {
       rethrow;
     } catch (_) {

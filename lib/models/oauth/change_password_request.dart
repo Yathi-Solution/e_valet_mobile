@@ -9,7 +9,7 @@ class ChangePasswordRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      'oldPassword': oldPassword,
+      'currentPassword': oldPassword,
       'newPassword': newPassword,
     };
   }

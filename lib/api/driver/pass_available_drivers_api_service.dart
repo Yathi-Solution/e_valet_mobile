@@ -9,8 +9,9 @@ class PassAvailableDriversApiService {
 
   static String get _baseUrl => ApiConfig.valetBaseUrl;
 
-  /// GET /sessions/{sessionId}/pass-available-drivers
-  /// Returns the list of drivers this session can be passed to.
+  /// The API has no per-session driver list; the online colleagues a Driver can
+  /// hand work to come from GET /drivers/pre-break/info (group first, then the
+  /// rest of the outlet).
   static Future<List<PassAvailableDriver>> getAvailableDrivers({
     required String sessionId,
   }) async {
@@ -28,15 +29,24 @@ class PassAvailableDriversApiService {
     );
 
     try {
-      final response =
-          await base.get('/sessions/$sessionId/pass-available-drivers');
+      final response = await base.get('/drivers/pre-break/info');
 
       final data = response.data as Map<String, dynamic>;
-      final rawList = data['drivers'] as List<dynamic>? ?? [];
-      return rawList
-          .whereType<Map<String, dynamic>>()
-          .map(PassAvailableDriver.fromJson)
-          .toList();
+      final seen = <String>{};
+      final drivers = <PassAvailableDriver>[];
+      for (final key in const ['groupDrivers', 'outletDrivers']) {
+        for (final d in (data[key] as List<dynamic>? ?? const [])) {
+          if (d is! Map<String, dynamic>) continue;
+          final id = (d['driverUserId'] ?? '').toString();
+          if (id.isEmpty || !seen.add(id)) continue;
+          drivers.add(PassAvailableDriver(
+            userId: id,
+            name: (d['name'] ?? 'Unknown Driver').toString(),
+            phone: (d['phone'] ?? 'N/A').toString(),
+          ));
+        }
+      }
+      return drivers;
     } on ApiException {
       rethrow;
     } catch (e) {
@@ -47,7 +57,9 @@ class PassAvailableDriversApiService {
     }
   }
 
-  /// POST /sessions/{sessionId}/pass
+  /// Without [driverUserId]: POST /sessions/{sessionId}/pass (no body, the
+  /// server picks a Driver). With it: POST /drivers/pass-parked-sessions to that
+  /// Driver, which also accepts ACCEPTED / ARRIVED retrievals.
   /// Response: { "sessionId", "newAssignmentId", "assignedTo", "assignedAt", "message" }
   static Future<String> passSessionToDriver({
     required String sessionId,
@@ -67,12 +79,25 @@ class PassAvailableDriversApiService {
     );
 
     try {
-      final response = await base.post(
-        '/sessions/$sessionId/pass',
-        data: (driverUserId != null && driverUserId.isNotEmpty)
-            ? <String, dynamic>{'driverUserId': driverUserId}
-            : null,
-      );
+      if (driverUserId != null && driverUserId.isNotEmpty) {
+        final res = await base.post('/drivers/pass-parked-sessions', data: {
+          'passes': [
+            {'sessionId': sessionId, 'passedToDriverUserId': driverUserId},
+          ],
+        });
+        final body = res.data as Map<String, dynamic>?;
+        final errors = body?['errors'] as List<dynamic>? ?? const [];
+        if (errors.isNotEmpty) {
+          final first = errors.first as Map<String, dynamic>;
+          throw ApiException(
+            (first['reason'] ?? 'Failed to pass session.').toString(),
+            code: 'pass_session_error',
+          );
+        }
+        return 'Request passed successfully.';
+      }
+
+      final response = await base.post('/sessions/$sessionId/pass');
 
       final data = response.data as Map<String, dynamic>?;
       return (data?['message'] as String?) ?? 'Request passed successfully.';

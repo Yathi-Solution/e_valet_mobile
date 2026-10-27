@@ -40,6 +40,16 @@ class OutletSelected extends LoginEvent {
   List<Object?> get props => [outlet];
 }
 
+/// Fired when the user picks a Client (Platform token, or 2+ Clients).
+class ClientSelected extends LoginEvent {
+  final String clientId;
+
+  const ClientSelected(this.clientId);
+
+  @override
+  List<Object?> get props => [clientId];
+}
+
 class LoginReset extends LoginEvent {
   const LoginReset();
 }

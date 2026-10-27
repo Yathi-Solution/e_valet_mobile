@@ -70,7 +70,7 @@ class NotificationApiService extends BaseHttpService {
       }
 
       final response = await postJson(
-        '/api/v1/notifications/fcm/register',
+        '/notifications/fcm/register',
         body: request.toJson(),
         headers: ApiConfig.authorizedHeaders(accessToken),
       );

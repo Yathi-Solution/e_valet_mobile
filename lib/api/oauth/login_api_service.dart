@@ -1,91 +1,108 @@
-import 'dart:convert';
 import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/api/core/base_http_service.dart';
+import 'package:niloufer_valet_mobile/api/core/base_dio_service.dart';
+import 'package:niloufer_valet_mobile/api/oauth/profile_api_service.dart';
 import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
+import 'package:niloufer_valet_mobile/models/oauth/client_summary.dart';
+import 'package:niloufer_valet_mobile/models/oauth/login_result.dart';
 import 'package:niloufer_valet_mobile/models/oauth/phone_password_login_request.dart';
 import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
-import 'package:niloufer_valet_mobile/models/oauth/user_profile.dart';
 import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 
 class LoginApiService {
   LoginApiService._();
 
-  static String get _baseUrl => ApiConfig.authBaseUrl;
-  static String get _apiKey => ApiConfig.authApiKey;
+  static String get _baseUrl => ApiConfig.valetBaseUrl;
 
-  static final _http = BaseHttpService(
-    baseUrl: _baseUrl,
-    defaultHeaders: ApiConfig.apiKeyHeaders(_apiKey),
-  );
+  /// POST /auth/login. A Client token finishes the login; a Platform token
+  /// (0 or 2+ Clients, or a Platform Admin) returns the Clients to choose from.
+  static Future<LoginResult> login(PhonePasswordLoginRequest request) async {
+    final base = BaseDioService(_baseUrl, ApiConfig.defaultJsonHeaders);
+    final response = await base.post(
+      '/auth/login',
+      data: request.toJson(),
+      endSessionOn401: false,
+    );
+    final data = _asMap(response.data);
 
-  static Future<Profile> verifyPhonePasswordLogin(
-    PhonePasswordLoginRequest request,
-  ) async {
-    final body = request.toJson();
-
-    try {
-      final response = await _http.postJson(
-        '/auth/login',
-        body: body,
-      ); // throws ApiException on error
-
-      // Parse JSON response body and persist tokens for subsequent API calls
-      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-
-      // Extract tokens from response
-      final accessToken = responseData['accessToken'] as String?;
-      final refreshToken = responseData['refreshToken'] as String?;
-
-      if (accessToken != null && accessToken.isNotEmpty) {
-        await TokenStorage.saveAccessToken(accessToken);
-        // Assume access token expires in 1 day
-        final expiry = DateTime.now().add(const Duration(days: 1));
-        await TokenStorage.saveAccessTokenExpiry(expiry);
-      }
-      if (refreshToken != null && refreshToken.isNotEmpty) {
-        await TokenStorage.saveRefreshToken(refreshToken);
-      }
-
-      // Extract and save user information if available
-      final userJson = responseData['user'] as Map<String, dynamic>? ?? {};
-      final application =
-          responseData['application'] as Map<String, dynamic>? ?? {};
-
-      // Build Profile object (application contains id/name/roles)
-      final user = UserProfile.fromJson(userJson);
-      final applicationId = (application['id'] ?? '').toString();
-      final rolesList = (application['roles'] as List<dynamic>? ?? [])
-          .map((r) => r.toString())
-          .toList();
-
-      // Save display name if available
-      if (user.firstName.isNotEmpty && user.lastName.isNotEmpty) {
-        await TokenStorage.saveUserName(
-          firstName: user.firstName,
-          lastName: user.lastName,
-        );
-      }
-
-      // Mark session as active for today
-      await SessionManager.markLoggedInForToday();
-
-      final normalizedRoles =
-          rolesList.map((r) => r.toLowerCase().trim()).toList();
-      if (user.id.isNotEmpty) {
-        await TokenStorage.saveCachedAuthContext(
-          normalizedRoles: normalizedRoles,
-          userId: user.id,
-        );
-      }
-
-      return Profile(
-        user: user,
-        applicationId: applicationId,
-        roles: rolesList,
-      );
-    } on ApiException {
-      rethrow; // let bloc/ui decide what to show
+    if (data['scope'] == 'CLIENT') {
+      return LoginResult.ready(await _completeClientLogin(data));
     }
+
+    // Platform token: keep it only long enough to list and select a Client.
+    await _saveToken(data);
+    final clients = await fetchClients();
+    return LoginResult.needsClient(clients);
+  }
+
+  /// GET /auth/clients (Platform or Client token).
+  static Future<List<ClientSummary>> fetchClients() async {
+    final token = await TokenStorage.getAccessToken();
+    if (token == null || token.isEmpty) {
+      throw ApiException('Access token not found. Please login again.',
+          code: 'no_token');
+    }
+    final base = BaseDioService(_baseUrl, ApiConfig.authorizedHeaders(token));
+    final response = await base.get('/auth/clients');
+    final list = _asMap(response.data)['clients'] as List<dynamic>? ?? [];
+    return list
+        .map((e) => ClientSummary.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// POST /auth/clients/:clientId/select. The previous token stops working.
+  static Future<Profile> selectClient(String clientId) async {
+    final token = await TokenStorage.getAccessToken();
+    if (token == null || token.isEmpty) {
+      throw ApiException('Access token not found. Please login again.',
+          code: 'no_token');
+    }
+    final base = BaseDioService(_baseUrl, ApiConfig.authorizedHeaders(token));
+    final response = await base.post('/auth/clients/$clientId/select');
+    return _completeClientLogin(_asMap(response.data));
+  }
+
+  static Future<Profile> _completeClientLogin(Map<String, dynamic> data) async {
+    await _saveToken(data);
+
+    final me = await ProfileApiService.getProfile();
+    final user = me.user;
+    if (user.fullName.isNotEmpty) {
+      await TokenStorage.saveUserName(
+        firstName: user.firstName,
+        lastName: user.lastName,
+      );
+    }
+    if (user.id.isNotEmpty) {
+      await TokenStorage.saveCachedAuthContext(
+        normalizedRoles: me.normalizedRoles,
+        userId: user.id,
+      );
+    }
+    await SessionManager.markLoggedInForToday();
+
+    return Profile(
+      user: user,
+      applicationId: me.applicationId,
+      roles: me.roles,
+    );
+  }
+
+  static Future<void> _saveToken(Map<String, dynamic> data) async {
+    final accessToken = data['accessToken'] as String?;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw ApiException('Invalid login response.', code: 'invalid_response');
+    }
+    await TokenStorage.saveAccessToken(accessToken);
+    final expiresAt = DateTime.tryParse('${data['expiresAt']}')?.toLocal();
+    await TokenStorage.saveAccessTokenExpiry(
+      expiresAt ?? DateTime.now().add(const Duration(hours: 24)),
+    );
+  }
+
+  static Map<String, dynamic> _asMap(dynamic data) {
+    if (data is Map<String, dynamic>) return data;
+    throw ApiException('Invalid response from server.',
+        code: 'invalid_response');
   }
 }

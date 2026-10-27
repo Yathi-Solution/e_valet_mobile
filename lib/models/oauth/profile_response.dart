@@ -58,6 +58,33 @@ class ProfileResponse {
     );
   }
 
+  /// Parses GET /auth/me: { user: {id,name,phone,email}, client, role }.
+  /// The single `role` (DRIVER | OPERATOR | CLIENT_ADMIN) becomes the roles
+  /// list and the Client id stands in for the old application id.
+  factory ProfileResponse.fromMe(Map<String, dynamic> json) {
+    final u = json['user'] as Map<String, dynamic>? ?? const {};
+    final client = json['client'] as Map<String, dynamic>? ?? const {};
+    final name = (u['name'] ?? '').toString().trim();
+    final space = name.indexOf(' ');
+    return ProfileResponse(
+      user: UserProfile(
+        id: (u['id'] ?? '').toString(),
+        email: (u['email'] ?? '').toString(),
+        username: '',
+        firstName: space == -1 ? name : name.substring(0, space),
+        lastName: space == -1 ? '' : name.substring(space + 1).trim(),
+        fullName: name,
+        phoneNumber: (u['phone'] ?? '').toString(),
+        isActive: true,
+        createdAt: '',
+      ),
+      applicationId: (client['id'] ?? '').toString(),
+      roles: [
+        if (json['role'] != null) json['role'].toString(),
+      ],
+    );
+  }
+
   /// Lowercased, trimmed roles for easy matching.
   List<String> get normalizedRoles =>
       roles.map((r) => r.toLowerCase().trim()).toList();
