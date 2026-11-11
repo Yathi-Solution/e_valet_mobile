@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 /// Section header with icon and accent styling.
 class GuidelinesSection extends StatelessWidget {

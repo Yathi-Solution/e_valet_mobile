@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_list_response.dart';
+import 'package:evalet/models/operator/operator_valet/valet_list_response.dart';
 
 abstract class ValetListState extends Equatable {
   const ValetListState();

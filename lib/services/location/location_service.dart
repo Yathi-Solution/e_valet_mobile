@@ -1,5 +1,5 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
 
 class LocationService {
   LocationService._();

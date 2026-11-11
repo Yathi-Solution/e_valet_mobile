@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/outlet/outlet.dart';
+import 'package:evalet/models/outlet/outlet.dart';
 
 abstract class LoginEvent extends Equatable {
   const LoginEvent();

@@ -2,20 +2,20 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_valet/operator_valets/valet_list_bloc.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_valet/operator_valets/valet_list_event.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_valet/operator_valets/valet_list_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/api/operator/operator_valet/valet_logout_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_drivers/widgets/valet_card.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_drivers/widgets/valet_details_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_drivers/operator_drivers_screen.dart';
+import 'package:evalet/bloc/operator/operator_valet/operator_valets/valet_list_bloc.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/bloc/operator/operator_valet/operator_valets/valet_list_event.dart';
+import 'package:evalet/bloc/operator/operator_valet/operator_valets/valet_list_state.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/api/operator/operator_valet/valet_logout_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/operator/operator_valet/valet_response.dart';
+import 'package:evalet/ui/operator/operator_drivers/widgets/valet_card.dart';
+import 'package:evalet/ui/operator/operator_drivers/widgets/valet_details_dialog.dart';
+import 'package:evalet/ui/operator/operator_drivers/operator_drivers_screen.dart';
 
 class ValetListView extends StatelessWidget {
   final String outletId;

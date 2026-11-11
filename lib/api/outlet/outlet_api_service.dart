@@ -1,10 +1,10 @@
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/api/core/base_dio_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/outlet/outlet.dart';
-import 'package:niloufer_valet_mobile/models/outlet/verify_location_request.dart';
-import 'package:niloufer_valet_mobile/models/outlet/verify_location_response.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/api/core/base_dio_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/outlet/outlet.dart';
+import 'package:evalet/models/outlet/verify_location_request.dart';
+import 'package:evalet/models/outlet/verify_location_response.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 class OutletApiService {
   OutletApiService._();

@@ -1,8 +1,8 @@
 import 'package:workmanager/workmanager.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/checkin_request_adapter.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/offline_checkin_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/park/offline_parking_photo.dart';
+import 'package:evalet/services/offline_sync/offline_parking_service.dart';
+import 'package:evalet/models/driver/session/checkin_request_adapter.dart';
+import 'package:evalet/models/driver/session/offline_checkin_request.dart';
+import 'package:evalet/models/driver/park/offline_parking_photo.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';

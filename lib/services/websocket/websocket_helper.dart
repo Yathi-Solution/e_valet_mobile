@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/websocket/websocket_event.dart';
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/bloc/websocket/websocket_bloc.dart';
+import 'package:evalet/bloc/websocket/websocket_event.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 /// Helper class to manage WebSocket lifecycle during app flow
 class WebSocketHelper {

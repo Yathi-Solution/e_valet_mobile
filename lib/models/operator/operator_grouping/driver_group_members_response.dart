@@ -1,4 +1,4 @@
-import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group_member.dart';
+import 'package:evalet/models/operator/operator_grouping/driver_group_member.dart';
 
 class DriverGroupMembersResponse {
   final int groupId;

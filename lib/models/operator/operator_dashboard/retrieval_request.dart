@@ -1,6 +1,6 @@
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/assigned_to.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/parked_by.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/vehicle.dart';
+import 'package:evalet/models/operator/operator_dashboard/assigned_to.dart';
+import 'package:evalet/models/operator/operator_dashboard/parked_by.dart';
+import 'package:evalet/models/operator/operator_dashboard/vehicle.dart';
 
 class RetrievalRequest {
   final String sessionId;

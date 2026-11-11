@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/api/ope_driv_help_support_api/help_support_api.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/guidelines/guidelines_main_title.dart';
-import 'package:niloufer_valet_mobile/ui/guidelines/guidelines_section.dart';
-import 'package:niloufer_valet_mobile/ui/help_support/contact_card.dart';
+import 'package:evalet/api/ope_driv_help_support_api/help_support_api.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/guidelines/guidelines_main_title.dart';
+import 'package:evalet/ui/guidelines/guidelines_section.dart';
+import 'package:evalet/ui/help_support/contact_card.dart';
 
 /// Shared Help screen for both Driver and Operator roles.
 /// Accessible from the overflow menu (driver) and side drawer (operator).

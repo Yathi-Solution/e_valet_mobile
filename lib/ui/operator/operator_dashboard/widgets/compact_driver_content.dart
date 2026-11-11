@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/available_drivers.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/utils/driver_utils.dart';
+import 'package:evalet/models/operator/operator_dashboard/available_drivers.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/utils/driver_utils.dart';
 
 /// Compact content: name and phone only, each max 1 line. Card width fits content.
 /// When [isRecommended] is true and [recommendedCardNumber] is set, shows "Recommended for card X".

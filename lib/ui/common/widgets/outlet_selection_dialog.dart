@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/models/outlet/outlet.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
+import 'package:evalet/models/outlet/outlet.dart';
+import 'package:evalet/ui/common/colors.dart';
 
 /// Non-dismissible center dialog for selecting an outlet after login.
 /// Cannot be closed by tapping outside or pressing the back button.

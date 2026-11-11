@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/initiate_repark/initiate_repark_bloc.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/initiate_repark/initiate_repark_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/initiate_repark/initiate_repark_state.dart';
-import 'package:niloufer_valet_mobile/services/location/location_service.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/car_photo_intro_screen.dart';
+import 'package:evalet/bloc/driver/initiate_repark/initiate_repark_bloc.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/bloc/driver/initiate_repark/initiate_repark_event.dart';
+import 'package:evalet/bloc/driver/initiate_repark/initiate_repark_state.dart';
+import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/driver/driver_home/status/car_photo_intro_screen.dart';
 
 class CustomerMissingDialog extends StatefulWidget {
   final String sessionId;

@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/checkin_request.dart';
+import 'package:evalet/models/driver/session/checkin_request.dart';
 
 class CheckinRequestAdapter extends TypeAdapter<CheckinRequest> {
   @override

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_event.dart';
-import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/driver_home.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_dashboard/operator_dashboard.dart';
-import 'package:niloufer_valet_mobile/ui/scanner/scanner_home.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_bloc.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_event.dart';
+import 'package:evalet/models/oauth/profile.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/driver/driver_home/driver_home.dart';
+import 'package:evalet/ui/operator/operator_dashboard/operator_dashboard.dart';
+import 'package:evalet/ui/scanner/scanner_home.dart';
 
 /// Navigates to the correct home shell after a completed login flow.
 void navigateToHomeForAuthenticatedProfile(

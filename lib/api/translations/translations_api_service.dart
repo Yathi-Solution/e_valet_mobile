@@ -1,7 +1,7 @@
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/api/core/base_dio_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/translations/translations_response.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/api/core/base_dio_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/translations/translations_response.dart';
 
 class TranslationsApiService {
   TranslationsApiService._();

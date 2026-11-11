@@ -1,4 +1,4 @@
-import 'package:niloufer_valet_mobile/models/oauth/user_profile.dart';
+import 'package:evalet/models/oauth/user_profile.dart';
 
 class ProfileResponse {
   final UserProfile user;

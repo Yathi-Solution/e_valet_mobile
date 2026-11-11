@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 // import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/car_camera/car_camera_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/car_camera/car_Camera_State.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/image_validation/validation_result.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/bloc/driver/car_camera/car_camera_event.dart';
+import 'package:evalet/bloc/driver/car_camera/car_Camera_State.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/image_validation/validation_result.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 
 class CarCameraBloc extends Bloc<CarCameraEvent, CarCameraState> {
   CameraController? _cameraController;

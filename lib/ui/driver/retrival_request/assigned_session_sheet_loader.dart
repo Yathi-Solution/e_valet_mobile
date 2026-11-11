@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/assigned_sessions_background/assigned_sessions_background_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_state.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/pass_available_drivers/pass_available_drivers_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/pass_available_drivers/pass_available_drivers_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/pass_available_drivers/pass_available_drivers_state.dart';
-import 'package:niloufer_valet_mobile/bloc/retrival_request/retrival_request_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/retrival_request/retrival_request_event.dart';
-import 'package:niloufer_valet_mobile/bloc/retrival_request/retrival_requesy_state.dart';
-import 'package:niloufer_valet_mobile/api/driver/sessions_pending_api.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/pending_session.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/driver/confirm_arrival/confirm_arrival_screen.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/park_flow_signals.dart';
-import 'package:niloufer_valet_mobile/ui/driver/retrival_request/retrieval_request_sheet.dart';
-import 'package:niloufer_valet_mobile/services/vibration_controller.dart';
-import 'package:niloufer_valet_mobile/utils/session_converter.dart';
+import 'package:evalet/bloc/driver/assigned_sessions_background/assigned_sessions_background_bloc.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_bloc.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_state.dart';
+import 'package:evalet/bloc/driver/pass_available_drivers/pass_available_drivers_bloc.dart';
+import 'package:evalet/bloc/driver/pass_available_drivers/pass_available_drivers_event.dart';
+import 'package:evalet/bloc/driver/pass_available_drivers/pass_available_drivers_state.dart';
+import 'package:evalet/bloc/retrival_request/retrival_request_bloc.dart';
+import 'package:evalet/bloc/retrival_request/retrival_request_event.dart';
+import 'package:evalet/bloc/retrival_request/retrival_requesy_state.dart';
+import 'package:evalet/api/driver/sessions_pending_api.dart';
+import 'package:evalet/models/driver/session/assigned_session.dart';
+import 'package:evalet/models/driver/session/pending_session.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/driver/confirm_arrival/confirm_arrival_screen.dart';
+import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
+import 'package:evalet/ui/driver/retrival_request/retrieval_request_sheet.dart';
+import 'package:evalet/services/vibration_controller.dart';
+import 'package:evalet/utils/session_converter.dart';
 
 /// Session id for one queue entry (same rules as [AssignedSessionsBackgroundBloc]).
 String? sessionIdOfQueueEntry(dynamic s) {

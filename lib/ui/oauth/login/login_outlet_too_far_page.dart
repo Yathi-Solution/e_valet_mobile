@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/oauth/login/outlet_location_retry_cubit.dart';
-import 'package:niloufer_valet_mobile/bloc/oauth/login/outlet_location_retry_state.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_state.dart';
-import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_state.dart';
-import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
-import 'package:niloufer_valet_mobile/models/outlet/outlet.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/clock_in_too_far_screen.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/widgets/pre_break_info_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/guidelines/guidelines_screen.dart';
-import 'package:niloufer_valet_mobile/ui/help_support/help_screen.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/login/login_role_navigation.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/profile/profile_screen.dart';
+import 'package:evalet/bloc/oauth/login/outlet_location_retry_cubit.dart';
+import 'package:evalet/bloc/oauth/login/outlet_location_retry_state.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_bloc.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_event.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_state.dart';
+import 'package:evalet/bloc/websocket/websocket_bloc.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_bloc.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_event.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_state.dart';
+import 'package:evalet/models/oauth/profile.dart';
+import 'package:evalet/models/outlet/outlet.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/driver/driver_home/status/clock_in_too_far_screen.dart';
+import 'package:evalet/ui/driver/driver_home/widgets/pre_break_info_dialog.dart';
+import 'package:evalet/ui/guidelines/guidelines_screen.dart';
+import 'package:evalet/ui/help_support/help_screen.dart';
+import 'package:evalet/ui/oauth/login/login_role_navigation.dart';
+import 'package:evalet/ui/oauth/profile/profile_screen.dart';
 
 /// How [LoginOutletTooFarPage] re-checks location when the user taps Retry.
 enum LoginOutletTooFarRetryMode {

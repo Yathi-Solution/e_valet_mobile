@@ -1,4 +1,4 @@
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/key_rack_item.dart';
+import 'package:evalet/models/operator/operator_dashboard/key_rack_item.dart';
 
 class DigitalKeyRackResponse {
   final List<KeyRackItem> keyRack;

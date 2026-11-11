@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/available_drivers.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_dashboard/widgets/compact_driver_content.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_dashboard/widgets/driver_card_content.dart';
+import 'package:evalet/models/operator/operator_dashboard/available_drivers.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/operator/operator_dashboard/widgets/compact_driver_content.dart';
+import 'package:evalet/ui/operator/operator_dashboard/widgets/driver_card_content.dart';
 
 class AvailableDriversCard extends StatelessWidget {
   final AvailableDriver driver;

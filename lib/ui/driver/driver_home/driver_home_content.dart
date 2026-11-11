@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/footer.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/driver_header_widget.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_online_content.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_offline_content.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_break_content.dart';
-import 'package:niloufer_valet_mobile/ui/scanner/scanner_qr_dialog.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/park_flow_signals.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_bloc.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_event.dart';
+import 'package:evalet/bloc/connectivity/connectivity_bloc.dart';
+import 'package:evalet/bloc/connectivity/connectivity_state.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/footer.dart';
+import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
+import 'package:evalet/ui/driver/driver_home/driver_header_widget.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_online_content.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_offline_content.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_break_content.dart';
+import 'package:evalet/ui/scanner/scanner_qr_dialog.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
 
 class DriverHomeContent extends StatefulWidget {
   final String driverName;

@@ -3,15 +3,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_qr/scanner_qr_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_qr/scanner_qr_event.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_qr/scanner_qr_state.dart';
-import 'package:niloufer_valet_mobile/services/qr/valet_qr_scanner_controller_factory.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/bloc/scanner/scanner_qr/scanner_qr_bloc.dart';
+import 'package:evalet/bloc/scanner/scanner_qr/scanner_qr_event.dart';
+import 'package:evalet/bloc/scanner/scanner_qr/scanner_qr_state.dart';
+import 'package:evalet/services/qr/valet_qr_scanner_controller_factory.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 /// Dialog that shows a QR scanner. On scan of a WhatsApp URL (e.g. from
 /// customer card), [ScannerQrBloc] extracts card number and calls manual

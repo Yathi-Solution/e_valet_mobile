@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'retrival_request_event.dart';
 import 'retrival_requesy_state.dart';
-import 'package:niloufer_valet_mobile/api/driver/assigned_sessions_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/retrival_accept_api.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/services/location/location_service.dart';
+import 'package:evalet/api/driver/assigned_sessions_api_service.dart';
+import 'package:evalet/api/driver/retrival_accept_api.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/services/location/location_service.dart';
 
 class RetrivalRequestBloc
     extends Bloc<RetrivalRequestEvent, RetrivalRequestState> {

@@ -1,14 +1,14 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:niloufer_valet_mobile/api/driver/image_API.dart';
-import 'package:niloufer_valet_mobile/api/driver/re-park_api.dart';
-import 'package:niloufer_valet_mobile/api/driver/session_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/park/offline_parking_photo.dart';
-import 'package:niloufer_valet_mobile/models/driver/park/park_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/re-park/repark_photo_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/parked/my_parked_sessions_response.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/offline_checkin_request.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/driver/image_API.dart';
+import 'package:evalet/api/driver/re-park_api.dart';
+import 'package:evalet/api/driver/session_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/park/offline_parking_photo.dart';
+import 'package:evalet/models/driver/park/park_request.dart';
+import 'package:evalet/models/driver/re-park/repark_photo_request.dart';
+import 'package:evalet/models/driver/parked/my_parked_sessions_response.dart';
+import 'package:evalet/models/driver/session/offline_checkin_request.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 import 'package:flutter/foundation.dart';
 
 class OfflineParkingService {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 class TextButtonComponent extends StatelessWidget {
   final String labelText;

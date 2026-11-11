@@ -1,12 +1,12 @@
 import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/driver_status_api_service.dart';
-import 'package:niloufer_valet_mobile/api/oauth/logout_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/clock_out_request.dart';
-import 'package:niloufer_valet_mobile/services/location/location_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/driver/driver_status_api_service.dart';
+import 'package:evalet/api/oauth/logout_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/status/clock_out_request.dart';
+import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/services/oauth/session_manager.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 import 'operator_menu_event.dart';
 import 'operator_menu_state.dart';
 

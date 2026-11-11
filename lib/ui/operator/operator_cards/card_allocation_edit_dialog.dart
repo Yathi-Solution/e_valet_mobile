@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/api/operator/operator_cards/card_assignments_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_cards/card_numbers_input.dart';
+import 'package:evalet/api/operator/operator_cards/card_assignments_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/operator/operator_cards/card_numbers_input.dart';
 
 /// Dialog to enter physical **card numbers** for one driver (not a total count).
 /// On Save, calls [CardAssignmentsApiService.assignCardNumbersToDriver] (PATCH),

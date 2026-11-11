@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
+import 'package:evalet/models/operator/operator_valet/valet_response.dart';
 
 abstract class OperatorOvertimeState extends Equatable {
   const OperatorOvertimeState();

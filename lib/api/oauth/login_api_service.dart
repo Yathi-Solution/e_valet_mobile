@@ -1,13 +1,13 @@
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/api/core/base_dio_service.dart';
-import 'package:niloufer_valet_mobile/api/oauth/profile_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/oauth/client_summary.dart';
-import 'package:niloufer_valet_mobile/models/oauth/login_result.dart';
-import 'package:niloufer_valet_mobile/models/oauth/phone_password_login_request.dart';
-import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
-import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/api/core/base_dio_service.dart';
+import 'package:evalet/api/oauth/profile_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/oauth/client_summary.dart';
+import 'package:evalet/models/oauth/login_result.dart';
+import 'package:evalet/models/oauth/phone_password_login_request.dart';
+import 'package:evalet/models/oauth/profile.dart';
+import 'package:evalet/services/oauth/session_manager.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 class LoginApiService {
   LoginApiService._();

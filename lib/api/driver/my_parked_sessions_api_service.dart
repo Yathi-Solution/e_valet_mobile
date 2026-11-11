@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/api/core/base_dio_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/parked/my_parked_sessions_response.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/api/core/base_dio_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/parked/my_parked_sessions_response.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/services/offline_sync/offline_parking_service.dart';
 
 class MyParkedSessionsApiService {
   MyParkedSessionsApiService._();

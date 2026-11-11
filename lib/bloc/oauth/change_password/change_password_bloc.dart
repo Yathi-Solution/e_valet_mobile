@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/oauth/password_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/oauth/change_password/change_password_event.dart';
-import 'package:niloufer_valet_mobile/bloc/oauth/change_password/change_password_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/oauth/change_password_request.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/api/oauth/password_api_service.dart';
+import 'package:evalet/bloc/oauth/change_password/change_password_event.dart';
+import 'package:evalet/bloc/oauth/change_password/change_password_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/oauth/change_password_request.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 
 class ChangePasswordBloc
     extends Bloc<ChangePasswordEvent, ChangePasswordState> {
