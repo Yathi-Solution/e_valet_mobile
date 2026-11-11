@@ -7,14 +7,13 @@ import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 class PasswordApiService {
   PasswordApiService._();
 
-  static String get _baseUrl => ApiConfig.authBaseUrl;
-  static String get _apiKey => ApiConfig.authApiKey;
+  static String get _baseUrl => ApiConfig.valetBaseUrl;
 
+  /// POST /auth/change-password (204). Ends the user's other sessions.
   static Future<void> changePassword(
     ChangePasswordRequest request,
   ) async {
     final accessToken = await TokenStorage.getAccessToken();
-    final refreshToken = await TokenStorage.getRefreshToken();
 
     if (accessToken == null || accessToken.isEmpty) {
       throw ApiException(
@@ -23,26 +22,10 @@ class PasswordApiService {
       );
     }
 
-    final cookieParts = <String>[];
-    if (refreshToken != null && refreshToken.isNotEmpty) {
-      cookieParts.add('refreshToken=$refreshToken');
-    }
-    cookieParts.add('accessToken=$accessToken');
-
-    final base = BaseDioService(_baseUrl, {
-      'Accept': 'application/json, text/plain, */*',
-      'x-api-key': _apiKey,
-      'Cookie': cookieParts.join('; '),
-      'Content-Type': 'application/json',
-    });
-
-    try {
-      await base.post(
-        '/auth/change-password',
-        data: request.toJson(),
-      );
-    } on ApiException {
-      rethrow;
-    }
+    final base = BaseDioService(
+      _baseUrl,
+      ApiConfig.authorizedHeaders(accessToken),
+    );
+    await base.post('/auth/change-password', data: request.toJson());
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:niloufer_valet_mobile/models/notification/notification_type.dart';
 import 'dart:developer';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
@@ -116,6 +117,19 @@ class LocalNotificationService {
         vibrationPattern: retrievalVibrationPattern,
       );
 
+      // The server sends retrieval pushes on Android channel `retrieval_requests`;
+      // it must exist on the device or the OS falls back to a quiet default.
+      final retrievalRequestsChannel = AndroidNotificationChannel(
+        'retrieval_requests',
+        'Retrieval Requests',
+        description: 'Notifications for valet retrieval requests',
+        importance: Importance.max,
+        playSound: true,
+        sound: retrievalSound,
+        enableVibration: true,
+        vibrationPattern: retrievalVibrationPattern,
+      );
+
       // Driver updates channel
       const driverUpdatesChannel = AndroidNotificationChannel(
         'driver_updates_channel',
@@ -153,6 +167,11 @@ class LocalNotificationService {
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(retrievalRequestChannel);
+
+      await _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(retrievalRequestsChannel);
 
       await _notificationsPlugin
           .resolvePlatformSpecificImplementation<
@@ -198,7 +217,7 @@ class LocalNotificationService {
 
       // Use the custom retrieval-alert sound for retrieval_request notifications;
       // fall back to the default system sound for all other types.
-      final isRetrieval = payload?['type'] == 'retrieval_request';
+      final isRetrieval = isRetrievalAlertType(payload?['type'] as String?);
       final notifSound = isRetrieval
           ? const RawResourceAndroidNotificationSound('retrieval_alert')
           : null;
@@ -381,6 +400,7 @@ class LocalNotificationService {
   String _getChannelId(String? type) {
     switch (type) {
       case 'retrieval_request':
+      case 'retrieval_assigned':
         return 'retrieval_request_channel';
       case 'driver_assigned':
       case 'driver_update':
@@ -399,6 +419,7 @@ class LocalNotificationService {
   String _getChannelName(String? type) {
     switch (type) {
       case 'retrieval_request':
+      case 'retrieval_assigned':
         return 'Retrieval Requests';
       case 'driver_assigned':
       case 'driver_update':
@@ -414,6 +435,7 @@ class LocalNotificationService {
   String _getChannelDescription(String? type) {
     switch (type) {
       case 'retrieval_request':
+      case 'retrieval_assigned':
         return 'Notifications for valet retrieval requests';
       case 'driver_assigned':
       case 'driver_update':

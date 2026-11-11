@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/oauth/refresh_api_service.dart';
+import 'package:niloufer_valet_mobile/api/oauth/profile_api_service.dart';
 import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
 import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 import 'package:niloufer_valet_mobile/services/websocket/websocket_service.dart';
@@ -147,7 +147,9 @@ class WebSocketBloc extends Bloc<WebSocketEvent, WebSocketState> {
       final roomName = event.roomName;
       // Emit subscribe event based on room type (matches NestJS @SubscribeMessage)
       final payload = event.additionalData ?? {};
-      payload['${event.roomType}Id'] = event.roomId;
+      // The API expects a numeric outletId.
+      payload['${event.roomType}Id'] =
+          int.tryParse(event.roomId) ?? event.roomId;
 
       // Use emitWithAck to get server confirmation
       try {
@@ -319,10 +321,11 @@ class WebSocketBloc extends Bloc<WebSocketEvent, WebSocketState> {
     _isRefreshingToken = true;
 
     try {
-      print('Refreshing access token for WebSocket reconnection...');
+      print('Checking session before WebSocket reconnection...');
 
-      // Refresh the token
-      await RefreshApiService.refreshToken();
+      // No refresh token exists: confirm the session is still alive. A 401
+      // ends the session (handled in the HTTP layer) and throws here.
+      await ProfileApiService.getProfile();
 
       // Get the new access token
       final newAccessToken = await TokenStorage.getAccessToken();
@@ -368,7 +371,7 @@ class WebSocketBloc extends Bloc<WebSocketEvent, WebSocketState> {
             final roomId = parts[1];
 
             final payload = <String, dynamic>{};
-            payload['${roomType}Id'] = roomId;
+            payload['${roomType}Id'] = int.tryParse(roomId) ?? roomId;
 
             try {
               await _webSocketService.emitWithAck(

@@ -40,9 +40,11 @@ class WebSocketHelper {
       final notificationsUrl = baseUrl;
 
       // Connect to WebSocket with authentication
-      // Pass token as query parameter for better compatibility
+      // The server reads the Client token from auth.token (or the
+      // Authorization header, which the service also sets from the query token).
       webSocketBloc.add(ConnectWebSocket(
         url: notificationsUrl,
+        auth: {'token': accessToken},
         query: {'token': accessToken},
       ));
 

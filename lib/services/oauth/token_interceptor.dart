@@ -1589,8 +1589,6 @@ class TokenStorage {
 
   static Future<bool> hasValidTokens() async {
     final access = await getAccessToken();
-    final refresh = await getRefreshToken();
-    return (access != null && access.isNotEmpty) ||
-        (refresh != null && refresh.isNotEmpty);
+    return access != null && access.isNotEmpty;
   }
 }
