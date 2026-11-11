@@ -1,4 +1,4 @@
-package com.niloufer.valet
+package com.yathi.evalet
 
 import io.flutter.embedding.android.FlutterActivity
 
