@@ -82,11 +82,11 @@ class WebSocketHelper {
         timeoutTimer.cancel();
       }
 
-      // Small delay before joining rooms
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      // Join outlet room only (driver/operator rooms are auto-joined by backend based on user roles)
-      if (outletId != null && webSocketBloc.service.isConnected) {
+      // Join outlet room only (driver/operator rooms are auto-joined by backend based on user roles).
+      // The room is remembered even if the socket is not ready yet: the bloc
+      // subscribes once the server accepts the connection, and again after
+      // every reconnect.
+      if (outletId != null) {
         print('Joining outlet room: $outletId');
         webSocketBloc.add(JoinRoom.outlet(outletId));
       }
