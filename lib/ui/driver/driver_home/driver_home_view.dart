@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_state.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_state.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/driver_home_content.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_bloc.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_event.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_state.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_bloc.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_event.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_state.dart';
+import 'package:evalet/ui/driver/driver_home/driver_home_content.dart';
 
 class DriverHomeView extends StatelessWidget {
   const DriverHomeView({super.key, this.homeResetNotifier});

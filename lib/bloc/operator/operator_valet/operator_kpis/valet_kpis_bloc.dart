@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/operator/operator_valet/valet_kpis_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
+import 'package:evalet/api/operator/operator_valet/valet_kpis_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
 import 'valet_kpis_event.dart';
 import 'valet_kpis_state.dart';
 

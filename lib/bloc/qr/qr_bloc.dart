@@ -3,11 +3,11 @@ import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/qr/qr_event.dart';
-import 'package:niloufer_valet_mobile/bloc/qr/qr_state.dart';
-import 'package:niloufer_valet_mobile/models/driver/qr/qr_data.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/utils/whatsapp_qr_parser.dart';
+import 'package:evalet/bloc/qr/qr_event.dart';
+import 'package:evalet/bloc/qr/qr_state.dart';
+import 'package:evalet/models/driver/qr/qr_data.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/utils/whatsapp_qr_parser.dart';
 
 class QrBloc extends Bloc<QrEvent, QrState> {
   QrBloc() : super(const QrState()) {

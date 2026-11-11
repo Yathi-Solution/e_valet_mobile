@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/oauth/logout_response.dart';
+import 'package:evalet/models/oauth/logout_response.dart';
 
 abstract class ScannerMenuState extends Equatable {
   const ScannerMenuState();

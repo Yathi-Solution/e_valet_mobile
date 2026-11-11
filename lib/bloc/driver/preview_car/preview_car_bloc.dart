@@ -1,15 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/image_API.dart';
-import 'package:niloufer_valet_mobile/api/driver/re-park_api.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/preview_car/preview_car_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/preview_car/preview_car_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/park/park_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/re-park/repark_photo_request.dart';
-import 'package:niloufer_valet_mobile/services/background/background_sync_service.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
-import 'package:niloufer_valet_mobile/models/driver/park/offline_parking_photo.dart';
-import 'package:niloufer_valet_mobile/services/image/image_compression_service.dart';
+import 'package:evalet/api/driver/image_API.dart';
+import 'package:evalet/api/driver/re-park_api.dart';
+import 'package:evalet/bloc/driver/preview_car/preview_car_event.dart';
+import 'package:evalet/bloc/driver/preview_car/preview_car_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/park/park_request.dart';
+import 'package:evalet/models/driver/re-park/repark_photo_request.dart';
+import 'package:evalet/services/background/background_sync_service.dart';
+import 'package:evalet/services/offline_sync/offline_parking_service.dart';
+import 'package:evalet/models/driver/park/offline_parking_photo.dart';
+import 'package:evalet/services/image/image_compression_service.dart';
 import 'package:flutter/foundation.dart';
 
 class PreviewCarBloc extends Bloc<PreviewCarEvent, PreviewCarState> {

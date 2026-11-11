@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
-import 'package:niloufer_valet_mobile/ui/common/typography.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/button_metrics.dart';
+import 'package:evalet/ui/common/typography.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 class CameraBottomOverlay extends StatefulWidget {
   final Function(BuildContext) onCapture;

@@ -1,9 +1,9 @@
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/operator_dashboard_kpis_response.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/operator_available_drivers_response.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/retrieval_requests_response.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/digital_key_rack_response.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/assign_retrieval_response.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/cancel_assignment_response.dart';
+import 'package:evalet/models/operator/operator_dashboard/operator_dashboard_kpis_response.dart';
+import 'package:evalet/models/operator/operator_dashboard/operator_available_drivers_response.dart';
+import 'package:evalet/models/operator/operator_dashboard/retrieval_requests_response.dart';
+import 'package:evalet/models/operator/operator_dashboard/digital_key_rack_response.dart';
+import 'package:evalet/models/operator/operator_dashboard/assign_retrieval_response.dart';
+import 'package:evalet/models/operator/operator_dashboard/cancel_assignment_response.dart';
 
 abstract class OperatorDashboardState {
   const OperatorDashboardState();

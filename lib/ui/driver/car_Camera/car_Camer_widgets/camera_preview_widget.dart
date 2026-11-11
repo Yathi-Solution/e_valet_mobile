@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
+import 'package:evalet/ui/common/colors.dart';
 
 class CameraPreviewWidget extends StatelessWidget {
   final bool isCameraInitialized;

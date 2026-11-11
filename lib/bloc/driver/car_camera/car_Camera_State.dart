@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/driver/image_validation/validation_result.dart';
+import 'package:evalet/models/driver/image_validation/validation_result.dart';
 
 abstract class CarCameraState extends Equatable {
   const CarCameraState();

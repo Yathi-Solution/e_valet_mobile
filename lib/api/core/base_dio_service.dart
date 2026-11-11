@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/services/oauth/session_events.dart';
-import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/services/oauth/session_events.dart';
+import 'package:evalet/services/oauth/session_manager.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 /// Dio wrapper. The ValetLink API has no refresh token: a 401 on an
 /// authenticated call means the session is over, so local state is cleared

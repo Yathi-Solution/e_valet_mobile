@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/splash/splash_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/splash/splash_event.dart';
-import 'package:niloufer_valet_mobile/bloc/splash/splash_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/version/version_check_args.dart';
-import 'package:niloufer_valet_mobile/ui/version/version_check_screen.dart';
+import 'package:evalet/bloc/splash/splash_bloc.dart';
+import 'package:evalet/bloc/splash/splash_event.dart';
+import 'package:evalet/bloc/splash/splash_state.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/version/version_check_args.dart';
+import 'package:evalet/ui/version/version_check_screen.dart';
 
 /// Startup bootstrap (translations, auth). Splash animation is disabled for now.
 class SplashScreen extends StatefulWidget {

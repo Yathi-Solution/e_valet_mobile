@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_drivers/operator_drivers_screen.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_car_logs/operator_car_logs_screen.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_cards/operator_cards_screen.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_parked_car/operator_parked_car_screen.dart';
+import 'package:evalet/ui/operator/operator_drivers/operator_drivers_screen.dart';
+import 'package:evalet/ui/operator/operator_car_logs/operator_car_logs_screen.dart';
+import 'package:evalet/ui/operator/operator_cards/operator_cards_screen.dart';
+import 'package:evalet/ui/operator/operator_parked_car/operator_parked_car_screen.dart';
 
 class OperatorScreenRouter {
   static Widget getScreen(

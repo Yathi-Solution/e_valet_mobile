@@ -1,12 +1,12 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:convert';
-import 'package:niloufer_valet_mobile/api/operator/operator_dashboard/operator_manual_retrieval_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_qr/scanner_qr_event.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_qr/scanner_qr_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/manual_retrieval_request.dart';
-import 'package:niloufer_valet_mobile/utils/whatsapp_qr_parser.dart';
+import 'package:evalet/api/operator/operator_dashboard/operator_manual_retrieval_api_service.dart';
+import 'package:evalet/bloc/scanner/scanner_qr/scanner_qr_event.dart';
+import 'package:evalet/bloc/scanner/scanner_qr/scanner_qr_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/operator/operator_dashboard/manual_retrieval_request.dart';
+import 'package:evalet/utils/whatsapp_qr_parser.dart';
 
 class ScannerQrBloc extends Bloc<ScannerQrEvent, ScannerQrState> {
   ScannerQrBloc() : super(const ScannerQrInitial()) {

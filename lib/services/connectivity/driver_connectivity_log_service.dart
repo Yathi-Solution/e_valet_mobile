@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:niloufer_valet_mobile/api/driver/connectivity_log_api_service.dart';
-import 'package:niloufer_valet_mobile/models/driver/connectivity/connectivity_log_batch_request.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/driver/connectivity_log_api_service.dart';
+import 'package:evalet/models/driver/connectivity/connectivity_log_batch_request.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 /// Logs driver internet on/off transitions locally and POSTs batches every 3h from login
 /// (or immediately when back online if a flush was due while offline).

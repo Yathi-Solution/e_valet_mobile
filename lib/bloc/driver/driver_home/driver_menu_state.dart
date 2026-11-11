@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/driver/pre_break/pre_break_info_response.dart';
-import 'package:niloufer_valet_mobile/models/driver/parked/my_parked_sessions_response.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/pending_sessions_response.dart';
-import 'package:niloufer_valet_mobile/models/oauth/logout_response.dart';
+import 'package:evalet/models/driver/pre_break/pre_break_info_response.dart';
+import 'package:evalet/models/driver/parked/my_parked_sessions_response.dart';
+import 'package:evalet/models/driver/session/pending_sessions_response.dart';
+import 'package:evalet/models/oauth/logout_response.dart';
 
 abstract class DriverMenuState extends Equatable {
   const DriverMenuState();

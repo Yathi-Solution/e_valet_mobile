@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_state.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_retrieval/scanner_retrieval_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_retrieval/scanner_retrieval_event.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_retrieval/scanner_retrieval_state.dart';
-import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/retrieval_request.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/login/login.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/profile/overflow_menu.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/profile/profile_screen.dart';
-import 'package:niloufer_valet_mobile/ui/scanner/scanner_qr_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/scanner/widgets/scanner_retrieval_request_card.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_bloc.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_event.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_state.dart';
+import 'package:evalet/bloc/scanner/scanner_retrieval/scanner_retrieval_bloc.dart';
+import 'package:evalet/bloc/scanner/scanner_retrieval/scanner_retrieval_event.dart';
+import 'package:evalet/bloc/scanner/scanner_retrieval/scanner_retrieval_state.dart';
+import 'package:evalet/bloc/websocket/websocket_bloc.dart';
+import 'package:evalet/models/operator/operator_dashboard/retrieval_request.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/oauth/login/login.dart';
+import 'package:evalet/ui/oauth/profile/overflow_menu.dart';
+import 'package:evalet/ui/oauth/profile/profile_screen.dart';
+import 'package:evalet/ui/scanner/scanner_qr_dialog.dart';
+import 'package:evalet/ui/scanner/widgets/scanner_retrieval_request_card.dart';
 
 /// Scanner role home screen: top bar (same style as driver) and menu with
 /// Profile and Logout only.

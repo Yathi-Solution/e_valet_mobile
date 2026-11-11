@@ -1,16 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/session_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/checkin_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/offline_checkin_request.dart';
-import 'package:niloufer_valet_mobile/services/background/background_sync_service.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/parked_card_availability_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/api/driver/session_api_service.dart';
+import 'package:evalet/bloc/driver/tag_submission/tag_submission_event.dart';
+import 'package:evalet/bloc/driver/tag_submission/tag_submission_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/session/checkin_request.dart';
+import 'package:evalet/models/driver/session/offline_checkin_request.dart';
+import 'package:evalet/services/background/background_sync_service.dart';
+import 'package:evalet/services/offline_sync/offline_parking_service.dart';
+import 'package:evalet/services/offline_sync/parked_card_availability_service.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 
 class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
   TagSubmissionBloc() : super(const TagSubmissionInitial()) {

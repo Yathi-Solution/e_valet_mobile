@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/car_logs_kpis_response.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/skeleton_loader.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_dashboard/widgets/kpi_card.dart';
+import 'package:evalet/models/operator/operator_dashboard/car_logs_kpis_response.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/skeleton_loader.dart';
+import 'package:evalet/ui/operator/operator_dashboard/widgets/kpi_card.dart';
 
 class CarLogsKpiGrid extends StatelessWidget {
   final CarLogsKpisResponse? kpis;

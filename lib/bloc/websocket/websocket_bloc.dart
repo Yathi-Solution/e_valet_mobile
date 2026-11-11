@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/oauth/profile_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/services/websocket/websocket_service.dart';
+import 'package:evalet/api/oauth/profile_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/services/websocket/websocket_service.dart';
 import 'websocket_event.dart';
 import 'websocket_state.dart';
 

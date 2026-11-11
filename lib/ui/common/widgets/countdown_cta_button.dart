@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/button_metrics.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 /// Full-width primary CTA with optional countdown badge on the left.
 class CountdownCtaButton extends StatelessWidget {
   final String label;

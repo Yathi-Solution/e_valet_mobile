@@ -1,14 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/pre_break_info_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/driver_status_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/break_start_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/break_end_request.dart';
-import 'package:niloufer_valet_mobile/services/location/location_service.dart';
-import 'package:niloufer_valet_mobile/services/connectivity/driver_connectivity_log_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/driver/pre_break_info_api_service.dart';
+import 'package:evalet/api/driver/driver_status_api_service.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_event.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/status/break_start_request.dart';
+import 'package:evalet/models/driver/status/break_end_request.dart';
+import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/services/connectivity/driver_connectivity_log_service.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 /// Driver status is driven by login (clock-in) and logout (clock-out).
 /// This bloc fetches/refreshes status and handles break start/end only.

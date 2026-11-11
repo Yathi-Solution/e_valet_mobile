@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/footer.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/profile/overflow_menu.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
+import 'package:evalet/ui/common/widgets/footer.dart';
+import 'package:evalet/ui/oauth/profile/overflow_menu.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 /// Shown when login succeeds but clock-in / verify-location fails because the user is too far from the outlet.
 class ClockInTooFarScreen extends StatelessWidget {

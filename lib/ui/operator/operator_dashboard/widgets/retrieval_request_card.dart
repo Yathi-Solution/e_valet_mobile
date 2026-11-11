@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_dashboard/operator_dashboard_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_dashboard/operator_dashboard_event.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_dashboard/operator_dashboard_state.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/available_drivers.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/retrieval_request.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/full_image_viewer_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/utils/retrieval_request_utils.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_dashboard/widgets/assignment_confirmation_dialog.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/bloc/operator/operator_dashboard/operator_dashboard_bloc.dart';
+import 'package:evalet/bloc/operator/operator_dashboard/operator_dashboard_event.dart';
+import 'package:evalet/bloc/operator/operator_dashboard/operator_dashboard_state.dart';
+import 'package:evalet/models/operator/operator_dashboard/available_drivers.dart';
+import 'package:evalet/models/operator/operator_dashboard/retrieval_request.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/full_image_viewer_dialog.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/utils/retrieval_request_utils.dart';
+import 'package:evalet/ui/operator/operator_dashboard/widgets/assignment_confirmation_dialog.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class RetrievalRequestCard extends StatefulWidget {

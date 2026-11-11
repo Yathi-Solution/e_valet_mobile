@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
-import 'package:niloufer_valet_mobile/api/translations/translations_api_service.dart';
-import 'package:niloufer_valet_mobile/models/translations/translations_response.dart';
-import 'package:niloufer_valet_mobile/services/translations/language_cache.dart';
+import 'package:evalet/api/translations/translations_api_service.dart';
+import 'package:evalet/models/translations/translations_response.dart';
+import 'package:evalet/services/translations/language_cache.dart';
 
 class TranslationsCache {
   static const String _boxName = 'translationsBox';

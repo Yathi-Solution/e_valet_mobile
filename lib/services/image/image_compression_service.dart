@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Compresses an image file for upload. Quality and optional max size

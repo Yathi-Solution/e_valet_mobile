@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:niloufer_valet_mobile/api/operator/operator_dashboard/operator_retrieval_requests_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_retrieval/scanner_retrieval_event.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_retrieval/scanner_retrieval_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
+import 'package:evalet/api/operator/operator_dashboard/operator_retrieval_requests_api_service.dart';
+import 'package:evalet/bloc/scanner/scanner_retrieval/scanner_retrieval_event.dart';
+import 'package:evalet/bloc/scanner/scanner_retrieval/scanner_retrieval_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/bloc/websocket/websocket_bloc.dart';
 
 class ScannerRetrievalBloc
     extends Bloc<ScannerRetrievalEvent, ScannerRetrievalState> {

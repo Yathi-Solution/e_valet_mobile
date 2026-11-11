@@ -1,7 +1,7 @@
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/api/core/base_dio_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/translations/language.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/api/core/base_dio_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/translations/language.dart';
 
 /// Fetches available languages from GET /api/languages.
 /// API returns: id, code, name, nativeName, isActive, isDefault, createdAt, updatedAt

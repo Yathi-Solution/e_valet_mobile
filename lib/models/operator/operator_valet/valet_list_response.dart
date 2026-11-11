@@ -1,4 +1,4 @@
-import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
+import 'package:evalet/models/operator/operator_valet/valet_response.dart';
 
 class ValetListResponse {
   final List<ValetResponse> valets;

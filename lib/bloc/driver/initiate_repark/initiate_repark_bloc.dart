@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/initiate_repark_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/re-park/initiate_repark_request.dart';
+import 'package:evalet/api/driver/initiate_repark_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/re-park/initiate_repark_request.dart';
 import 'initiate_repark_event.dart';
 import 'initiate_repark_state.dart';
 

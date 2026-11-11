@@ -1,8 +1,8 @@
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/api/core/base_dio_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_cards/card_assignments_response.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/api/core/base_dio_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/operator/operator_cards/card_assignments_response.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 /// GET/POST/DELETE/PATCH /api/v1/operators/card-assignments
 /// The PATCH /drivers/{driverUserId} replaces the full set of card numbers for one driver.

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/utils/duration_utils.dart';
-import 'package:niloufer_valet_mobile/utils/time_utils.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/utils/duration_utils.dart';
+import 'package:evalet/utils/time_utils.dart';
 
 class RetrievalRequestUtils {
   RetrievalRequestUtils._();

@@ -1,4 +1,4 @@
-import 'package:niloufer_valet_mobile/models/operator/operator_overtime/grant_overtime_response.dart';
+import 'package:evalet/models/operator/operator_overtime/grant_overtime_response.dart';
 
 class ValetResponse {
   final String userId;

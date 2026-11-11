@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/oauth/logout_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/api/oauth/logout_api_service.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_event.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 
 class ScannerMenuBloc extends Bloc<ScannerMenuEvent, ScannerMenuState> {
   ScannerMenuBloc() : super(const ScannerMenuInitial()) {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 /// A dialog that displays a full-size image when the user taps on a car image.
 /// Use [FullImageViewerDialog.show] to display an image URL in a popup.

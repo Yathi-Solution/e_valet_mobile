@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/driver/qr/qr_data.dart';
+import 'package:evalet/models/driver/qr/qr_data.dart';
 
 abstract class TagSubmissionEvent extends Equatable {
   const TagSubmissionEvent();

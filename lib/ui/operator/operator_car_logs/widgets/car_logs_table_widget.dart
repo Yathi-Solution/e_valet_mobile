@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/car_log.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_car_logs/widgets/table_header_row_widget.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_car_logs/widgets/table_data_row_widget.dart';
+import 'package:evalet/models/operator/operator_dashboard/car_log.dart';
+import 'package:evalet/ui/operator/operator_car_logs/widgets/table_header_row_widget.dart';
+import 'package:evalet/ui/operator/operator_car_logs/widgets/table_data_row_widget.dart';
 
 class CarLogsTableWidget extends StatelessWidget {
   final List<CarLog> logs;

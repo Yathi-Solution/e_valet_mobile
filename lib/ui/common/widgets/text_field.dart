@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/typography.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/typography.dart';
 
 class TextFieldComponent extends StatefulWidget {
   final String labelText;

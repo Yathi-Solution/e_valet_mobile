@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/driver/retrival_request/retrival_widgets/session_card.dart';
+import 'package:evalet/models/driver/session/assigned_session.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/driver/retrival_request/retrival_widgets/session_card.dart';
 
 class RetrievalRequestSheet extends StatelessWidget {
   final AssignedSession? session;

@@ -2,20 +2,20 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/pre_break_info_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/my_cards_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/driver_status_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/sessions_pending_api.dart';
-import 'package:niloufer_valet_mobile/api/oauth/logout_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/parked/my_parked_sessions_response.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/clock_out_request.dart';
-import 'package:niloufer_valet_mobile/services/location/location_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/api/driver/pre_break_info_api_service.dart';
+import 'package:evalet/api/driver/my_cards_api_service.dart';
+import 'package:evalet/api/driver/driver_status_api_service.dart';
+import 'package:evalet/api/driver/my_parked_sessions_api_service.dart';
+import 'package:evalet/api/driver/sessions_pending_api.dart';
+import 'package:evalet/api/oauth/logout_api_service.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_event.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/parked/my_parked_sessions_response.dart';
+import 'package:evalet/models/driver/status/clock_out_request.dart';
+import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 
 class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
   DriverMenuBloc() : super(const DriverMenuInitial()) {

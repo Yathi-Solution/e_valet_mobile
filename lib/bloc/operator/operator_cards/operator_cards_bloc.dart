@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/operator/operator_cards/card_assignments_api_service.dart';
-import 'package:niloufer_valet_mobile/api/operator/operator_valet/valet_list_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_cards/operator_cards_event.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_cards/operator_cards_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_cards/card_assignments_response.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
+import 'package:evalet/api/operator/operator_cards/card_assignments_api_service.dart';
+import 'package:evalet/api/operator/operator_valet/valet_list_api_service.dart';
+import 'package:evalet/bloc/operator/operator_cards/operator_cards_event.dart';
+import 'package:evalet/bloc/operator/operator_cards/operator_cards_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/operator/operator_cards/card_assignments_response.dart';
+import 'package:evalet/models/operator/operator_valet/valet_response.dart';
 
 class OperatorCardsBloc extends Bloc<OperatorCardsEvent, OperatorCardsState> {
   OperatorCardsBloc({required this.outletId})
