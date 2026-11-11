@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:niloufer_valet_mobile/models/oauth/client_summary.dart';
 import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
 import 'package:niloufer_valet_mobile/models/outlet/outlet.dart';
 
@@ -37,6 +38,16 @@ class LoginSuccessNeedsOutletSelection extends LoginState {
   @override
   List<Object?> get props =>
       [profile, outlets, isDriver, isOperator, isScanner];
+}
+
+/// Login returned a Platform token; the user must pick a Client to enter.
+class LoginNeedsClientSelection extends LoginState {
+  final List<ClientSummary> clients;
+
+  const LoginNeedsClientSelection(this.clients);
+
+  @override
+  List<Object?> get props => [clients];
 }
 
 /// Outlet selected; now performing clock-in / verify-location in the background.

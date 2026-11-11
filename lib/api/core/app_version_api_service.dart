@@ -28,7 +28,7 @@ class AppVersionApiService {
     );
     final response = await base.get(
       '/app-version/build-number',
-      retryOn401: false,
+      endSessionOn401: false,
     );
     final data = response.data as Map<String, dynamic>?;
     if (data == null) {

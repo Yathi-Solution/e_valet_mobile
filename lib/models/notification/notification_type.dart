@@ -1,3 +1,8 @@
+/// The server's FCM type for a new assignment (`retrieval_assigned`) is handled
+/// exactly like the legacy `retrieval_request`.
+bool isRetrievalAlertType(String? type) =>
+    type == 'retrieval_request' || type == 'retrieval_assigned';
+
 /// Notification types for the valet system
 enum NotificationType {
   retrievalRequest('retrieval_request'),
@@ -15,6 +20,7 @@ enum NotificationType {
   static NotificationType fromString(String? value) {
     switch (value?.toLowerCase()) {
       case 'retrieval_request':
+      case 'retrieval_assigned':
         return NotificationType.retrievalRequest;
       case 'driver_assigned':
         return NotificationType.driverAssigned;

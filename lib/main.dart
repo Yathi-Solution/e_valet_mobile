@@ -24,7 +24,7 @@ import 'package:provider/provider.dart';
 import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
 import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_bloc.dart';
 import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_event.dart';
-import 'package:niloufer_valet_mobile/api/oauth/refresh_api_service.dart';
+import 'package:niloufer_valet_mobile/services/oauth/session_events.dart';
 import 'package:niloufer_valet_mobile/services/permissions/permissions_service.dart';
 import 'package:niloufer_valet_mobile/ui/oauth/login/login.dart';
 import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
@@ -74,8 +74,8 @@ void main() async {
   final firebaseMessagingService = FirebaseMessagingService();
   await firebaseMessagingService.initialize();
 
-  // When refresh returns 401 (e.g. logged in on another device), clear is done in RefreshApiService; show message and go to login.
-  RefreshApiService.onSessionEnded = (message) {
+  // On 401 SESSION_ENDED the HTTP layer has already cleared local state; show message and go to login.
+  SessionEvents.onSessionEnded = (message) {
     final ctx = FirebaseMessagingService.navigatorKey.currentContext;
     if (ctx != null) {
       SnackBars.showErrorSnackBar(ctx, message);
