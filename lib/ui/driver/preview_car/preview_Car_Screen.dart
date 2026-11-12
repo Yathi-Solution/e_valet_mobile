@@ -19,6 +19,7 @@ import 'package:evalet/api/driver/sessions_pending_api.dart';
 import 'package:evalet/models/driver/session/pending_sessions_response.dart';
 import 'package:evalet/ui/driver/driver_home/driver_home.dart';
 import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
 import 'package:evalet/bloc/driver/driver_home/driver_menu_bloc.dart';
 import 'package:evalet/bloc/driver/driver_home/driver_menu_event.dart';
 import 'package:evalet/bloc/driver/preview_car/preview_car_bloc.dart';
@@ -63,9 +64,16 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
 
   bool _hasNavigatedAfterSuccess = false;
 
+  /// Location lookup started when the screen opens, so the fix is usually
+  /// ready by the time the driver taps Done. Resolves to null on failure.
+  Future<Map<String, double>?>? _warmCoordinates;
+
   @override
   void initState() {
     super.initState();
+    _warmCoordinates = LocationService.getFastCoordinates()
+        .then<Map<String, double>?>((c) => c)
+        .catchError((_) => null);
     // Clear any global "no internet" banner so it never shows over the preview
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) ScaffoldMessenger.of(context).clearMaterialBanners();
@@ -82,6 +90,7 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
 
   @override
   void dispose() {
+    ParkFlowSignals.setParkSubmitInProgress(false);
     _parkingLocationController.dispose();
     super.dispose();
   }
@@ -90,10 +99,16 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
     // Guard: prevent multiple rapid taps immediately
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
+    // Tell the pending-session watchdogs not to treat this session as cancelled
+    // once the park succeeds and it leaves the pending list.
+    ParkFlowSignals.setParkSubmitInProgress(true);
 
     try {
       // Get current GPS location
-      final coordinates = await LocationService.getCurrentCoordinates();
+      // Use the lookup started in initState; retry once if it failed so the
+      // driver still sees a proper error (permission, location off, ...).
+      final coordinates = await _warmCoordinates ??
+          await LocationService.getFastCoordinates();
 
       if (!context.mounted) return;
 
@@ -128,10 +143,12 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
             ),
           );
     } on ApiException catch (e) {
+      ParkFlowSignals.setParkSubmitInProgress(false);
       if (!context.mounted) return;
       setState(() => _isProcessing = false);
       SnackBars.showErrorSnackBar(context, e.message);
     } catch (e) {
+      ParkFlowSignals.setParkSubmitInProgress(false);
       if (!context.mounted) return;
       setState(() => _isProcessing = false);
       SnackBars.showErrorSnackBar(
@@ -151,11 +168,24 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
     if (_hasNavigatedAfterSuccess) return;
     _hasNavigatedAfterSuccess = true;
 
+    // The session is parked, so it is no longer pending. Clear the stored id
+    // right away; otherwise a watchdog poll sees it missing from the pending
+    // list, assumes it was cancelled and pops back to Home before the success
+    // screen appears.
+    try {
+      await TokenStorage.clearSessionId();
+      await TokenStorage.clearSessionIdFromGetApi();
+    } catch (_) {}
+    ParkFlowSignals.setParkSubmitInProgress(false);
+    if (!context.mounted) return;
+
     _refreshParkedCarsCount(context);
 
     PendingSessionsResponse? pending;
     try {
-      pending = await SessionsPendingApiService.getPendingSessions();
+      // Don't hold the driver on this screen if the check is slow.
+      pending = await SessionsPendingApiService.getPendingSessions()
+          .timeout(const Duration(seconds: 4));
     } catch (_) {
       pending = null;
     }
@@ -345,6 +375,7 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
           if (state is PreviewCarSuccess) {
             _handlePostParkNavigation(context);
           } else if (state is PreviewCarError) {
+            ParkFlowSignals.setParkSubmitInProgress(false);
             setState(() => _isProcessing = false);
             SnackBars.showErrorSnackBar(
               context,

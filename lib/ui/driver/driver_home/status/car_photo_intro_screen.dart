@@ -96,6 +96,8 @@ class _CarPhotoIntroScreenState extends State<CarPhotoIntroScreen>
 
   Future<void> _checkPendingSessionCancellation() async {
     if (!mounted || _isHandlingCancellation) return;
+    // A park submit is in flight: the session leaving the pending list is expected.
+    if (ParkFlowSignals.isParkSubmitInProgress) return;
     final sessionId = await TokenStorage.getSessionId();
     if (sessionId == null || sessionId.isEmpty) return;
     if (OfflineParkingService.isOfflineSessionId(sessionId)) return;
@@ -103,6 +105,10 @@ class _CarPhotoIntroScreenState extends State<CarPhotoIntroScreen>
     try {
       final pending = await SessionsPendingApiService.getPendingSessions();
       final stillExists = pending.sessions.any((s) => s.sessionId == sessionId);
+      // The park may have completed while this request was in flight; a
+      // parked session is no longer "pending" but it was not cancelled.
+      if (ParkFlowSignals.isParkSubmitInProgress) return;
+      if (await TokenStorage.getSessionId() != sessionId) return;
       if (!stillExists) {
         await _redirectToHomeOnCancellation();
       }
