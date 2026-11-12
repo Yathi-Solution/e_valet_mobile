@@ -274,10 +274,10 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
                       cardNumber: _lastSubmittedCardNumber,
                       onReturnFromCamera: () {
                         widget.onReturnFromCarCamera?.call();
-                        if (mounted) {
-                          _introTimer?.cancel();
-                          setState(() => _showCamera = true);
-                        }
+                        // Widget may be gone (e.g. navigated away after park success).
+                        if (!mounted || !context.mounted) return;
+                        _introTimer?.cancel();
+                        setState(() => _showCamera = true);
                         context
                             .read<QrBloc>()
                             .add(const QrCameraActivateRequested());
@@ -287,10 +287,10 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
                 ).then((_) {
                   // When user returns from third screen: show camera again (intro already shown)
                   widget.onReturnFromCarCamera?.call();
-                  if (mounted) {
-                    _introTimer?.cancel();
-                    setState(() => _showCamera = true);
-                  }
+                  // Widget may be gone (e.g. navigated away after park success).
+                  if (!mounted || !context.mounted) return;
+                  _introTimer?.cancel();
+                  setState(() => _showCamera = true);
                   context.read<QrBloc>().add(const QrCameraActivateRequested());
                 });
               } else if (submissionState is TagSubmissionError) {

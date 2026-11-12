@@ -14,6 +14,7 @@ import 'package:evalet/models/driver/status/clock_in_request.dart';
 import 'package:evalet/models/oauth/phone_password_login_request.dart';
 import 'package:evalet/models/oauth/login_result.dart';
 import 'package:evalet/models/oauth/profile.dart';
+import 'package:evalet/models/outlet/outlet.dart';
 import 'package:evalet/models/outlet/verify_location_request.dart';
 import 'package:evalet/models/outlet/verify_location_response.dart';
 import 'package:evalet/services/location/location_service.dart';
@@ -166,6 +167,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     // Fetch outlets so the user can pick one before clock-in / verify-location
     final outlets = await OutletApiService.getOutlets();
 
+    // Only one outlet available: skip the picker and continue with it directly.
+    // The state stays [LoginLoading] so the login button keeps its spinner.
+    if (outlets.length == 1) {
+      await _completeOutletSelection(outlets.first, emit);
+      return;
+    }
+
     emit(LoginSuccessNeedsOutletSelection(
       profile: profile,
       outlets: outlets,
@@ -179,12 +187,21 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     OutletSelected event,
     Emitter<LoginState> emit,
   ) async {
-    final profile = _pendingProfile;
-    if (profile == null) return;
+    if (_pendingProfile == null) return;
 
     emit(const LoginOutletSelectionLoading());
 
-    final outlet = event.outlet;
+    await _completeOutletSelection(event.outlet, emit);
+  }
+
+  /// Clock-in / verify-location for the chosen [outlet]. Used both when the
+  /// user picks from the dialog and when there is only one outlet.
+  Future<void> _completeOutletSelection(
+    Outlet outlet,
+    Emitter<LoginState> emit,
+  ) async {
+    final profile = _pendingProfile;
+    if (profile == null) return;
 
     try {
       // Get the user's current location (shared by both driver and operator/scanner paths)
