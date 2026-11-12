@@ -15,6 +15,7 @@ import 'package:evalet/ui/common/widgets/snack_bar.dart';
 import 'package:evalet/ui/oauth/login/login_form.dart';
 import 'package:evalet/ui/oauth/login/login_outlet_too_far_page.dart';
 import 'package:evalet/ui/oauth/login/login_role_navigation.dart';
+import 'package:evalet/ui/common/widgets/client_selection_dialog.dart';
 import 'package:evalet/ui/common/widgets/outlet_selection_dialog.dart';
 import 'package:evalet/models/oauth/client_summary.dart';
 import 'package:evalet/models/oauth/profile.dart';
@@ -108,22 +109,13 @@ class _LoginScreenState extends State<LoginScreen> {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => SimpleDialog(
-        title: const Text('Select client'),
-        children: [
-          for (final c in clients)
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                bloc.add(ClientSelected(c.id));
-              },
-              child: Text(c.name),
-            ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
-          ),
-        ],
+      builder: (dialogContext) => ClientSelectionDialog(
+        clients: clients,
+        onClientSelected: (client) {
+          Navigator.of(dialogContext).pop();
+          bloc.add(ClientSelected(client.id));
+        },
+        onCancel: () => Navigator.of(dialogContext).pop(),
       ),
     );
   }

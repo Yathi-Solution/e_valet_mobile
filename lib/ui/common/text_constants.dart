@@ -232,6 +232,9 @@ class TextConstants {
 
   /// Selected outlet from login (operator/scanner/driver session).
   static const String profileOutletLabel = 'Outlet';
+
+  /// Client (tenant) the user is signed in to.
+  static const String profileClientLabel = 'Client';
   static const String usernameLabel = 'Username';
   static const String joinedLabel = 'Joined';
   static const String resetPassword = 'Reset Password';
