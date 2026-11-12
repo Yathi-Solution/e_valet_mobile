@@ -16,7 +16,6 @@ import 'package:evalet/ui/driver/preview_car/preview_Car_widgets/preview_image_c
 import 'package:evalet/ui/driver/preview_car/preview_Car_widgets/preview_submit_button.dart';
 import 'package:evalet/ui/driver/car_Camera/car_Success.dart';
 import 'package:evalet/api/driver/sessions_pending_api.dart';
-import 'package:evalet/models/driver/session/pending_sessions_response.dart';
 import 'package:evalet/ui/driver/driver_home/driver_home.dart';
 import 'package:evalet/services/oauth/token_interceptor.dart';
 import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
@@ -67,6 +66,21 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
   /// Location lookup started when the screen opens, so the fix is usually
   /// ready by the time the driver taps Done. Resolves to null on failure.
   Future<Map<String, double>?>? _warmCoordinates;
+
+  /// Whether the driver has other checked-in cars still waiting to be parked.
+  /// Started alongside the park call so the result is ready when it succeeds.
+  Future<bool>? _otherPendingSessions;
+
+  Future<bool> _fetchHasOtherPendingSessions() async {
+    try {
+      final pending = await SessionsPendingApiService.getPendingSessions()
+          .timeout(const Duration(seconds: 4));
+      // The session being parked may still be listed; it doesn't count.
+      return pending.sessions.any((s) => s.sessionId != widget.sessionId);
+    } catch (_) {
+      return false;
+    }
+  }
 
   @override
   void initState() {
@@ -125,6 +139,8 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
           sessionId.isNotEmpty &&
           !OfflineParkingService.isOfflineSessionId(sessionId);
 
+      _otherPendingSessions = _fetchHasOtherPendingSessions();
+
       context.read<PreviewCarBloc>().add(
             SubmitPhotoRequested(
               imagePath: (widget.parkingLocation == null ||
@@ -181,18 +197,11 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
 
     _refreshParkedCarsCount(context);
 
-    PendingSessionsResponse? pending;
-    try {
-      // Don't hold the driver on this screen if the check is slow.
-      pending = await SessionsPendingApiService.getPendingSessions()
-          .timeout(const Duration(seconds: 4));
-    } catch (_) {
-      pending = null;
-    }
+    // Usually already resolved: it ran while the park request was uploading.
+    final hasPending =
+        await (_otherPendingSessions ?? _fetchHasOtherPendingSessions());
 
     if (!context.mounted) return;
-
-    final hasPending = pending != null && pending.sessions.isNotEmpty;
 
     if (hasPending) {
       try {

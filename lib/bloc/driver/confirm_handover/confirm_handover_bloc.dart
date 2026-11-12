@@ -45,8 +45,11 @@ class ConfirmHandoverBloc
         );
       }
 
-      // Get current location coordinates with accuracy
-      final coordinates = await LocationService.getCurrentCoordinates();
+      // Driver has just moved the car: only reuse a fix from the last few
+      // seconds, otherwise wait briefly for a fresh one.
+      final coordinates = await LocationService.getFastCoordinates(
+        maxAge: const Duration(seconds: 15),
+      );
       final latitude = coordinates['latitude']!;
       final longitude = coordinates['longitude']!;
       final accuracy = coordinates['accuracy']!;
