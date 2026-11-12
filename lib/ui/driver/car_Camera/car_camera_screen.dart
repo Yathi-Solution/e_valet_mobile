@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:evalet/api/driver/sessions_pending_api.dart';
 import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
 import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
 import 'package:evalet/ui/common/colors.dart';
 import 'package:evalet/ui/common/text_constants.dart';
@@ -77,12 +78,18 @@ class _CarCameraScreenState extends State<CarCameraScreen>
 
   Future<void> _checkPendingSessionCancellation() async {
     if (!mounted || _isHandlingCancellation) return;
+    // A park submit is in flight: the session leaving the pending list is expected.
+    if (ParkFlowSignals.isParkSubmitInProgress) return;
     final sessionId = await TokenStorage.getSessionId();
     if (sessionId == null || sessionId.isEmpty) return;
 
     try {
       final pending = await SessionsPendingApiService.getPendingSessions();
       final stillExists = pending.sessions.any((s) => s.sessionId == sessionId);
+      // The park may have completed while this request was in flight; a
+      // parked session is no longer "pending" but it was not cancelled.
+      if (ParkFlowSignals.isParkSubmitInProgress) return;
+      if (await TokenStorage.getSessionId() != sessionId) return;
       if (!stillExists) {
         await _redirectToHomeOnCancellation();
       }

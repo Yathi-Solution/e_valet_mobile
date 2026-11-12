@@ -29,8 +29,9 @@ class LocationService {
     return await Geolocator.openAppSettings();
   }
 
-  /// Get current location with latitude and longitude
-  static Future<Position> getCurrentLocation() async {
+  /// Throws an [ApiException] unless location services are on and the app
+  /// has location permission (prompting the user where possible).
+  static Future<void> _ensureServiceAndPermission() async {
     // Check if location services are enabled
     bool serviceEnabled = await isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -75,6 +76,11 @@ class LocationService {
         code: 'location_permission_denied_forever',
       );
     }
+  }
+
+  /// Get current location with latitude and longitude
+  static Future<Position> getCurrentLocation() async {
+    await _ensureServiceAndPermission();
 
     // Get current position - try high accuracy first, then fallback to lower accuracy
     try {
@@ -122,6 +128,59 @@ class LocationService {
       'accuracy': position.accuracy,
     };
   }
+
+  /// Faster variant for flows where the user is waiting on a button (e.g. park
+  /// submit). Reuses the device's last known position when it is newer than
+  /// [maxAge]; otherwise waits at most [freshTimeout] for a fresh fix and falls
+  /// back to the last known position of any age before giving up.
+  static Future<Map<String, double>> getFastCoordinates({
+    Duration maxAge = const Duration(minutes: 2),
+    Duration freshTimeout = const Duration(seconds: 4),
+  }) async {
+    await _ensureServiceAndPermission();
+
+    Position? lastKnown;
+    try {
+      lastKnown = await Geolocator.getLastKnownPosition();
+    } catch (_) {
+      lastKnown = null;
+    }
+
+    if (lastKnown != null &&
+        DateTime.now().difference(lastKnown.timestamp).abs() <= maxAge) {
+      return _toCoordinates(lastKnown);
+    }
+
+    try {
+      final fresh = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: freshTimeout,
+      );
+      return _toCoordinates(fresh);
+    } catch (_) {
+      // Weak GPS (e.g. basement parking): an older fix beats making the user wait.
+      if (lastKnown != null) return _toCoordinates(lastKnown);
+    }
+
+    try {
+      final coarse = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: freshTimeout,
+      );
+      return _toCoordinates(coarse);
+    } catch (_) {
+      throw ApiException(
+        'Unable to get location. Please ensure location services are enabled and try again.',
+        code: 'location_timeout',
+      );
+    }
+  }
+
+  static Map<String, double> _toCoordinates(Position position) => {
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+        'accuracy': position.accuracy,
+      };
 
   /// Get address from coordinates (placeholder - can be enhanced with reverse geocoding)
   /// For now, returns a formatted string with coordinates

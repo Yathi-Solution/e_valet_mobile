@@ -15,6 +15,7 @@ import 'package:evalet/ui/driver/driver_home/status/driver_vehicle_details_scree
 import 'package:evalet/ui/driver/retrival_request/pending_retrieval_requests_screen.dart';
 import 'package:evalet/services/oauth/session_manager.dart';
 import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
 import 'package:evalet/services/offline_sync/offline_parking_service.dart';
 import 'package:evalet/ui/oauth/login/login.dart';
 
@@ -71,6 +72,8 @@ class _DriverOnlineContentState extends State<DriverOnlineContent>
 
   Future<void> _checkPendingSessionCancellation() async {
     if (!mounted || _handlingPendingCancellation) return;
+    // A park submit is in flight: the session leaving the pending list is expected.
+    if (ParkFlowSignals.isParkSubmitInProgress) return;
     final sessionId = await TokenStorage.getSessionId();
     if (sessionId == null || sessionId.isEmpty) return;
     if (OfflineParkingService.isOfflineSessionId(sessionId)) return;
@@ -81,6 +84,10 @@ class _DriverOnlineContentState extends State<DriverOnlineContent>
           pending.sessions.any((s) => s.sessionId == sessionId);
 
       // Backend cancelled/expired the session if it's no longer returned.
+      // The park may have completed while this request was in flight; a
+      // parked session is no longer "pending" but it was not cancelled.
+      if (ParkFlowSignals.isParkSubmitInProgress) return;
+      if (await TokenStorage.getSessionId() != sessionId) return;
       if (!stillPending) {
         _handlingPendingCancellation = true;
         await _handlePendingSessionCancelled();
