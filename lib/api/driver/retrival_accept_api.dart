@@ -1,10 +1,7 @@
 import 'package:evalet/api/core/api_config.dart';
 import 'package:evalet/api/core/base_dio_service.dart';
-import 'package:evalet/api/driver/image_API.dart';
 import 'package:evalet/models/core/api_exceptions.dart';
-import 'package:evalet/models/driver/park/park_request.dart';
 import 'package:evalet/models/driver/session/accept_response.dart';
-import 'package:evalet/services/image/image_compression_service.dart';
 import 'package:evalet/services/oauth/token_interceptor.dart';
 
 class RetrievalAcceptApiService {
@@ -48,31 +45,6 @@ class RetrievalAcceptApiService {
       );
 
       final data = response.data as Map<String, dynamic>;
-
-      // Check if there's a pending photo to upload
-      final pendingPhotoPath = await TokenStorage.getPendingPhotoPath();
-      if (pendingPhotoPath != null && pendingPhotoPath.isNotEmpty) {
-        try {
-          final compressedPath =
-              await ImageCompressionService.compressImage(pendingPhotoPath);
-          // Create park request with photo and GPS data from accept call
-          final parkRequest = ParkRequest(
-            imagePath: compressedPath,
-            latitude: latitude,
-            longitude: longitude,
-            // accuracy is optional, so we don't include it here
-          );
-
-          await ImageApiService.uploadParkingPhoto(
-            request: parkRequest,
-            sessionId: sessionId,
-          );
-          await TokenStorage.clearPendingPhotoPath();
-        } catch (photoError) {
-          print('❌ Failed to upload pending photo: $photoError');
-          // Don't fail the whole operation if photo upload fails
-        }
-      }
 
       return AcceptResponse.fromJson(data);
     } on ApiException catch (e) {

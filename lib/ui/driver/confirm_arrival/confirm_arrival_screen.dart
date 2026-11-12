@@ -414,12 +414,12 @@ class _ConfirmArrivalScreenState extends State<ConfirmArrivalScreen> {
         );
       }
 
-      final position = await LocationService.getCurrentLocation();
+      final coordinates = await LocationService.getFastCoordinates();
 
       final request = InitiateReparkRequest(
-        latitude: position.latitude,
-        longitude: position.longitude,
-        accuracy: position.accuracy,
+        latitude: coordinates['latitude']!,
+        longitude: coordinates['longitude']!,
+        accuracy: coordinates['accuracy']!,
       );
 
       final response = await InitiateReparkApiService.initiateRepark(

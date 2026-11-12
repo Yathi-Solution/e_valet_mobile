@@ -199,8 +199,8 @@ class _CustomerMissingDialogState extends State<CustomerMissingDialog> {
                               }
 
                               // Get current location
-                              final position =
-                                  await LocationService.getCurrentLocation();
+                              final coordinates =
+                                  await LocationService.getFastCoordinates();
 
                               if (!context.mounted) return;
 
@@ -208,9 +208,9 @@ class _CustomerMissingDialogState extends State<CustomerMissingDialog> {
                               context.read<InitiateReparkBloc>().add(
                                     InitiateReparkRequested(
                                       sessionId: widget.sessionId,
-                                      latitude: position.latitude,
-                                      longitude: position.longitude,
-                                      accuracy: position.accuracy,
+                                      latitude: coordinates['latitude']!,
+                                      longitude: coordinates['longitude']!,
+                                      accuracy: coordinates['accuracy']!,
                                     ),
                                   );
                             } catch (e) {

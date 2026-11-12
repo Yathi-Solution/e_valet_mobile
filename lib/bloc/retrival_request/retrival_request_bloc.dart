@@ -68,7 +68,7 @@ class RetrivalRequestBloc
       throw Exception('Location permission is required to accept session');
     }
 
-    final coordinates = await LocationService.getCurrentCoordinates();
+    final coordinates = await LocationService.getFastCoordinates();
     final latitude = coordinates['latitude']!;
     final longitude = coordinates['longitude']!;
     final accuracy = coordinates['accuracy']!;
