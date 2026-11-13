@@ -7,17 +7,23 @@ class OfflineCheckinRequest {
   final String clientSessionId;
   final String timestamp;
 
+  /// Outlet Code read from the scanned card, kept so the server can still
+  /// check the card's outlet when this check-in syncs. Null when unknown.
+  final String? outletCode;
+
   OfflineCheckinRequest({
     required this.outletId,
     required this.cardNumber,
     required this.clientSessionId,
     required this.timestamp,
+    this.outletCode,
   });
 
   CheckinRequest toCheckinRequest() {
     return CheckinRequest(
       outletId: outletId,
       cardNumber: cardNumber,
+      outletCode: outletCode,
     );
   }
 }
@@ -37,13 +43,15 @@ class OfflineCheckinRequestAdapter extends TypeAdapter<OfflineCheckinRequest> {
       cardNumber: fields[1] as int,
       clientSessionId: fields[2] as String,
       timestamp: fields[3] as String,
+      // Absent on entries saved before this field existed.
+      outletCode: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, OfflineCheckinRequest obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.outletId)
       ..writeByte(1)
@@ -51,6 +59,8 @@ class OfflineCheckinRequestAdapter extends TypeAdapter<OfflineCheckinRequest> {
       ..writeByte(2)
       ..write(obj.clientSessionId)
       ..writeByte(3)
-      ..write(obj.timestamp);
+      ..write(obj.timestamp)
+      ..writeByte(4)
+      ..write(obj.outletCode);
   }
 }

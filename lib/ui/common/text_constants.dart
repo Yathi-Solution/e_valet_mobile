@@ -54,6 +54,9 @@ class TextConstants {
   /// Error shown to a driver who tries to park/retrieve using a card not allocated to them.
   static const String driverCardNotAssigned =
       'The card number does not match with your cards. You may have taken another driver\'s card.';
+  /// Error shown to a driver who scans a card that belongs to another outlet.
+  static const String driverCardDifferentOutlet =
+      'This valet card belongs to a different outlet. Please scan a card assigned to your current outlet.';
   static const String driverCardsLoading =
       'Your assigned cards are still loading. Please wait a moment and try again.';
   static const String cardsAllocationHint =

@@ -46,6 +46,8 @@ class QrBloc extends Bloc<QrEvent, QrState> {
       final qrData = QrData(
         outletId: outletId,
         cardNumber: customerCardNumber,
+        // Sent at check-in so the server can refuse a card of another outlet.
+        outletCode: tryParseOutletCodeFromWhatsAppUrl(raw),
       );
 
       emit(state.copyWith(
