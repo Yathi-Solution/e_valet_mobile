@@ -5,7 +5,7 @@ import 'package:evalet/bloc/driver/driver_home/driver_menu_state.dart';
 import 'package:evalet/ui/common/colors.dart';
 import 'package:evalet/ui/common/widgets/app_logo.dart';
 import 'package:evalet/ui/oauth/profile/overflow_menu.dart';
-import 'package:evalet/ui/common/translations/language_dropdown_button.dart';
+// import 'package:evalet/ui/common/translations/language_dropdown_button.dart';
 import 'package:evalet/ui/driver/parked_cars/widgets/parked_cars_app_bar_action.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -74,10 +74,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         );
         built.add(SizedBox(width: screenWidth * 0.01));
       }
-      if (showLanguageIcon) {
-        built.add(LanguageDropdownButton(iconSize: defaultIconSize));
-        built.add(SizedBox(width: screenWidth * 0.04));
-      }
+      // Language selector is turned off for now; uncomment (with its import
+      // above) to bring it back on screens that pass [showLanguageIcon].
+      // if (showLanguageIcon) {
+      //   built.add(LanguageDropdownButton(iconSize: defaultIconSize));
+      //   built.add(SizedBox(width: screenWidth * 0.04));
+      // }
 
       DriverMenuBloc? driverMenuBloc;
       try {
