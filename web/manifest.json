@@ -1,6 +1,6 @@
 {
-    "name": "ValetLink",
-    "short_name": "ValetLink",
+    "name": "Valet Link",
+    "short_name": "Valet Link",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#1C1C1E",
