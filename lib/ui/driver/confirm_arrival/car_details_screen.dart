@@ -44,6 +44,7 @@ class CarDetailsSection extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final fontSize = screenWidth * 0.045;
     final labelFontSize = screenWidth * 0.045;
+    final parkedByMe = session.parkedBy?.isCurrentUser ?? false;
 
     return Container(
       width: double.infinity,
@@ -104,18 +105,21 @@ class CarDetailsSection extends StatelessWidget {
                         Expanded(
                           child: TextComponent(
                             labelText:
-                                '${t.get(TextConstants.parkedByLabel)} ${session.parkedBy?.name ?? t.get(TextConstants.unknown)}',
+                                '${t.get(TextConstants.parkedByLabel)} ${parkedByMe ? t.get(TextConstants.you) : session.parkedBy?.name ?? t.get(TextConstants.unknown)}',
                             fontSize: fontSize,
                             color: AppColors.black,
                             maxLines: 1,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        _CallButton(
-                          onPressed: () => FlutterPhoneDirectCaller.callNumber(
-                              session.parkedBy?.phone ?? ''),
-                        ),
+                        if (!parkedByMe) ...[
+                          const SizedBox(width: 8),
+                          _CallButton(
+                            onPressed: () =>
+                                FlutterPhoneDirectCaller.callNumber(
+                                    session.parkedBy?.phone ?? ''),
+                          ),
+                        ],
                       ],
                     ),
                   ],

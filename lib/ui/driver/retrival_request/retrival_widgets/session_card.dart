@@ -18,6 +18,7 @@ class SessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.watch<AppTranslationsNotifier>();
     final screenWidth = MediaQuery.of(context).size.width;
+    final parkedByMe = session.parkedBy?.isCurrentUser ?? false;
 
     return Column(
       children: [
@@ -117,14 +118,14 @@ class SessionCard extends StatelessWidget {
                             Expanded(
                               child: TextComponent(
                                 labelText:
-                                    '${t.get(TextConstants.parkedBy)} ${session.parkedBy?.name ?? t.get(TextConstants.unknown)}',
+                                    '${t.get(TextConstants.parkedBy)} ${parkedByMe ? t.get(TextConstants.you) : session.parkedBy?.name ?? t.get(TextConstants.unknown)}',
                                 fontSize: screenWidth * 0.032,
                                 color: AppColors.black,
                                 maxLines: 2,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            InkWell(
+                            if (!parkedByMe) InkWell(
                               onTap: () =>
                                   _makePhoneCall(session.parkedBy?.phone ?? ''),
                               borderRadius: BorderRadius.circular(20),

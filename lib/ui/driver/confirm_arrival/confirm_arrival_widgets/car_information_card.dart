@@ -26,6 +26,7 @@ class CarInformationCard extends StatelessWidget {
     final t = context.watch<AppTranslationsNotifier>();
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final parkedByMe = session.parkedBy?.isCurrentUser ?? false;
 
     return Container(
       decoration: BoxDecoration(
@@ -140,16 +141,18 @@ class CarInformationCard extends StatelessWidget {
                     ),
                     if (!compact) SizedBox(height: screenHeight * 0.01),
                     TextComponent(
-                      labelText: session.parkedBy?.name ??
-                          t.get(TextConstants.unknown),
+                      labelText: parkedByMe
+                          ? t.get(TextConstants.you)
+                          : session.parkedBy?.name ??
+                              t.get(TextConstants.unknown),
                       fontSize:
                           compact ? screenWidth * 0.032 : screenWidth * 0.04,
                       fontWeight: FontWeight.w500,
                       color: AppColors.black,
                     ),
                     Spacer(),
-                    // Phone Icon
-                    IconButton(
+                    // Phone Icon (hidden when the valet parked the car themselves)
+                    if (!parkedByMe) IconButton(
                       padding: compact ? const EdgeInsets.all(4) : null,
                       constraints: compact
                           ? const BoxConstraints(minWidth: 32, minHeight: 32)
