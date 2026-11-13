@@ -26,6 +26,7 @@ class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
     final request = CheckinRequest(
       outletId: event.qrData.outletId,
       cardNumber: event.qrData.cardNumber,
+      outletCode: event.qrData.outletCode,
     );
     await _submitCheckin(request, emit);
   }
@@ -78,17 +79,35 @@ class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
         return;
       }
 
+      if (_isDifferentOutletError(e)) {
+        emit(const TagSubmissionError(TextConstants.driverCardDifferentOutlet));
+        return;
+      }
+
       emit(TagSubmissionError(e.message));
     } catch (e) {
-      debugPrint('Check-in failed, falling back to offline storage: $e');
-      await _saveOfflineAndEmitSuccess(request, emit);
+      // Not a connectivity failure, so don't report it as "saved offline".
+      debugPrint('Check-in failed: $e');
+      emit(const TagSubmissionError(
+        'Failed to check in. Please try again.',
+      ));
     }
   }
 
+  /// Only a real connectivity failure may be saved offline. Anything else
+  /// (a server refusal, a bad response) must surface as an error rather than
+  /// look like a successful check-in.
   bool _shouldFallbackToOffline(ApiException e) {
-    return e.code == 'network_error' ||
-        e.code == 'timeout' ||
-        e.code == 'unknown_error';
+    return e.code == 'network_error' || e.code == 'timeout';
+  }
+
+  /// The server refused the card because it belongs to another outlet:
+  /// 400 CARD_NOT_AT_OUTLET (Outlet Code mismatch) or the 403 raised when the
+  /// card's outlet is not the one the driver is clocked in at.
+  bool _isDifferentOutletError(ApiException e) {
+    return e.code == 'CARD_NOT_AT_OUTLET' ||
+        (e.statusCode == 403 &&
+            e.message.toLowerCase().contains('not valid for your outlet'));
   }
 
   Future<void> _saveOfflineAndEmitSuccess(
@@ -110,6 +129,7 @@ class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
         cardNumber: request.cardNumber,
         clientSessionId: clientSessionId,
         timestamp: DateTime.now().toIso8601String(),
+        outletCode: request.outletCode,
       );
 
       await OfflineParkingService.savePendingCheckin(offlineCheckin);
