@@ -1547,6 +1547,16 @@ class TokenStorage {
     }
   }
 
+  /// Sync getter for build methods that need to know who is logged in.
+  static String? getCachedUserIdSync() {
+    try {
+      if (!Hive.isBoxOpen(_boxName)) return null;
+      return Hive.box(_boxName).get(_cachedUserIdKey) as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<void> clearCachedAuthContext() async {
     try {
       await _box.delete(_cachedNormalizedRolesKey);

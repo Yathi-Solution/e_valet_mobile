@@ -343,6 +343,9 @@ class TextConstants {
   static const String cardNumber = 'Card Number';
   static const String parkedBy = 'Parked By';
   static const String unknown = 'Unknown';
+
+  /// Shown in place of the valet's name when they parked the car themselves.
+  static const String you = 'You';
   static const String retrievalRequest = 'Retrieval Request';
   static const String retrievalRequested = 'Retrieval Requested';
   static const String noActiveRetrievalRequests =
