@@ -133,7 +133,7 @@ class MyApp extends StatelessWidget {
           ),
         ],
         child: MaterialApp(
-          title: dotenv.env['APP_NAME'] ?? 'ValetLink',
+          title: dotenv.env['APP_NAME'] ?? 'Valet Link',
           navigatorKey: FirebaseMessagingService.navigatorKey,
           navigatorObservers: [DriverHomeRouteObserver()],
           home: const SplashScreen(),
