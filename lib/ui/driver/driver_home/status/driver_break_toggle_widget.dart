@@ -126,7 +126,8 @@ class _BreakToggle extends StatelessWidget {
         height: trackHeight,
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
-          color: value ? AppColors.coral : AppColors.trackGray,
+          // Green while available, so the resting state doesn't read as "off".
+          color: value ? AppColors.coral : AppColors.success,
           borderRadius: BorderRadius.circular(trackHeight / 2),
         ),
         child: AnimatedAlign(
