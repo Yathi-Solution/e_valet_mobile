@@ -38,10 +38,28 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     on<DriverOnlineStatusToggled>(_onOnlineStatusToggled);
   }
 
+  /// True from the Logout tap until logout succeeds, fails or is blocked.
+  ///
+  /// The logout loader is driven by this bloc's state, which also carries the
+  /// home data. While this is set, home refreshes must not emit, or they would
+  /// replace the loading state and hide the loader mid-logout; repeated Logout
+  /// taps are ignored for the same reason.
+  bool _logoutInProgress = false;
+
   Future<void> _onLogoutPressed(
     DriverLogoutPressed event,
     Emitter<DriverMenuState> emit,
   ) async {
+    if (_logoutInProgress) return;
+    _logoutInProgress = true;
+    try {
+      await _logout(emit);
+    } finally {
+      _logoutInProgress = false;
+    }
+  }
+
+  Future<void> _logout(Emitter<DriverMenuState> emit) async {
     emit(const DriverMenuLogoutPrecheckLoading());
     try {
       final preBreakInfo = await PreBreakInfoApiService.getPreBreakInfo();
@@ -152,6 +170,8 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     final driverName =
         firstName.isNotEmpty ? firstName : TextConstants.driverFallbackName;
 
+    if (_logoutInProgress) return;
+
     final parkedCarsData = await _fetchParkedCarsData();
     final parkedCarsCount = parkedCarsData?.sessionCount ?? 0;
 
@@ -159,6 +179,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     try {
       final pendingSessions =
           await SessionsPendingApiService.getPendingSessions();
+      if (_logoutInProgress) return;
       emit(DriverHomeLoaded(
         driverName: driverName,
         isOnBreak: false,
@@ -170,6 +191,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     } catch (e) {
       // If API call fails, still emit loaded state without pending sessions
       // This allows the screen to load even if the API fails
+      if (_logoutInProgress) return;
       emit(DriverHomeLoaded(
         driverName: driverName,
         isOnBreak: false,
@@ -184,6 +206,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     DriverPendingSessionsRefresh event,
     Emitter<DriverMenuState> emit,
   ) async {
+    if (_logoutInProgress) return;
     if (state is! DriverHomeLoaded) {
       add(const DriverHomeStarted());
       return;
@@ -197,6 +220,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     try {
       final pendingSessions =
           await SessionsPendingApiService.getPendingSessions();
+      if (_logoutInProgress) return;
       emit(currentState.copyWith(
         pendingSessions: pendingSessions,
         parkedCarsCount: parkedCarsCount,
@@ -204,6 +228,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
       ));
     } catch (e) {
       // Keep existing pending sessions if refresh fails; still update parked data
+      if (_logoutInProgress) return;
       emit(currentState.copyWith(
         parkedCarsCount: parkedCarsCount,
         parkedCarsData: parkedCarsData,
@@ -215,7 +240,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     DriverOnBreakToggled event,
     Emitter<DriverMenuState> emit,
   ) {
-    if (state is DriverHomeLoaded) {
+    if (!_logoutInProgress && state is DriverHomeLoaded) {
       final currentState = state as DriverHomeLoaded;
       emit(currentState.copyWith(isOnBreak: event.isOnBreak));
     }
@@ -225,7 +250,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     DriverOnlineStatusToggled event,
     Emitter<DriverMenuState> emit,
   ) {
-    if (state is DriverHomeLoaded) {
+    if (!_logoutInProgress && state is DriverHomeLoaded) {
       final currentState = state as DriverHomeLoaded;
       emit(currentState.copyWith(isOnline: event.isOnline));
     }
