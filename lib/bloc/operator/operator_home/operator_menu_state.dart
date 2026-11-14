@@ -11,6 +11,11 @@ class OperatorMenuInitial extends OperatorMenuState {
   const OperatorMenuInitial();
 }
 
+/// Logout is running; the UI shows a blocking loader until it finishes.
+class OperatorMenuLogoutLoading extends OperatorMenuState {
+  const OperatorMenuLogoutLoading();
+}
+
 class OperatorMenuLogoutSuccess extends OperatorMenuState {
   final String message;
   const OperatorMenuLogoutSuccess(this.message);

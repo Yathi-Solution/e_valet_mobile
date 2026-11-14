@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:evalet/bloc/operator/operator_home/operator_menu_bloc.dart';
 import 'package:evalet/bloc/operator/operator_home/operator_menu_event.dart';
-import 'package:evalet/bloc/operator/operator_home/operator_menu_state.dart';
 import 'package:evalet/bloc/operator/operator_dashboard/operator_dashboard_bloc.dart';
 import 'package:evalet/bloc/operator/operator_dashboard/operator_dashboard_event.dart';
 import 'package:evalet/bloc/websocket/websocket_bloc.dart';
@@ -11,8 +10,6 @@ import 'package:evalet/ui/common/colors.dart';
 import 'package:evalet/ui/guidelines/guidelines_screen.dart';
 import 'package:evalet/ui/help_support/help_screen.dart';
 import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
-import 'package:evalet/ui/common/widgets/snack_bar.dart';
-import 'package:evalet/ui/oauth/login/login.dart';
 import 'package:evalet/ui/oauth/profile/profile_screen.dart';
 import 'package:evalet/ui/operator/operator_dashboard/operator_content.dart';
 import 'package:evalet/ui/operator/operator_drawer/operator_drawer.dart';
@@ -198,59 +195,36 @@ class _OperatorDashboardViewState extends State<OperatorDashboardView> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => OperatorMenuBloc()),
-        BlocProvider.value(value: _dashboardBloc),
-      ],
-      child: BlocListener<OperatorMenuBloc, OperatorMenuState>(
-        listener: (context, state) {
-          if (state is OperatorMenuLogoutSuccess) {
-            SnackBars.showSuccessSnackBar(context, state.message);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (_) => const LoginScreen(),
-              ),
-              (route) => false,
-            );
-          } else if (state is OperatorMenuLogoutFailure) {
-            SnackBars.showErrorSnackBar(context, state.message);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (_) => const LoginScreen(),
-              ),
-              (route) => false,
-            );
-          }
-        },
-        child: Scaffold(
-          key: _scaffoldKey,
-          endDrawer: OperatorDrawer(
-            selectedIndex: _selectedIndex,
-            onItemSelected: _onMenuItemSelected,
-          ),
-          appBar: CustomAppBar(
-            showLanguageIcon: true,
-            actions: [
-              IconButton(
-                onPressed: _refreshDashboard,
-                icon: const Icon(Icons.refresh, color: AppColors.white),
-              ),
-              IconButton(
-                icon: const Icon(Icons.menu, color: AppColors.white),
-                onPressed: () {
-                  final currentScope = FocusScope.of(context);
-                  if (!currentScope.hasPrimaryFocus &&
-                      currentScope.focusedChild != null) {
-                    currentScope.unfocus();
-                  }
-                  _scaffoldKey.currentState?.openEndDrawer();
-                },
-              ),
-            ],
-          ),
-          body: _getBodyWidget(),
+    // OperatorMenuBloc and its logout listener live in OperatorDashboardScreen.
+    return BlocProvider.value(
+      value: _dashboardBloc,
+      child: Scaffold(
+        key: _scaffoldKey,
+        endDrawer: OperatorDrawer(
+          selectedIndex: _selectedIndex,
+          onItemSelected: _onMenuItemSelected,
         ),
+        appBar: CustomAppBar(
+          showLanguageIcon: true,
+          actions: [
+            IconButton(
+              onPressed: _refreshDashboard,
+              icon: const Icon(Icons.refresh, color: AppColors.white),
+            ),
+            IconButton(
+              icon: const Icon(Icons.menu, color: AppColors.white),
+              onPressed: () {
+                final currentScope = FocusScope.of(context);
+                if (!currentScope.hasPrimaryFocus &&
+                    currentScope.focusedChild != null) {
+                  currentScope.unfocus();
+                }
+                _scaffoldKey.currentState?.openEndDrawer();
+              },
+            ),
+          ],
+        ),
+        body: _getBodyWidget(),
       ),
     );
   }
