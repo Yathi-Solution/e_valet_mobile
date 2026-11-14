@@ -11,6 +11,7 @@ import 'package:evalet/services/offline_sync/offline_parking_service.dart';
 import 'package:evalet/services/offline_sync/parked_card_availability_service.dart';
 import 'package:evalet/services/oauth/token_interceptor.dart';
 import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/utils/card_outlet_check.dart';
 
 class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
   TagSubmissionBloc() : super(const TagSubmissionInitial()) {
@@ -67,6 +68,16 @@ class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
         await TokenStorage.saveSessionId(response.sessionId);
       }
 
+      // The server only accepts a card whose Outlet Code belongs to this
+      // outlet, so remember the code for refusing other outlets' cards offline.
+      final outletCode = request.outletCode;
+      if (outletCode != null) {
+        await TokenStorage.saveConfirmedOutletCode(
+          outletId: request.outletId,
+          outletCode: outletCode,
+        );
+      }
+
       emit(TagSubmissionSuccess(response.message));
     } on ApiException catch (e) {
       if (e.code == 'session_expired') {
@@ -114,6 +125,16 @@ class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
     CheckinRequest request,
     Emitter<TagSubmissionState> emit,
   ) async {
+    // Offline the server cannot refuse another outlet's card, and saving it
+    // would look like a successful check-in that only fails at sync.
+    if (isCardFromAnotherOutlet(
+      cardOutletCode: request.outletCode,
+      currentOutletCode: TokenStorage.getConfirmedOutletCodeSync(),
+    )) {
+      emit(const TagSubmissionError(TextConstants.driverCardDifferentOutlet));
+      return;
+    }
+
     try {
       if (await ParkedCardAvailabilityService.isCardNumberAlreadyInUse(
         request.cardNumber,

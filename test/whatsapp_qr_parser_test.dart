@@ -1,4 +1,5 @@
 import 'package:evalet/models/driver/session/checkin_request.dart';
+import 'package:evalet/utils/card_outlet_check.dart';
 import 'package:evalet/utils/whatsapp_qr_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -29,6 +30,43 @@ void main() {
     test('older card has a card number but no Outlet Code', () {
       expect(tryParseCardNumberFromWhatsAppUrl(oldQr), 67);
       expect(tryParseOutletCodeFromWhatsAppUrl(oldQr), isNull);
+    });
+  });
+
+  group('card of another outlet', () {
+    test('a card naming a different Outlet Code is refused', () {
+      expect(
+        isCardFromAnotherOutlet(
+          cardOutletCode: 'OUT2',
+          currentOutletCode: 'OUT1',
+        ),
+        isTrue,
+      );
+    });
+
+    test('the same code matches whatever its case or spacing', () {
+      expect(
+        isCardFromAnotherOutlet(
+          cardOutletCode: ' orion  east-2 ',
+          currentOutletCode: 'Orion East-2',
+        ),
+        isFalse,
+      );
+    });
+
+    test('a card or outlet without a code is left to the server', () {
+      expect(
+        isCardFromAnotherOutlet(cardOutletCode: null, currentOutletCode: 'A1'),
+        isFalse,
+      );
+      expect(
+        isCardFromAnotherOutlet(cardOutletCode: 'A1', currentOutletCode: null),
+        isFalse,
+      );
+      expect(
+        isCardFromAnotherOutlet(cardOutletCode: 'A1', currentOutletCode: ' '),
+        isFalse,
+      );
     });
   });
 
