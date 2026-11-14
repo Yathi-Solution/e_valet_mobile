@@ -15,30 +15,55 @@ class OperatorMenuBloc extends Bloc<OperatorMenuEvent, OperatorMenuState> {
     on<OperatorMenuLogoutRequested>(_onLogoutRequested);
   }
 
+  /// Upper bound on the best-effort clock-out so it can never stall logout.
+  static const Duration _clockOutTimeout = Duration(seconds: 5);
+
+  /// True from the Logout tap until logout finishes; repeated taps are ignored.
+  bool _logoutInProgress = false;
+
   Future<void> _onLogoutRequested(
     OperatorMenuLogoutRequested event,
     Emitter<OperatorMenuState> emit,
   ) async {
-    // Try to clock out first (will fail gracefully if not clocked in or not applicable)
-    await _tryClockOutForOperator();
-    await TokenStorage.clearAll();
-    await SessionManager.clearSessionFlags();
+    if (_logoutInProgress) return;
+    _logoutInProgress = true;
+    emit(const OperatorMenuLogoutLoading());
 
     try {
+      // Best-effort clock-out (fails gracefully if not clocked in or not
+      // applicable). Bounded so a slow network or GPS fix cannot hold up logout.
+      try {
+        await _tryClockOutForOperator().timeout(_clockOutTimeout);
+      } catch (e) {
+        log('Operator clock-out skipped before logout: $e');
+      }
+
+      // LogoutApiService calls the server while the token is still valid and
+      // then clears tokens and session flags, even when the API call fails.
       final response = await LogoutApiService.logout();
       emit(OperatorMenuLogoutSuccess(response.message));
     } on ApiException catch (e) {
       print(
           '🔵 OPERATOR LOGOUT ERROR: Logout API failed with ApiException: ${e.message}');
-      // Ensure local logout even if API fails
-
+      await _clearLocalSession();
       emit(OperatorMenuLogoutFailure(e.message));
     } catch (e) {
       print(
           '🔵 OPERATOR LOGOUT ERROR: Logout API failed with unknown error: $e');
-      // Ensure local logout even if API fails
-
+      await _clearLocalSession();
       emit(OperatorMenuLogoutFailure('Logout failed: ${getDisplayErrorMessage(e)}'));
+    } finally {
+      _logoutInProgress = false;
+    }
+  }
+
+  /// Ensure local logout even if the logout flow threw before clearing.
+  Future<void> _clearLocalSession() async {
+    try {
+      await TokenStorage.clearAll();
+      await SessionManager.clearSessionFlags();
+    } catch (e) {
+      log('Failed to clear local session on operator logout: $e');
     }
   }
 
@@ -58,8 +83,9 @@ class OperatorMenuBloc extends Bloc<OperatorMenuEvent, OperatorMenuState> {
           longitude = locationData['longitude'] as double;
           accuracy = locationData['accuracy'] as double? ?? 0.0;
         } else {
-          // Fallback: Get current location if stored location not available
-          final coordinates = await LocationService.getCurrentCoordinates();
+          // Fallback: quick fix (reuses last known position) if no stored location
+          final coordinates = await LocationService.getFastCoordinates()
+              .timeout(const Duration(seconds: 3));
           latitude = coordinates['latitude']!;
           longitude = coordinates['longitude']!;
           accuracy = coordinates['accuracy']!;

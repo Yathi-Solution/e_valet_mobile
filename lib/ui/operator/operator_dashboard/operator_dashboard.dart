@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:evalet/bloc/operator/operator_home/operator_menu_bloc.dart';
 import 'package:evalet/bloc/operator/operator_home/operator_menu_state.dart';
+import 'package:evalet/ui/common/colors.dart';
 import 'package:evalet/ui/common/widgets/snack_bar.dart';
 import 'package:evalet/ui/oauth/login/login.dart';
 import 'operator_dashboard_view.dart';
@@ -29,7 +30,35 @@ class OperatorDashboardScreen extends StatelessWidget {
             );
           }
         },
-        child: const OperatorDashboardView(),
+        child: BlocBuilder<OperatorMenuBloc, OperatorMenuState>(
+          buildWhen: (previous, current) =>
+              (previous is OperatorMenuLogoutLoading) !=
+              (current is OperatorMenuLogoutLoading),
+          builder: (context, state) {
+            return Stack(
+              children: [
+                const OperatorDashboardView(),
+                // Block the screen while logout runs so the tap has visible
+                // feedback and cannot be repeated.
+                if (state is OperatorMenuLogoutLoading)
+                  Positioned.fill(
+                    child: AbsorbPointer(
+                      absorbing: true,
+                      child: Container(
+                        color: AppColors.black.withOpacity(0.45),
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.primary),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
