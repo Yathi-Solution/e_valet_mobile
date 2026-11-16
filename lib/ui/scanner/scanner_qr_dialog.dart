@@ -165,63 +165,65 @@ class _ScannerQrDialogState extends State<ScannerQrDialog> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: size.height * 0.4,
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final w = constraints.maxWidth;
-                          final h = constraints.maxHeight;
-                          final side = math.min(w, h) * 0.88;
-                          final scanWindow = Rect.fromCenter(
-                            center: Offset(w / 2, h / 2),
-                            width: side,
-                            height: side,
-                          );
-                          return Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              MobileScanner(
-                                controller: _controller,
-                                scanWindow: scanWindow,
-                                onDetect: _onDetect,
-                                errorBuilder:
-                                    (context, error, child) => Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.error_outline,
-                                        color: AppColors.error,
-                                        size: 48,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      TextComponent(
-                                        labelText:
-                                            t.get(TextConstants.cameraError),
-                                        color: AppColors.black,
-                                        fontSize: 14,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              if (isProcessing)
-                                Container(
-                                  color: AppColors.qrProcessingOverlay,
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.white,
-                                      ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: size.height * 0.4,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final w = constraints.maxWidth;
+                            final h = constraints.maxHeight;
+                            final side = math.min(w, h) * 0.88;
+                            final scanWindow = Rect.fromCenter(
+                              center: Offset(w / 2, h / 2),
+                              width: side,
+                              height: side,
+                            );
+                            return Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                MobileScanner(
+                                  controller: _controller,
+                                  scanWindow: scanWindow,
+                                  onDetect: _onDetect,
+                                  errorBuilder: (context, error, child) =>
+                                      Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.error_outline,
+                                          color: AppColors.error,
+                                          size: 48,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        TextComponent(
+                                          labelText:
+                                              t.get(TextConstants.cameraError),
+                                          color: AppColors.black,
+                                          fontSize: 14,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                            ],
-                          );
-                        },
+                                if (isProcessing)
+                                  Container(
+                                    color: AppColors.qrProcessingOverlay,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                          AppColors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
                       ),
-                    ),
                     ),
                   ),
                 ),

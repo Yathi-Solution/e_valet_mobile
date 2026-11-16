@@ -293,7 +293,8 @@ class CarCameraBloc extends Bloc<CarCameraEvent, CarCameraState> {
       }
     } catch (e) {
       emit(CarCameraValidationError(
-        message: '${TextConstants.errorValidatingImage}: ${getDisplayErrorMessage(e)}',
+        message:
+            '${TextConstants.errorValidatingImage}: ${getDisplayErrorMessage(e)}',
         result: ImageValidationResult.failure(
           hasVehicle: false,
           hasNumberPlate: false,
@@ -351,7 +352,8 @@ class CarCameraBloc extends Bloc<CarCameraEvent, CarCameraState> {
       return ImageValidationResult.failure(
         hasVehicle: false,
         hasNumberPlate: false,
-        errorMessage: '${TextConstants.errorProcessingImage}: ${getDisplayErrorMessage(e)}',
+        errorMessage:
+            '${TextConstants.errorProcessingImage}: ${getDisplayErrorMessage(e)}',
       );
     }
   }

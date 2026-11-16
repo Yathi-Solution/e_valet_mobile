@@ -192,8 +192,7 @@ class _CameraBottomOverlayState extends State<CameraBottomOverlay> {
                             'submitButton',
                             TextConstants.submitButton,
                           ),
-                          fontSize:
-                              ButtonMetrics.cameraSubmitFontSize(context),
+                          fontSize: ButtonMetrics.cameraSubmitFontSize(context),
                           fontWeight: FontWeight.w600,
                           color: AppColors.white,
                           textAlign: TextAlign.center,

@@ -482,68 +482,73 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
                     ),
                   ),
                 SizedBox(
-              height: h * 0.085,
-              child: BlocBuilder<QrBloc, QrState>(
-                buildWhen: (previous, current) =>
-                    previous.qrData != current.qrData,
-                builder: (context, qrState) {
-                  final hasScannedQr = qrState.qrData != null;
-                  return BlocBuilder<TagSubmissionBloc, TagSubmissionState>(
-                    builder: (context, submissionState) {
-                      final isLoading = submissionState is TagSubmissionLoading;
-                      final canSubmit = hasScannedQr && !isLoading;
-                      final buttonHeight = h * 0.085;
-                      final textSize = w * 0.072;
-                      return SizedBox(
-                        width: double.infinity,
-                        height: buttonHeight,
-                        child: ElevatedButton(
-                          onPressed:
-                              canSubmit ? () => _handleSubmit(context) : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            disabledBackgroundColor:
-                                AppColors.grey.withOpacity(0.5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(w * 0.025),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.white),
-                                  ),
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    TextComponent(
-                                      labelText: t.getByKey('submitButton',
-                                          TextConstants.submitButton),
-                                      fontSize: textSize,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.white,
-                                    ),
-                                    SizedBox(width: w * 0.02),
-                                    Icon(
-                                      Icons.arrow_forward,
-                                      color: AppColors.white,
-                                      size: textSize,
-                                    ),
-                                  ],
+                  height: h * 0.085,
+                  child: BlocBuilder<QrBloc, QrState>(
+                    buildWhen: (previous, current) =>
+                        previous.qrData != current.qrData,
+                    builder: (context, qrState) {
+                      final hasScannedQr = qrState.qrData != null;
+                      return BlocBuilder<TagSubmissionBloc, TagSubmissionState>(
+                        builder: (context, submissionState) {
+                          final isLoading =
+                              submissionState is TagSubmissionLoading;
+                          final canSubmit = hasScannedQr && !isLoading;
+                          final buttonHeight = h * 0.085;
+                          final textSize = w * 0.072;
+                          return SizedBox(
+                            width: double.infinity,
+                            height: buttonHeight,
+                            child: ElevatedButton(
+                              onPressed: canSubmit
+                                  ? () => _handleSubmit(context)
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                disabledBackgroundColor:
+                                    AppColors.grey.withOpacity(0.5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(w * 0.025),
                                 ),
-                        ),
+                                elevation: 0,
+                              ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                AppColors.white),
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        TextComponent(
+                                          labelText: t.getByKey('submitButton',
+                                              TextConstants.submitButton),
+                                          fontSize: textSize,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.white,
+                                        ),
+                                        SizedBox(width: w * 0.02),
+                                        Icon(
+                                          Icons.arrow_forward,
+                                          color: AppColors.white,
+                                          size: textSize,
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          );
+                        },
                       );
                     },
-                  );
-                },
-              ),
-            ),
+                  ),
+                ),
               ],
             ),
           ),

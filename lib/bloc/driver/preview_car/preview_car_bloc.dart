@@ -77,7 +77,9 @@ class PreviewCarBloc extends Bloc<PreviewCarEvent, PreviewCarState> {
     } catch (e) {
       debugPrint('[PreviewCarBloc] Park API error: $e');
       // If vehicle is already parked or session already in progress, treat as success
-      final msg = (e is ApiException ? e.displayMessage : getDisplayErrorMessage(e)).toUpperCase();
+      final msg =
+          (e is ApiException ? e.displayMessage : getDisplayErrorMessage(e))
+              .toUpperCase();
       if ((msg.contains('PARKED') && msg.contains('CHECKED_IN')) ||
           (msg.contains('ALREADY') && msg.contains('CHECKED'))) {
         debugPrint('Park/session already in progress, treating as success');

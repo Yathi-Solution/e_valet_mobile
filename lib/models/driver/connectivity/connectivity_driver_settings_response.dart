@@ -10,7 +10,8 @@ class ConnectivityDriverSettingsResponse {
     required this.isEnabled,
   });
 
-  factory ConnectivityDriverSettingsResponse.fromJson(Map<String, dynamic> json) {
+  factory ConnectivityDriverSettingsResponse.fromJson(
+      Map<String, dynamic> json) {
     return ConnectivityDriverSettingsResponse(
       outletId: (json['outletId'] is int)
           ? json['outletId'] as int

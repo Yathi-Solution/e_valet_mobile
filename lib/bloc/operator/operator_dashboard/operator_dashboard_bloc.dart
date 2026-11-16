@@ -412,7 +412,8 @@ class OperatorDashboardBloc
       ));
     } catch (e) {
       // Show a business-friendly error message for card not found
-      String errorMessage = e is ApiException ? e.displayMessage : getDisplayErrorMessage(e);
+      String errorMessage =
+          e is ApiException ? e.displayMessage : getDisplayErrorMessage(e);
       final cardNotFoundRegExp =
           RegExp(r'Card #[0-9]+ not found in outlet [0-9]+');
       final match = cardNotFoundRegExp.firstMatch(errorMessage);

@@ -10,8 +10,10 @@ class OfflineParkingPhoto {
   final String? sessionId;
   final bool isReparking;
   final String timestamp;
+
   /// Card number for this park (used for local parked-cars list and offline check-in sync).
   final int? cardNumber;
+
   /// True when scanner/check-in submit already reached the server; only park API remains.
   final bool checkinSubmittedOnServer;
 

@@ -115,7 +115,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
           'Driver cards refreshed on splash restore: ${cardsResponse.cards.length} cards',
         );
       } catch (e) {
-        print('Splash: Failed to refresh driver cards on restore (non-fatal): $e');
+        print(
+            'Splash: Failed to refresh driver cards on restore (non-fatal): $e');
       }
 
       try {
@@ -125,7 +126,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
           'Driver parked cars refreshed on splash restore: ${parkedResponse.sessionCount} sessions',
         );
       } catch (e) {
-        print('Splash: Failed to refresh parked cars on restore (non-fatal): $e');
+        print(
+            'Splash: Failed to refresh parked cars on restore (non-fatal): $e');
       }
     }
 
@@ -159,7 +161,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
 
   /// Loads profile from the network, or last cached roles/user id when the failure
   /// is transient (e.g. no connectivity). Returns null only when login is required.
-  Future<({List<String> roles, String userId})?> _loadProfileOrOfflineSnapshot() async {
+  Future<({List<String> roles, String userId})?>
+      _loadProfileOrOfflineSnapshot() async {
     try {
       final profile = await ProfileApiService.getProfile();
       final roles = profile.normalizedRoles;
@@ -181,7 +184,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     }
   }
 
-  Future<({List<String> roles, String userId})?> _readCachedAuthSnapshot() async {
+  Future<({List<String> roles, String userId})?>
+      _readCachedAuthSnapshot() async {
     final roles = await TokenStorage.getCachedNormalizedRoles();
     final userId = await TokenStorage.getCachedUserId();
     if (roles == null || roles.isEmpty || userId == null || userId.isEmpty) {

@@ -79,7 +79,9 @@ class DriverBreakToggleWidget extends StatelessWidget {
                   )
                 : Semantics(
                     button: true,
-                    label: isOnBreak ? 'On break, tap to go available' : 'Available, tap to go on break',
+                    label: isOnBreak
+                        ? 'On break, tap to go available'
+                        : 'Available, tap to go on break',
                     child: SizedBox(
                       width: 44,
                       height: 44,

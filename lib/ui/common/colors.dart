@@ -27,9 +27,11 @@ class AppColors {
   // Neutrals
   static const Color offWhite = Color(0xFFF5F5F0);
   static const Color trackGray = Color(0xFFE8E8E4);
+
   /// Muted text — secondary labels, hints, captions (#6B7280).
   static const Color mutedText = Color(0xFF6B7280);
   static const Color secondaryLabel = mutedText;
+
   /// @deprecated Prefer [mutedText] for secondary labels.
   static const Color footerGray = mutedText;
   static const Color disabledBackground = trackGray;

@@ -122,7 +122,8 @@ class WebSocketService {
           }
           callback({
             ...?auth,
-            'token': (token != null && token.isNotEmpty) ? token : fallbackToken,
+            'token':
+                (token != null && token.isNotEmpty) ? token : fallbackToken,
           });
         });
       } else if (auth != null && auth.isNotEmpty) {

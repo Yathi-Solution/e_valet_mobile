@@ -53,7 +53,8 @@ class OperatorMenuBloc extends Bloc<OperatorMenuEvent, OperatorMenuState> {
       print(
           '🔵 OPERATOR LOGOUT ERROR: Logout API failed with unknown error: $e');
       await _clearLocalSession();
-      emit(OperatorMenuLogoutFailure('Logout failed: ${getDisplayErrorMessage(e)}'));
+      emit(OperatorMenuLogoutFailure(
+          'Logout failed: ${getDisplayErrorMessage(e)}'));
     } finally {
       _logoutInProgress = false;
       LogoutProgress.active.value = false;

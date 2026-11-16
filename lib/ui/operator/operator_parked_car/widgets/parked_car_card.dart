@@ -40,9 +40,8 @@ class ParkedCarCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          color: isHighlighted
-              ? AppColors.accentSoft
-              : AppColors.cardBackground,
+          color:
+              isHighlighted ? AppColors.accentSoft : AppColors.cardBackground,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isHighlighted

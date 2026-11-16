@@ -152,20 +152,22 @@ class CarInformationCard extends StatelessWidget {
                     ),
                     Spacer(),
                     // Phone Icon (hidden when the valet parked the car themselves)
-                    if (!parkedByMe) IconButton(
-                      padding: compact ? const EdgeInsets.all(4) : null,
-                      constraints: compact
-                          ? const BoxConstraints(minWidth: 32, minHeight: 32)
-                          : null,
-                      onPressed: () =>
-                          _makePhoneCall(session.parkedBy?.phone ?? ''),
-                      icon: Icon(
-                        Icons.phone,
-                        color: AppColors.secondary,
-                        size:
-                            compact ? screenWidth * 0.045 : screenWidth * 0.06,
+                    if (!parkedByMe)
+                      IconButton(
+                        padding: compact ? const EdgeInsets.all(4) : null,
+                        constraints: compact
+                            ? const BoxConstraints(minWidth: 32, minHeight: 32)
+                            : null,
+                        onPressed: () =>
+                            _makePhoneCall(session.parkedBy?.phone ?? ''),
+                        icon: Icon(
+                          Icons.phone,
+                          color: AppColors.secondary,
+                          size: compact
+                              ? screenWidth * 0.045
+                              : screenWidth * 0.06,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ],

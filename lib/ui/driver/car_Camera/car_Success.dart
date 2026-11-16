@@ -131,8 +131,8 @@ class _CarSuccessScreenState extends State<CarSuccessScreen> {
                               ),
                             )
                           : VehiclePhotoPlaceholder(
-                              caption: t.get(
-                                  TextConstants.tapToCaptureVehiclePhoto),
+                              caption:
+                                  t.get(TextConstants.tapToCaptureVehiclePhoto),
                               minHeight: 200,
                             ),
                 ),

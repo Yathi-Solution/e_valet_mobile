@@ -30,7 +30,8 @@ class TokenStorage {
     }
   }
 
-  static const String _cachedParkedSessionsJsonKey = 'cached_parked_sessions_json';
+  static const String _cachedParkedSessionsJsonKey =
+      'cached_parked_sessions_json';
 
   static Future<void> saveCachedParkedSessionsJson(String json) async {
     try {
@@ -104,8 +105,7 @@ class TokenStorage {
       'image_compression_max_size_kb';
 
   /// Last known roles and user id when `/auth/profile` succeeds (splash offline fallback).
-  static const String _cachedNormalizedRolesKey =
-      'cached_normalized_roles_v1';
+  static const String _cachedNormalizedRolesKey = 'cached_normalized_roles_v1';
   static const String _cachedUserIdKey = 'cached_user_id_v1';
 
   /// Driver POST /connectivity/log/batch context (cleared on logout).
@@ -1311,7 +1311,8 @@ class TokenStorage {
   }
 
   // Driver assigned cards (for park-time ownership check against local allocation)
-  static Future<void> saveDriverAssignedCardNumbers(List<int> cardNumbers) async {
+  static Future<void> saveDriverAssignedCardNumbers(
+      List<int> cardNumbers) async {
     try {
       await _box.put(_driverAssignedCardNumbersKey, cardNumbers);
       await _box.put(_driverAssignedCardsLoadedKey, true);
@@ -1471,7 +1472,8 @@ class TokenStorage {
       // Default to true if not present (fail open for logging)
       return true;
     } catch (e) {
-      print('[TokenStorage] Error reading driver connectivity enabled flag: $e');
+      print(
+          '[TokenStorage] Error reading driver connectivity enabled flag: $e');
       return true;
     }
   }
@@ -1510,7 +1512,8 @@ class TokenStorage {
       if (v is int) return v;
       return int.tryParse(v?.toString() ?? '');
     } catch (e) {
-      print('[TokenStorage] Error reading driver connectivity settings outletId: $e');
+      print(
+          '[TokenStorage] Error reading driver connectivity settings outletId: $e');
       return null;
     }
   }

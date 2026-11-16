@@ -24,7 +24,8 @@ class ConnectivitySettingsApiService {
   ///
   /// On success: silent (no logs).
   /// Only logs on errors.
-  static Future<ConnectivityDriverSettingsResponse?> getDriverConnectivitySettings({
+  static Future<ConnectivityDriverSettingsResponse?>
+      getDriverConnectivitySettings({
     required int outletId,
   }) async {
     final accessToken = await TokenStorage.getAccessToken();
@@ -56,7 +57,9 @@ class ConnectivitySettingsApiService {
         return ConnectivityDriverSettingsResponse.fromJson(rawData);
       }
 
-      if (rawData is List && rawData.isNotEmpty && rawData.first is Map<String, dynamic>) {
+      if (rawData is List &&
+          rawData.isNotEmpty &&
+          rawData.first is Map<String, dynamic>) {
         return ConnectivityDriverSettingsResponse.fromJson(
           rawData.first as Map<String, dynamic>,
         );

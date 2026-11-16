@@ -8,6 +8,7 @@ import 'package:evalet/ui/common/text_constants.dart';
 import 'package:evalet/ui/common/button_metrics.dart';
 import 'package:evalet/ui/common/widgets/countdown_cta_button.dart';
 import 'package:evalet/ui/common/widgets/text.dart';
+
 class HandoverButtonsSection extends StatefulWidget {
   final bool isLoading;
   final VoidCallback onConfirmHandover;
@@ -204,8 +205,8 @@ class HandoverButtonsSectionState extends State<HandoverButtonsSection> {
               return CountdownCtaButton(
                 label: t.get(TextConstants.slideToConfirmHandover),
                 onPressed: widget.onConfirmHandover,
-                isLoading: widget.isLoading &&
-                    _confirmHandoverRemainingSeconds <= 0,
+                isLoading:
+                    widget.isLoading && _confirmHandoverRemainingSeconds <= 0,
                 countdownSeconds: _confirmHandoverRemainingSeconds,
                 iconWhenEnabled: Icons.handshake,
                 height: constraints.maxHeight,

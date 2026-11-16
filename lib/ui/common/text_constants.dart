@@ -54,6 +54,7 @@ class TextConstants {
   /// Error shown to a driver who tries to park/retrieve using a card not allocated to them.
   static const String driverCardNotAssigned =
       'The card number does not match with your cards. You may have taken another driver\'s card.';
+
   /// Error shown to a driver who scans a card that belongs to another outlet.
   static const String driverCardDifferentOutlet =
       'This valet card belongs to a different outlet. Please scan a card assigned to your current outlet.';
@@ -211,8 +212,7 @@ class TextConstants {
   /// Hint for the parking/photo screen (after tag/QR submit): car photo only.
   static const String vehicleDetailsParkingPhotoHint =
       'Capture a photo of the car.';
-  static const String tapToCaptureVehiclePhoto =
-      'Tap to capture vehicle photo';
+  static const String tapToCaptureVehiclePhoto = 'Tap to capture vehicle photo';
   static const String previewDoneButton = 'Done';
   static const String scanTabLabel = 'Scan';
   static const String typeIdNumberTabLabel = 'ID Number';
