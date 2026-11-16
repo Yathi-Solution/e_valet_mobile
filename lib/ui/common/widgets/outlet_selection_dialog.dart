@@ -9,15 +9,35 @@ class OutletSelectionDialog extends StatelessWidget {
   final bool isLoading;
   final void Function(Outlet outlet) onOutletSelected;
 
+  /// Roles the user holds in the signed-in client (e.g. "CLIENT_ADMIN").
+  /// Shown under each outlet name.
+  final List<String> roles;
+
   const OutletSelectionDialog({
     super.key,
     required this.outlets,
     required this.isLoading,
     required this.onOutletSelected,
+    this.roles = const [],
   });
+
+  /// ["CLIENT_ADMIN", "DRIVER"] -> "Client Admin, Driver".
+  String? get _roleLabel {
+    final labels = roles
+        .map((role) => role
+            .trim()
+            .split('_')
+            .where((w) => w.isNotEmpty)
+            .map((w) => w[0].toUpperCase() + w.substring(1).toLowerCase())
+            .join(' '))
+        .where((label) => label.isNotEmpty)
+        .toList();
+    return labels.isEmpty ? null : labels.join(', ');
+  }
 
   @override
   Widget build(BuildContext context) {
+    final roleLabel = _roleLabel;
     return PopScope(
       canPop: false,
       child: Dialog(
@@ -103,6 +123,7 @@ class OutletSelectionDialog extends StatelessWidget {
                         final outlet = outlets[index];
                         return _OutletTile(
                           outlet: outlet,
+                          roleLabel: roleLabel,
                           onTap: () => onOutletSelected(outlet),
                         );
                       },
@@ -119,10 +140,12 @@ class OutletSelectionDialog extends StatelessWidget {
 
 class _OutletTile extends StatelessWidget {
   final Outlet outlet;
+  final String? roleLabel;
   final VoidCallback onTap;
 
   const _OutletTile({
     required this.outlet,
+    required this.roleLabel,
     required this.onTap,
   });
 
@@ -157,13 +180,29 @@ class _OutletTile extends StatelessWidget {
               ),
               const SizedBox(width: 14),
               Expanded(
-                child: Text(
-                  outlet.name,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.black,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      outlet.name,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.black,
+                      ),
+                    ),
+                    if (roleLabel != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        roleLabel!,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.mutedText,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
               const Icon(

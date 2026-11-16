@@ -125,22 +125,10 @@ class _ClientTile extends StatelessWidget {
     required this.onTap,
   });
 
-  /// "CLIENT_ADMIN" -> "Client Admin".
-  String? get _roleLabel {
-    final role = client.role?.trim();
-    if (role == null || role.isEmpty) return null;
-    return role
-        .split('_')
-        .where((w) => w.isNotEmpty)
-        .map((w) => w[0].toUpperCase() + w.substring(1).toLowerCase())
-        .join(' ');
-  }
-
   @override
   Widget build(BuildContext context) {
     final name = client.name.trim();
     final initial = name.isEmpty ? '?' : name[0].toUpperCase();
-    final roleLabel = _roleLabel;
 
     return Material(
       color: AppColors.transparent,
@@ -175,29 +163,13 @@ class _ClientTile extends StatelessWidget {
               ),
               const SizedBox(width: 14),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.black,
-                      ),
-                    ),
-                    if (roleLabel != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        roleLabel,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.mutedText,
-                        ),
-                      ),
-                    ],
-                  ],
+                child: Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
                 ),
               ),
               const Icon(

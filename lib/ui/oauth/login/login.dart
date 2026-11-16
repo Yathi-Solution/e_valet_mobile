@@ -88,6 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
               final isLoading = s is LoginOutletSelectionLoading;
               return OutletSelectionDialog(
                 outlets: state.outlets,
+                roles: state.profile.roles,
                 isLoading: isLoading,
                 onOutletSelected: isLoading
                     ? (_) {}
