@@ -9,15 +9,27 @@ class ClientSelectionDialog extends StatelessWidget {
   final void Function(ClientSummary client) onClientSelected;
   final VoidCallback onCancel;
 
+  /// True after a client is picked, while its profile and outlets load. The
+  /// list is replaced by a spinner and the dialog cannot be dismissed.
+  final bool isLoading;
+
   const ClientSelectionDialog({
     super.key,
     required this.clients,
     required this.onClientSelected,
     required this.onCancel,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    return PopScope(
+      canPop: !isLoading,
+      child: _buildDialog(),
+    );
+  }
+
+  Widget _buildDialog() {
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -79,35 +91,46 @@ class ClientSelectionDialog extends StatelessWidget {
               const SizedBox(height: 20),
               const Divider(height: 1, color: AppColors.divider),
               const SizedBox(height: 16),
-              Flexible(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: clients.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final client = clients[index];
-                    return _ClientTile(
-                      client: client,
-                      onTap: () => onClientSelected(client),
-                    );
-                  },
+              if (isLoading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                )
+              else ...[
+                Flexible(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: clients.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final client = clients[index];
+                      return _ClientTile(
+                        client: client,
+                        onTap: () => onClientSelected(client),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: onCancel,
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.mutedText,
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: onCancel,
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.mutedText,
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
         ),

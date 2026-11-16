@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:evalet/bloc/oauth/login/login_event.dart';
 import 'package:evalet/bloc/websocket/websocket_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:evalet/bloc/oauth/login/login_bloc.dart';
@@ -15,9 +14,7 @@ import 'package:evalet/ui/common/widgets/snack_bar.dart';
 import 'package:evalet/ui/oauth/login/login_form.dart';
 import 'package:evalet/ui/oauth/login/login_outlet_too_far_page.dart';
 import 'package:evalet/ui/oauth/login/login_role_navigation.dart';
-import 'package:evalet/ui/common/widgets/client_selection_dialog.dart';
-import 'package:evalet/ui/common/widgets/outlet_selection_dialog.dart';
-import 'package:evalet/models/oauth/client_summary.dart';
+import 'package:evalet/ui/oauth/login/login_selection_dialog.dart';
 import 'package:evalet/models/oauth/profile.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -40,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final FocusNode _loginIdFocusNode = FocusNode();
   final FocusNode _pinFocusNode = FocusNode();
 
-  bool _outletDialogShowing = false;
+  bool _selectionDialogShowing = false;
   bool _initialMessageShown = false;
 
   @override
@@ -66,59 +63,28 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _showOutletDialog(
-    BuildContext context,
-    LoginSuccessNeedsOutletSelection state,
-  ) {
-    if (_outletDialogShowing) return;
-    _outletDialogShowing = true;
+  /// Opens the client / outlet selection dialog. One dialog serves both steps:
+  /// if it is already open (client step), it switches to the outlet step by
+  /// itself from the bloc state, so this is a no-op.
+  ///
+  /// Navigation and full dismissal are handled by the BlocListener below via
+  /// pushAndRemoveUntil, which clears the entire stack including the dialog
+  /// route.
+  void _showSelectionDialog(BuildContext context) {
+    if (_selectionDialogShowing) return;
+    _selectionDialogShowing = true;
 
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return BlocProvider.value(
-          value: context.read<LoginBloc>(),
-          // BlocBuilder updates the loading spinner inside the dialog.
-          // Navigation and full dismissal are handled by the outer BlocListener
-          // via pushAndRemoveUntil, which clears the entire stack including the
-          // dialog route — so we do NOT pop() from here.
-          child: BlocBuilder<LoginBloc, LoginState>(
-            builder: (ctx, s) {
-              final isLoading = s is LoginOutletSelectionLoading;
-              return OutletSelectionDialog(
-                outlets: state.outlets,
-                roles: state.profile.roles,
-                isLoading: isLoading,
-                onOutletSelected: isLoading
-                    ? (_) {}
-                    : (outlet) {
-                        ctx.read<LoginBloc>().add(OutletSelected(outlet));
-                      },
-              );
-            },
-          ),
-        );
-      },
-    ).whenComplete(() {
-      _outletDialogShowing = false;
-    });
-  }
-
-  void _showClientDialog(BuildContext context, List<ClientSummary> clients) {
     final bloc = context.read<LoginBloc>();
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => ClientSelectionDialog(
-        clients: clients,
-        onClientSelected: (client) {
-          Navigator.of(dialogContext).pop();
-          bloc.add(ClientSelected(client.id));
-        },
-        onCancel: () => Navigator.of(dialogContext).pop(),
+      builder: (_) => BlocProvider.value(
+        value: bloc,
+        child: const LoginSelectionDialog(),
       ),
-    );
+    ).whenComplete(() {
+      _selectionDialogShowing = false;
+    });
   }
 
   bool _profileHasScannerRole(Profile profile) {
@@ -148,10 +114,9 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
-          if (state is LoginNeedsClientSelection) {
-            _showClientDialog(context, state.clients);
-          } else if (state is LoginSuccessNeedsOutletSelection) {
-            _showOutletDialog(context, state);
+          if (state is LoginNeedsClientSelection ||
+              state is LoginSuccessNeedsOutletSelection) {
+            _showSelectionDialog(context);
           } else if (state is LoginSuccess) {
             navigateToHomeForAuthenticatedProfile(context, state.profile);
           } else if (state is LoginSuccessClockInTooFar) {
