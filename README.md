@@ -1,146 +1,379 @@
-# Cafe Niloufer E-Valet (Mobile App)
+# ValetLink E-Valet (Mobile App)
 
-A **Flutter mobile app** for valet parking at Cafe Niloufer. Valet staff (drivers) use it to park and retrieve cars; supervisors (operators) use it to manage sessions, view reports, and see who is working with live stats.
+A **Flutter mobile app** for running valet parking at an outlet. Valets park and retrieve cars, operators run the floor from a dashboard, and scanner staff raise retrieval requests by scanning a customer's card. One account can belong to several clients and outlets; the user picks which one to work at when logging in.
 
-**Drivers (valets) can:**
-- **Log in and clock in/out** – go online, offline, or on break from the home screen
-- **Park car** – tap Park car → scan QR or enter tag number (from valet card) → collect car from customer → go to basement → take car photo → submit → **Car parked successfully** → back to home
-- **Get retrieval request** – when assigned by operator, a **bottom sheet** with car details appears (valid **45 seconds**); tap **Collect keys** → get car from basement → bring to main gate
-- **Confirm arrival** – at main gate tap **Confirm arrival** → customer gets **WhatsApp** message (e.g. your car has arrived at main gate)
-- **Handover** – when customer comes, hand over keys and tap **Handover** → session completed, vehicle handovered
-- **Repark** – if customer doesn’t come within **120 seconds** at main gate, take car back to basement, take photo, tap **Repark**
-- **Push notification** – when a retrieval is assigned to you, you get a notification even when the app is closed
+> **This README keeps itself up to date.** The sections marked *auto-generated* are rewritten from the code on every commit by [tool/update_readme.dart](tool/update_readme.dart). See [Keeping this README up to date](#keeping-this-readme-up-to-date).
 
-**Supervisors (operators) can see:**
-- **Total cars parked** and **total cars retrieved** (handovered) for the outlet
-- **How many people are working today** – total valets, available valets, on duty, on break
-- **Login and clock-in time** for each valet (when they started their shift)
-- **Per-valet stats** – for each valet: how many cars they parked (picked up), how many they retrieved (handed over), last activity, and on-break duration
-- **Car logs** – total parked, in transit, handovered, in lot; plus detailed logs per car/session
-- **Retrieval requests by card number** – when customer says "bring my car" in WhatsApp, request appears with card number; operator **assigns a valet** to that card
-- **Daily dashboard** – how many on duty, averages, how many cards (sessions) per day, and other KPIs
-- **Sound alert** when a new retrieval request comes in (tab view in dashboard)
-- **Valet gets push notification** when a retrieval is assigned to them (even when app is closed)
+## At a glance
 
----
+*Auto-generated.*
 
-## What This App Does
-
-| Who uses it | What they do |
-|-------------|----------------|
-| **Driver** (valet) | Full park → retrieve → handover flow (see **Driver flow** below). |
-| **Operator** (supervisor) | Full flow: dashboard (KPIs, retrieval requests by card), assign valet to card, daily stats, sound alert; valet gets push when assigned (see **Operator flow** below). |
-
-After login, the app sends you to **Driver Home** or **Operator Dashboard** based on your role.
+<!-- AUTO:overview:START -->
+|  |  |
+|---|---|
+| Package | `evalet` |
+| Version | `1.0.0` |
+| Dart SDK | `^3.6.1` |
+| Screens | 30 |
+| BLoCs / cubits | 30 |
+| API service files | 48 |
+| Model files | 97 |
+| Service files | 25 |
+| Dart files in `lib/` | 443 |
+<!-- AUTO:overview:END -->
 
 ---
 
-## Driver flow (complete)
+## Who uses it
 
-The driver logs in and lands on the **home screen**. From there:
+After login the app opens the home screen that matches the account's role. The role is checked in this order:
 
-### 1. Park car
+| Role | Home screen | What they do |
+|------|-------------|--------------|
+| **Scanner** | Scanner Home | Scans a customer's WhatsApp card QR to raise a retrieval request, and sees the list of retrieval requests. |
+| **Operator** (or admin) | Operator Dashboard | Watches KPIs and retrieval requests, assigns valets, manages valets, cards, groups and overtime. |
+| **Driver** (valet) | Driver Home | Clocks in, parks cars, brings them back and hands them over. |
 
-- Driver taps **Park car** on the home screen.
-- Next screen: **QR scanner** or **manual tag number** (tag is provided to valet staff).
-- Valet **scans QR** (or enters tag) → **collects car from customer** → goes to **basement**.
-- Takes **car photo** and submits it.
-- Taps **Car parked successfully** → car is marked as parked; driver returns to **home screen**.
+An account with none of these roles is refused with a message to contact the administrator.
+
+---
+
+## Login and start-up
+
+1. **Splash** → if a session is saved the app goes straight to the right home screen; otherwise it shows **Login**.
+2. **Login** with phone number and password. **Forgot password** uses an OTP.
+3. **Client and outlet selection** – one dialog. If the account has several clients, pick the client, then pick the outlet. The role is shown next to each outlet.
+4. **Location check** – the app verifies the user is at the outlet. If they are too far away, a full-screen "too far" page offers **Retry** (fresh GPS reading) without logging out.
+5. **Version check** – if the server reports a newer mandatory build, an update dialog blocks the app.
+6. **Permissions** – camera, location and notifications are requested.
+
+If the same account logs in on another device, the session here is ended and the user is sent back to login.
+
+---
+
+## Driver flow
+
+### Home screen
+
+- **Go online / offline** (clock in and clock out) and **take a break**. Before a break the app shows the driver's break information.
+- Clock-in is refused when the driver is too far from the outlet.
+- The overflow menu has **Profile**, **Help**, **Guidelines**, **Cards** and **Logout**.
+
+### 1. Park a car
+
+1. Tap **Park car**.
+2. **Scan the QR** on the valet card, or type the card number by hand.
+3. A card that belongs to a different outlet is refused, even when offline.
+4. Collect the car, drive it to the parking area and take a **car photo**. The photo is checked on the device (image labelling) and compressed before upload.
+5. Preview the photo and submit → **car parked successfully** → back to home.
 
 ### 2. Retrieval request
 
-- When a **retrieval request** is assigned to this valet, a **bottom sheet** appears on the home screen with **car details**.
-- Bottom sheet is valid for **45 seconds**; driver must accept in that time.
-- Driver accepts by tapping **Collect keys** → collects the car from basement → brings it to the **main gate**.
+- When a retrieval is assigned to the driver, a **bottom sheet** with the car details appears on the home screen, with a countdown.
+- The driver gets a **push notification** even when the app is closed, and the message is **read aloud**.
+- Tap **Collect keys** to accept, or **pass the request** to another available driver.
+- Pending requests are also listed on their own screen.
 
 ### 3. Confirm arrival and handover
 
-- At the main gate, driver taps **Confirm arrival** → customer receives a **WhatsApp message** (e.g. "Your car has arrived at main gate").
-- When the **customer comes**, valet hands over the keys and taps **Handover** → session is completed and vehicle is **successfully handovered**.
+- At the gate, slide **Confirm arrival** → the customer is told on **WhatsApp** that the car has arrived.
+- When the customer comes, hand over the keys and confirm **Handover** → the session is complete.
+- The Confirm arrival, Customer missing and Handover buttons stay disabled for a short cooldown (set in `.env`).
 
-### 4. Repark (customer didn't come)
+### 4. Customer missing → re-park
 
-- If the car is at the main gate but the **customer doesn't come within 120 seconds**, the valet takes the car back to the basement.
-- Valet takes a **car photo** again and taps **Repark** → car is **reparked** and the flow can repeat when the customer requests retrieval again.
+- If the customer does not come, tap **Customer Missing**, take the car back, take a new photo and **re-park**. The retrieval is cancelled and the car can be requested again later.
 
----
+### Other driver screens
 
-## Operator flow (complete)
+- **My parked cars** – the cars this driver parked.
+- **My cards** – the physical card numbers assigned to this driver, with **Sync cards** to refresh them.
 
-### Customer card and WhatsApp
+### Working offline
 
-- For each car there are **two physical cards**:
-  - A **customer WhatsApp card** with a WhatsApp icon, QR code, and card/tag number (this stays with the customer).
-  - A **valet card** with the same QR code and card/tag number (this stays with the valet/parking team).
-- When the valet **takes the car from the customer**, they give the customer the **WhatsApp card** and keep the **valet card**.
-- The **valet scans the QR on the valet card** when entering/parking the car; the **customer scans the QR on their card in WhatsApp** to get a message (for example: your card number and that your car is successfully parked).
-- The **card number** on both cards is the same and identifies that parking session; it is also encoded in the QR that the valet scans in the app when parking or retrieving.
-
-### How retrieval is requested
-
-
-- When the customer wants their car, they go to the **same WhatsApp account** and type something like **"bring my car"** and send it.
-- A **retrieval request** then appears in the **operator dashboard**, showing that customer’s **card number**. The operator **assigns a valet** to that card; that valet is responsible to bring the car for that card number.
-- If the customer **never scanned the QR in WhatsApp**, they still have the **physical card** with the **card number**. The valet app also uses the same **card number** (e.g. when the valet scans the QR or enters the tag), so the valet knows which car to bring. Once the operator assigns that card to a valet, the flow in the valet app is as in [Driver flow (complete)](#driver-flow-complete) (bottom sheet, Collect keys, etc.).
-
-### Dashboard (operator app)
-
-- The dashboard is a **tab view** with KPIs and retrieval requests.
-- When a new retrieval request comes in (e.g. customer sent "bring my car" in WhatsApp), a **sound plays** so the operator knows to look at the dashboard and assign a valet.
-- **Daily stats** in the dashboard include: how many valets are **on duty**, **average** (e.g. per valet or per day), how many **cards** (sessions) came in that day, and other KPIs – everything needed to run the valet operation in one place.
-
-### Valet notification when assigned
-
-- When the operator **assigns a retrieval request to a valet**, that valet receives a **push notification** on their phone so they know they got the retrieval request, **even when the valet app is closed**.
+- A park done without internet is saved on the phone (Hive) and sent to the server when the connection returns, including by a background job when the app is closed.
+- A banner shows when the phone is offline.
+- Internet on/off changes during a shift are logged and sent to the server in batches.
 
 ---
 
-## Tech Stack
+## Operator flow
 
-- **Flutter** (Dart) – UI and app logic  
-- **BLoC** – State management  
-- **Dio** – HTTP API calls  
-- **Hive** – Local storage (e.g. tokens, offline data)  
-- **Firebase** – Push notifications (FCM)  
-- **WebSocket** – Real-time updates from the server  
-- **.env** – API URLs, keys, and config (see `.env`)
+### The two cards
+
+For each car there are **two physical cards** with the same card number:
+
+- The **customer card** has a WhatsApp QR. The customer scans it to chat with the ValetLink WhatsApp number; the QR carries the outlet code and card number.
+- The **valet card** stays with the parking team. The valet scans it in the app when parking.
+
+### How a retrieval is requested
+
+- The customer sends a message in WhatsApp asking for their car, **or**
+- scanner staff scan the customer's card, **or**
+- the operator raises a **manual request** for a card number.
+
+The request appears on the operator dashboard with the card number and a **sound alert** plays.
+
+### Dashboard
+
+- **KPIs** for the outlet and the list of **retrieval requests**.
+- **Available drivers** – assign a valet to a request, or cancel an assignment.
+- **Auto-assign** – when switched on, the server assigns valets itself and manual requests are disabled.
+
+### Side drawer
+
+| Menu | What it shows |
+|------|---------------|
+| **Dashboard** | KPIs, retrieval requests, available drivers. |
+| **Parked car** | Digital key rack: every car currently parked. |
+| **Valets** | Valet list with status, per-valet KPIs, details, and remote logout of a valet. |
+| **Car logs** | Sortable, paged table of every session with KPIs and a details popup; a session's status can be updated. |
+| **Cards** | Which physical card numbers each driver may use. |
+| **Drivers group** | Create groups of valets and add members. |
+| **Overtime** | Grant overtime to a valet. |
+| **Profile / Help / Guidelines / Logout** | Account, support contacts, operator responsibilities. |
 
 ---
 
-## Project Structure (Simple)
+## Scanner flow
 
+- The home screen lists retrieval requests and updates live.
+- Tap scan, point at the customer's WhatsApp card QR → the app reads the card number and raises a retrieval request.
+- The menu has only **Profile** and **Logout**.
+
+---
+
+## App-wide features
+
+- **Languages** – the app's text is translated; languages and translations come from the server and are cached. The language can be changed from the app bar.
+- **Push notifications** (Firebase Cloud Messaging) with local notifications, sound, vibration and text-to-speech.
+- **Real-time updates** over Socket.IO, reconnecting when the app comes back to the foreground.
+- **Help & support** contacts and role-specific **guidelines**.
+- **Profile** with change password.
+
+---
+
+## Tech stack
+
+- **Flutter** (Dart) – UI and app logic
+- **flutter_bloc** – state management (with `provider` for a few app-wide objects)
+- **Dio** – HTTP API calls, with a token interceptor that refreshes the session
+- **Hive** – local storage (tokens, offline parks, caches)
+- **Firebase Messaging** – push notifications
+- **socket_io_client** – real-time events
+- **workmanager** – background sync
+- **mobile_scanner**, **camera**, **Google ML Kit** – QR scanning and car photos
+- **flutter_dotenv** – configuration from `.env`
+
+### Dependencies
+
+*Auto-generated from `pubspec.yaml`.*
+
+<!-- AUTO:dependencies:START -->
+| Package | Version |
+|---|---|
+| `audioplayers` | `^6.6.0` |
+| `camera` | `^0.11.0+1` |
+| `connectivity_plus` | `^7.0.0` |
+| `cupertino_icons` | `^1.0.8` |
+| `device_info_plus` | `^11.3.0` |
+| `dio` | `^5.9.0` |
+| `dropdown_button2` | `^2.3.9` |
+| `equatable` | `^2.0.7` |
+| `firebase_core` | `^4.3.0` |
+| `firebase_messaging` | `^16.1.0` |
+| `flutter` | `sdk: flutter` |
+| `flutter_bloc` | `^9.1.1` |
+| `flutter_dotenv` | `^6.0.0` |
+| `flutter_image_compress` | `^2.1.0` |
+| `flutter_local_notifications` | `^19.5.0` |
+| `flutter_phone_direct_caller` | `^2.1.1` |
+| `flutter_svg` | `^2.0.10+1` |
+| `flutter_tts` | `^4.2.0` |
+| `geolocator` | `13.0.4` |
+| `google_fonts` | `^6.3.0` |
+| `google_mlkit_image_labeling` | `0.14.1` |
+| `google_mlkit_text_recognition` | `0.15.0` |
+| `hive_flutter` | `^1.1.0` |
+| `intl` | `^0.19.0` |
+| `intl_phone_field` | `^3.2.0` |
+| `lottie` | `^3.3.1` |
+| `mobile_scanner` | `^6.0.11` |
+| `package_info_plus` | `^8.1.2` |
+| `path_provider` | `^2.1.2` |
+| `permission_handler` | `^12.0.1` |
+| `pinput` | `^5.0.0` |
+| `provider` | `^6.1.2` |
+| `pull_down_button` | `^0.10.2` |
+| `slide_to_act` | `^2.0.2` |
+| `socket_io_client` | `^2.0.3+1` |
+| `url_launcher` | `^6.3.0` |
+| `vibration` | `^2.0.0` |
+| `workmanager` | `0.7.0` |
+
+**Dev dependencies**
+
+| Package | Version |
+|---|---|
+| `flutter_launcher_icons` | `^0.13.1` |
+| `flutter_lints` | `^5.0.0` |
+| `flutter_test` | `sdk: flutter` |
+<!-- AUTO:dependencies:END -->
+
+---
+
+## Project structure
+
+*Auto-generated.*
+
+<!-- AUTO:structure:START -->
 ```
 lib/
-├── api/          → All API calls (auth, driver, operator)
-├── bloc/         → State management (login, driver, operator, websocket, etc.)
-├── models/       → Data models (requests/responses)
-├── services/     → OAuth, notifications, background sync, permissions, version check
-├── ui/           → Screens and widgets
-│   ├── common/   → Shared widgets, colors, text
-│   ├── oauth/    → Login, forgot password, splash
-│   ├── driver/   → Driver home, QR, camera, confirm handover, retrieval
-│   ├── operator/ → Operator dashboard, drivers, car logs
-│   ├── permissions/
-│   └── version/
-└── utils/        → Helpers
+├── main.dart
+├── api/  (48 files)
+│   ├── core/  (4 files)
+│   ├── driver/  (18 files)
+│   ├── notification/  (1 file)
+│   ├── oauth/  (5 files)
+│   ├── ope_driv_help_support_api/  (1 file)
+│   ├── operator/  (16 files)
+│   ├── outlet/  (1 file)
+│   └── translations/  (2 files)
+├── bloc/  (89 files)
+│   ├── connectivity/  (3 files)
+│   ├── driver/  (30 files)
+│   ├── oauth/  (14 files)
+│   ├── operator/  (21 files)
+│   ├── qr/  (3 files)
+│   ├── retrival_request/  (3 files)
+│   ├── scanner/  (9 files)
+│   ├── splash/  (3 files)
+│   └── websocket/  (3 files)
+├── models/  (97 files)
+│   ├── core/  (1 file)
+│   ├── driver/  (40 files)
+│   ├── help_support/  (1 file)
+│   ├── notification/  (6 files)
+│   ├── oauth/  (8 files)
+│   ├── operator/  (36 files)
+│   ├── outlet/  (3 files)
+│   └── translations/  (2 files)
+├── services/  (25 files)
+│   ├── background/  (1 file)
+│   ├── connectivity/  (1 file)
+│   ├── device/  (1 file)
+│   ├── driver/  (1 file)
+│   ├── image/  (1 file)
+│   ├── location/  (1 file)
+│   ├── notification/  (4 files)
+│   ├── oauth/  (4 files)
+│   ├── offline_sync/  (2 files)
+│   ├── permissions/  (1 file)
+│   ├── qr/  (1 file)
+│   ├── translations/  (3 files)
+│   ├── version/  (1 file)
+│   └── websocket/  (2 files)
+├── ui/  (173 files)
+│   ├── common/  (34 files)
+│   ├── driver/  (58 files)
+│   ├── guidelines/  (3 files)
+│   ├── help_support/  (2 files)
+│   ├── oauth/  (13 files)
+│   ├── operator/  (56 files)
+│   ├── permissions/  (1 file)
+│   ├── scanner/  (3 files)
+│   └── version/  (3 files)
+└── utils/  (10 files)
 ```
+<!-- AUTO:structure:END -->
 
-- **Driver flow:** Splash → Login (if needed) → Version check → Permissions → **Driver Home** → see [Driver flow (complete)](#driver-flow-complete) for park, retrieval, confirm arrival, handover, and repark.
-- **Operator flow:** Same until role check → **Operator Dashboard** → see [Operator flow (complete)](#operator-flow-complete) for customer card/WhatsApp, retrieval by card, dashboard sound, valet push notification.
+| Folder | What lives there |
+|--------|------------------|
+| `api/` | One service per backend endpoint group. |
+| `bloc/` | State management, one folder per feature (`*_bloc`, `*_event`, `*_state`). |
+| `models/` | Request and response models. |
+| `services/` | Things that outlive a screen: session, notifications, offline sync, location, WebSocket, translations. |
+| `ui/` | Screens and widgets, grouped by role, plus `common/` shared widgets, colours and text. |
+| `utils/` | Small helpers (QR parsing, time, FIFO ordering of sessions). |
+
+### What is in each area
+
+*Auto-generated.*
+
+<!-- AUTO:inventory:START -->
+**Screens** (`lib/ui`)
+
+| Area | Screens |
+|---|---|
+| `driver` (11) | `car_camera_screen`, `car_details_screen`, `car_photo_intro_screen`, `clock_in_too_far_screen`, `confirm_arrival_screen`, `driver_home`, `driver_vehicle_details_screen`, `my_cards_screen`, `my_parked_cars_screen`, `pending_retrieval_requests_screen`, `preview_Car_Screen` |
+| `guidelines` (1) | `guidelines_screen` |
+| `help_support` (1) | `help_screen` |
+| `oauth` (5) | `forgot_password_screen`, `login`, `login_outlet_too_far_page`, `profile_screen`, `splash` |
+| `operator` (9) | `operator_car_logs_screen`, `operator_cards_screen`, `operator_dashboard`, `operator_drivers_screen`, `operator_group_members_screen`, `operator_grouping_screen`, `operator_home`, `operator_overtime_screen`, `operator_parked_car_screen` |
+| `permissions` (1) | `permissions_screen` |
+| `scanner` (1) | `scanner_home` |
+| `version` (1) | `version_check_screen` |
+
+**BLoCs / cubits** (`lib/bloc`)
+
+| Area | BLoCs |
+|---|---|
+| `connectivity` (1) | `connectivity_bloc` |
+| `driver` (10) | `assigned_sessions_background_bloc`, `car_Camer_bloc`, `confirm_arrival_bloc`, `confirm_handover_bloc`, `driver_menu_bloc`, `driver_status_bloc`, `initiate_repark_bloc`, `pass_available_drivers_bloc`, `preview_car_bloc`, `tag_submission_bloc` |
+| `oauth` (5) | `change_password_bloc`, `forgot_password_bloc`, `login_bloc`, `outlet_location_retry_cubit`, `profile_bloc` |
+| `operator` (7) | `car_logs_bloc`, `operator_cards_bloc`, `operator_dashboard_bloc`, `operator_menu_bloc`, `operator_overtime_bloc`, `valet_kpis_bloc`, `valet_list_bloc` |
+| `qr` (1) | `qr_bloc` |
+| `retrival_request` (1) | `retrival_request_bloc` |
+| `scanner` (3) | `scanner_menu_bloc`, `scanner_qr_bloc`, `scanner_retrieval_bloc` |
+| `splash` (1) | `splash_bloc` |
+| `websocket` (1) | `websocket_bloc` |
+
+**API services** (`lib/api`)
+
+| Area | Files |
+|---|---|
+| `core` (4) | `api_config`, `app_version_api_service`, `base_dio_service`, `base_http_service` |
+| `driver` (18) | `arrived_api`, `assigned_sessions_api_service`, `config_api_service`, `connectivity_log_api_service`, `connectivity_settings_api_service`, `driver_status_api_service`, `handover_api`, `image_API`, `initiate_repark_api_service`, `my_cards_api_service`, `my_parked_sessions_api_service`, `pass_available_drivers_api_service`, `pass_parked_sessions_api_service`, `pre_break_info_api_service`, `re-park_api`, `retrival_accept_api`, `session_api_service`, `sessions_pending_api` |
+| `notification` (1) | `notification_api_service` |
+| `oauth` (5) | `login_api_service`, `logout_api_service`, `otp_api_service`, `password_api_service`, `profile_api_service` |
+| `ope_driv_help_support_api` (1) | `help_support_api` |
+| `operator` (16) | `card_assignments_api_service`, `grant_overtime_api_service`, `operator_assign_retrieval_api_service`, `operator_auto_assign_api_service`, `operator_available_drivers_api_service`, `operator_cancel_assignment_api_service`, `operator_car_logs_api_service`, `operator_dashboard_api_service`, `operator_digital_key_rack_api_service`, `operator_driver_groups_api_service`, `operator_manual_retrieval_api_service`, `operator_retrieval_requests_api_service`, `operator_update_session_api_service`, `valet_kpis_api_service`, `valet_list_api_service`, `valet_logout_api_service` |
+| `outlet` (1) | `outlet_api_service` |
+| `translations` (2) | `language_api_service`, `translations_api_service` |
+
+**Services** (`lib/services`)
+
+| Area | Files |
+|---|---|
+| `background` (1) | `background_sync_service` |
+| `connectivity` (1) | `driver_connectivity_log_service` |
+| `device` (1) | `device_info_service` |
+| `driver` (1) | `customer_missing_service` |
+| `image` (1) | `image_compression_service` |
+| `location` (1) | `location_service` |
+| `notification` (4) | `firebase_messaging_service`, `local_notification_service`, `notification_service`, `text_to_speech_service` |
+| `oauth` (4) | `logout_progress`, `session_events`, `session_manager`, `token_interceptor` |
+| `offline_sync` (2) | `offline_parking_service`, `parked_card_availability_service` |
+| `permissions` (1) | `permissions_service` |
+| `qr` (1) | `valet_qr_scanner_controller_factory` |
+| `translations` (3) | `app_translations_notifier`, `language_cache`, `translations_cache` |
+| `version` (1) | `version_service` |
+| `websocket` (2) | `websocket_helper`, `websocket_service` |
+<!-- AUTO:inventory:END -->
 
 ---
 
-## How to Run
+## How to run
 
 ### 1. Prerequisites
 
-- [Flutter SDK](https://flutter.dev/docs/get-started/install) (project uses SDK `^3.6.1`)
-- Android Studio / Xcode for device or emulator
+- [Flutter SDK](https://flutter.dev/docs/get-started/install) matching the Dart SDK version in [At a glance](#at-a-glance)
+- Android Studio or Xcode, with a device or emulator
+- Firebase config files for the platform you build (`google-services.json` / `GoogleService-Info.plist`)
 
 ### 2. Environment
 
-- Copy or create a `.env` file at the project root (see `.env` for `APP_NAME`, `OAUTH_BASE_URL`, `API_BASE_URL`, `WEBSOCKET_BASE_URL`, `OUTLET_ID`, etc.).
-- Do not commit real API keys or secrets.
+Create a `.env` file at the project root with the variables listed under [Configuration](#configuration-env). `.env` is git-ignored; never commit real URLs or keys.
 
 ### 3. Install and run
 
@@ -149,39 +382,93 @@ flutter pub get
 flutter run
 ```
 
-Use `flutter run -d <device_id>` to pick a device. For release build: `flutter build apk` or `flutter build ios`.
+Use `flutter run -d <device_id>` to pick a device. For a release build: `flutter build apk` or `flutter build ios`.
 
----
+### 4. Turn on the README hook (once per clone)
 
-## Main Features (Summary)
+```bash
+git config core.hooksPath .githooks
+```
 
-- **Auth:** Login, logout, forgot password, OAuth token refresh, session end handling (e.g. login on another device).
-- **Driver:** Clock in/out, break, accept session, scan QR, take park/repark photos, confirm arrival, handover, customer missing, retrieval requests, offline-friendly flow with background sync.
-- **Operator:** Customer card with QR (WhatsApp message to customer when parked); retrieval when customer sends "bring my car" in WhatsApp (request shows card number); dashboard tab view with sound when new retrieval comes in; assign valet to card; daily stats (on duty, averages, cards per day); valet list and car logs; push notification to valet when retrieval is assigned (even when app is closed).
-- **App-wide:** Version check (optional mandatory update), permissions screen (camera, location, etc.), connectivity banner when offline, push notifications, WebSocket reconnect on resume.
+On macOS or Linux also run `chmod +x .githooks/pre-commit`.
 
 ---
 
 ## Configuration (.env)
 
-Important variables (see `.env` for full list):
+*Auto-generated: every variable the code reads.*
 
-- `APP_NAME` – App title (e.g. Cafe Niloufer E-Valet)
-- `OAUTH_BASE_URL` – Auth API base URL  
-- `API_BASE_URL` – E-Valet API base URL  
-- `WEBSOCKET_BASE_URL` – WebSocket URL for real-time events  
-- `OUTLET_ID` – Outlet identifier  
-- `IMAGE_COMPRESSION_QUALITY` / `IMAGE_COMPRESSION_MAX_KB` – Photo upload size  
-- `CONFIRM_ARRIVAL_DISABLE_SECONDS` / `CUSTOMER_MISSING_DISABLE_SECONDS` – Button cooldowns  
+<!-- AUTO:env:START -->
+| Variable | Read in |
+|---|---|
+| `API_BASE_URL` | `lib/api/core/api_config.dart` |
+| `APP_NAME` | `lib/main.dart` |
+| `CONFIRM_ARRIVAL_DISABLE_SECONDS` | `lib/ui/driver/confirm_arrival/confirm_arrival_screen.dart` |
+| `CONFIRM_HANDOVER_DISABLE_SECONDS` | `lib/ui/driver/confirm_arrival/confirm_arrival_screen.dart` |
+| `CUSTOMER_MISSING_DISABLE_SECONDS` | `lib/ui/driver/confirm_arrival/confirm_arrival_screen.dart` |
+| `OUTLET_ID` | `lib/api/core/api_config.dart` and 24 more files |
+| `WEBSOCKET_BASE_URL` | `lib/api/core/api_config.dart` |
+<!-- AUTO:env:END -->
 
-UAT vs prod can be switched by changing which `*_BASE_URL` and `*_API_KEY` are set in `.env`.
+What they mean:
+
+- `APP_NAME` – app title (defaults to `ValetLink`)
+- `API_BASE_URL` – backend API base URL
+- `WEBSOCKET_BASE_URL` – real-time server URL
+- `OUTLET_ID` – optional fixed outlet id sent with API calls
+- `CONFIRM_ARRIVAL_DISABLE_SECONDS`, `CUSTOMER_MISSING_DISABLE_SECONDS`, `CONFIRM_HANDOVER_DISABLE_SECONDS` – button cooldowns in seconds
+
+Switch between UAT and production by changing the `*_BASE_URL` values.
 
 ---
 
-## Version
+## Assets and tests
 
-App version is in `pubspec.yaml` (e.g. `1.0.3`). The app checks for updates on launch and can show a mandatory update dialog if the server reports a higher build.
+*Auto-generated.*
+
+<!-- AUTO:assets_tests:START -->
+**Assets**
+
+| Folder | Files |
+|---|---|
+| `assets/images/` | 19 |
+| `assets/jsons/` | 4 |
+| `assets/sounds/` | 2 |
+| `assets/svg/` | 3 |
+
+**Tests** (`flutter test`)
+
+- `test/whatsapp_qr_parser_test.dart`
+- `test/widget_test.dart`
+<!-- AUTO:assets_tests:END -->
 
 ---
 
-*README for **niloufer-valet-mobile** – simple overview to understand and run the project.*
+## CI
+
+[.github/workflows/flutter-build.yml](.github/workflows/flutter-build.yml) runs on pull requests to `main` and `dev`:
+
+- Commit messages must look like `feat: ...`, `fix: ...`, `docs: ...`, `style: ...`, `refactor: ...`, `test: ...` or `chore: ...`
+- `flutter analyze`
+- `dart format --set-exit-if-changed .`
+
+---
+
+## Keeping this README up to date
+
+The README has two kinds of content:
+
+1. **Auto-generated sections** – version, counts, folder tree, screens, BLoCs, API services, dependencies, `.env` variables, assets and tests. They sit between `<!-- AUTO:name:START -->` and `<!-- AUTO:name:END -->` markers. Do not edit them by hand; they are overwritten.
+2. **Written sections** – the flows and explanations. These are edited by hand when behaviour changes.
+
+How the automatic part works:
+
+- [tool/update_readme.dart](tool/update_readme.dart) reads `pubspec.yaml`, `lib/`, `assets/` and `test/` and rewrites the auto-generated sections.
+- [.githooks/pre-commit](.githooks/pre-commit) runs that script on every commit and adds the refreshed `README.md` to the commit.
+
+```bash
+dart tool/update_readme.dart          # refresh now
+dart tool/update_readme.dart --check  # exit 1 if the README is stale
+```
+
+To add a new auto-generated section, add a marker pair to this file and a matching entry in the `sections` map of the script.

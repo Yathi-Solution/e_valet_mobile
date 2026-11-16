@@ -90,6 +90,18 @@ jobs:
       - run: flutter pub get
       - run: dart format --set-exit-if-changed .
 
+  readme_check:
+    needs: validate_commit_message
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'
+      # Fails when README.md no longer matches the code.
+      # Fix locally with: dart tool/update_readme.dart
+      - run: dart tool/update_readme.dart --check
+
   # tests:
   #   needs: [code_format, code_quality]
   #   runs-on: ubuntu-latest
