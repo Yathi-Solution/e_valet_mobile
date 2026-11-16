@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:evalet/api/operator/operator_grouping/operator_driver_groups_api_service.dart';
+import 'package:evalet/services/operator/driver_groups_repository.dart';
 import 'package:evalet/models/core/api_exceptions.dart';
-import 'package:evalet/models/operator/operator_grouping/add_group_member_request.dart';
 import 'package:evalet/models/operator/operator_valet/valet_response.dart';
 import 'package:evalet/services/translations/app_translations_notifier.dart';
 import 'package:evalet/ui/common/colors.dart';
@@ -27,9 +26,7 @@ class GroupingAddMembersDialog {
 
     final selectedValets = <ValetResponse>[];
     final assignedDriverIdsFuture =
-        OperatorDriverGroupsApiService.getAssignedDriverUserIds(
-      outletId: outletId,
-    );
+        DriverGroupsRepository.assignedDriverUserIds(outletId: outletId);
     var isSubmitting = false;
     String? errorText;
 
@@ -53,13 +50,11 @@ class GroupingAddMembersDialog {
       });
 
       try {
-        for (final v in selectedValets) {
-          await OperatorDriverGroupsApiService.addDriverGroupMember(
-            outletId: outletId,
-            groupId: groupId,
-            request: AddGroupMemberRequest(driverUserId: v.userId),
-          );
-        }
+        await DriverGroupsRepository.addMembers(
+          outletId: outletId,
+          groupId: groupId,
+          driverUserIds: selectedValets.map((v) => v.userId).toList(),
+        );
 
         if (!dialogCtx.mounted) return;
         Navigator.of(dialogCtx).pop();

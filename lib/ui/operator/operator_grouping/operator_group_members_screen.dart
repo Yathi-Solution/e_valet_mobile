@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:evalet/api/operator/operator_grouping/operator_driver_groups_api_service.dart';
+import 'package:evalet/services/operator/driver_groups_repository.dart';
 import 'package:evalet/bloc/operator/operator_home/operator_menu_bloc.dart';
 import 'package:evalet/bloc/operator/operator_home/operator_menu_event.dart';
 import 'package:evalet/models/core/api_exceptions.dart';
@@ -60,10 +60,10 @@ class _OperatorGroupMembersScreenState
 
   void _loadMembers() {
     setState(() {
-      _future = OperatorDriverGroupsApiService.getDriverGroupMembers(
+      _future = DriverGroupsRepository.groupWithMembers(
         outletId: _outletId,
         groupId: widget.groupId,
-      ).then((res) => (groupName: res.groupName, members: res.members));
+      );
     });
   }
 

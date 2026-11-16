@@ -18,8 +18,8 @@ A **Flutter mobile app** for running valet parking at an outlet. Valets park and
 | BLoCs / cubits | 30 |
 | API service files | 48 |
 | Model files | 97 |
-| Service files | 25 |
-| Dart files in `lib/` | 443 |
+| Service files | 39 |
+| Dart files in `lib/` | 464 |
 <!-- AUTO:overview:END -->
 
 ---
@@ -258,28 +258,30 @@ lib/
 │   ├── operator/  (36 files)
 │   ├── outlet/  (3 files)
 │   └── translations/  (2 files)
-├── services/  (25 files)
+├── services/  (39 files)
 │   ├── background/  (1 file)
 │   ├── connectivity/  (1 file)
 │   ├── device/  (1 file)
-│   ├── driver/  (1 file)
+│   ├── driver/  (3 files)
 │   ├── image/  (1 file)
 │   ├── location/  (1 file)
 │   ├── notification/  (4 files)
 │   ├── oauth/  (4 files)
 │   ├── offline_sync/  (2 files)
+│   ├── operator/  (1 file)
 │   ├── permissions/  (1 file)
 │   ├── qr/  (1 file)
+│   ├── storage/  (11 files)
 │   ├── translations/  (3 files)
 │   ├── version/  (1 file)
 │   └── websocket/  (2 files)
-├── ui/  (173 files)
+├── ui/  (180 files)
 │   ├── common/  (34 files)
-│   ├── driver/  (58 files)
+│   ├── driver/  (62 files)
 │   ├── guidelines/  (3 files)
 │   ├── help_support/  (2 files)
 │   ├── oauth/  (13 files)
-│   ├── operator/  (56 files)
+│   ├── operator/  (59 files)
 │   ├── permissions/  (1 file)
 │   ├── scanner/  (3 files)
 │   └── version/  (3 files)
@@ -292,7 +294,7 @@ lib/
 | `api/` | One service per backend endpoint group. |
 | `bloc/` | State management, one folder per feature (`*_bloc`, `*_event`, `*_state`). |
 | `models/` | Request and response models. |
-| `services/` | Things that outlive a screen: session, notifications, offline sync, location, WebSocket, translations. |
+| `services/` | Things that outlive a screen: session, notifications, offline sync, location, WebSocket, translations. `services/storage/` holds one small store per kind of locally saved data (tokens, user, outlet, parking session, cooldowns, driver cards and so on), all sharing one Hive box. `TokenStorage` is the older single entry point and now only forwards to these stores; new code should call the store directly. |
 | `ui/` | Screens and widgets, grouped by role, plus `common/` shared widgets, colours and text. |
 | `utils/` | Small helpers (QR parsing, time, FIFO ordering of sessions). |
 
@@ -348,14 +350,16 @@ lib/
 | `background` (1) | `background_sync_service` |
 | `connectivity` (1) | `driver_connectivity_log_service` |
 | `device` (1) | `device_info_service` |
-| `driver` (1) | `customer_missing_service` |
+| `driver` (3) | `customer_missing_service`, `repark_service`, `retrieval_override_service` |
 | `image` (1) | `image_compression_service` |
 | `location` (1) | `location_service` |
 | `notification` (4) | `firebase_messaging_service`, `local_notification_service`, `notification_service`, `text_to_speech_service` |
 | `oauth` (4) | `logout_progress`, `session_events`, `session_manager`, `token_interceptor` |
 | `offline_sync` (2) | `offline_parking_service`, `parked_card_availability_service` |
+| `operator` (1) | `driver_groups_repository` |
 | `permissions` (1) | `permissions_service` |
 | `qr` (1) | `valet_qr_scanner_controller_factory` |
+| `storage` (11) | `app_config_storage`, `auth_box`, `auth_storage`, `connectivity_log_storage`, `cooldown_storage`, `driver_cards_storage`, `location_storage`, `outlet_storage`, `parking_session_storage`, `retrieval_flow_storage`, `user_storage` |
 | `translations` (3) | `app_translations_notifier`, `language_cache`, `translations_cache` |
 | `version` (1) | `version_service` |
 | `websocket` (2) | `websocket_helper`, `websocket_service` |
@@ -438,6 +442,7 @@ Switch between UAT and production by changing the `*_BASE_URL` values.
 
 **Tests** (`flutter test`)
 
+- `test/driver_flow_resolver_test.dart`
 - `test/whatsapp_qr_parser_test.dart`
 - `test/widget_test.dart`
 <!-- AUTO:assets_tests:END -->

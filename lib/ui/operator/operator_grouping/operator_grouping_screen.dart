@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:evalet/api/operator/operator_grouping/operator_driver_groups_api_service.dart';
-import 'package:evalet/api/operator/operator_valet/valet_list_api_service.dart';
+import 'package:evalet/services/operator/driver_groups_repository.dart';
 import 'package:evalet/bloc/operator/operator_home/operator_menu_bloc.dart';
 import 'package:evalet/bloc/operator/operator_home/operator_menu_event.dart';
 import 'package:evalet/models/core/api_exceptions.dart';
@@ -57,23 +56,19 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
 
   void _loadGroups() {
     setState(() {
-      _groupsFuture = OperatorDriverGroupsApiService.getDriverGroups(
-        outletId: _outletId,
-      ).then((res) => res.groups);
+      _groupsFuture = DriverGroupsRepository.groups(outletId: _outletId);
       _membersFuturesByGroupId.clear();
       _valetsFuture = null;
     });
   }
 
   void _loadValetsIfNeeded() {
-    _valetsFuture ??= ValetListApiService.getValets(outletId: _outletId)
-        .then((r) => r.valets);
+    _valetsFuture ??= DriverGroupsRepository.valets(outletId: _outletId);
   }
 
   void _reloadValets() {
     setState(() {
-      _valetsFuture = ValetListApiService.getValets(outletId: _outletId)
-          .then((r) => r.valets);
+      _valetsFuture = DriverGroupsRepository.valets(outletId: _outletId);
     });
   }
 
@@ -93,11 +88,10 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
       reloadValets: _reloadValets,
       onMembersAdded: (gid) {
         setState(() {
-          _membersFuturesByGroupId[gid] =
-              OperatorDriverGroupsApiService.getDriverGroupMembers(
+          _membersFuturesByGroupId[gid] = DriverGroupsRepository.members(
             outletId: _outletId,
             groupId: gid,
-          ).then((res) => res.members);
+          );
         });
       },
     );
@@ -183,7 +177,7 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
     if (!shouldRemove) return;
 
     try {
-      await OperatorDriverGroupsApiService.removeDriverGroupMember(
+      await DriverGroupsRepository.removeMember(
         outletId: _outletId,
         groupId: groupId,
         driverUserId: member.driverUserId,
@@ -478,11 +472,10 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
                             t: t,
                             membersFuture: _membersFuturesByGroupId.putIfAbsent(
                               g.id,
-                              () => OperatorDriverGroupsApiService
-                                  .getDriverGroupMembers(
+                              () => DriverGroupsRepository.members(
                                 outletId: _outletId,
                                 groupId: g.id,
-                              ).then((res) => res.members),
+                              ),
                             ),
                             onAddMembers: () => _showAddMembersDialog(
                               groupId: g.id,
@@ -491,11 +484,10 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
                             onRetryMembers: () {
                               setState(() {
                                 _membersFuturesByGroupId[g.id] =
-                                    OperatorDriverGroupsApiService
-                                        .getDriverGroupMembers(
+                                    DriverGroupsRepository.members(
                                   outletId: _outletId,
                                   groupId: g.id,
-                                ).then((res) => res.members);
+                                );
                               });
                             },
                             onRemoveMember: (member) => _removeMemberFromGroup(
