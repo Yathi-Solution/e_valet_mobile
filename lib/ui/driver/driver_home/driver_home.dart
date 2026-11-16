@@ -11,7 +11,6 @@ import 'package:evalet/bloc/driver/driver_status/driver_status_bloc.dart';
 import 'package:evalet/bloc/driver/driver_status/driver_status_event.dart';
 import 'package:evalet/bloc/driver/driver_status/driver_status_state.dart';
 import 'package:evalet/bloc/websocket/websocket_bloc.dart';
-import 'package:evalet/bloc/websocket/websocket_state.dart';
 import 'package:evalet/api/driver/pre_break_info_api_service.dart';
 import 'package:evalet/services/notification/firebase_messaging_service.dart';
 import 'package:evalet/services/oauth/token_interceptor.dart';
@@ -32,21 +31,10 @@ import 'package:evalet/models/driver/session/assigned_session.dart';
 import 'package:evalet/models/driver/session/pending_session.dart';
 import 'package:evalet/models/driver/session/pending_sessions_response.dart';
 import 'package:evalet/services/offline_sync/offline_parking_service.dart';
-import 'package:evalet/utils/session_converter.dart';
 import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
 import 'package:evalet/ui/driver/driver_home/driver_home_route_observer.dart';
-
-/// True when every queued assignment id is in collect-keys-in-transit ack
-/// (sheet should stay hidden until park completes or queue clears).
-bool allQueuedSessionsInCollectKeysAck(List<dynamic> sessions) {
-  if (sessions.isEmpty) return true;
-  for (final s in sessions) {
-    final id = AssignedSessionsBackgroundBloc.sessionIdOfFirstSession([s]);
-    if (id == null || id.isEmpty) continue;
-    if (!TokenStorage.collectKeysInTransitAckContainsSync(id)) return false;
-  }
-  return true;
-}
+import 'package:evalet/ui/driver/driver_home/driver_flow_resolver.dart';
+import 'package:evalet/ui/driver/driver_home/widgets/action_blocking_loader.dart';
 
 class DriverHomeScreen extends StatefulWidget {
   const DriverHomeScreen({
@@ -97,6 +85,19 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
   /// Last session id we auto-opened Confirm Arrival for (detect stuck guard if route observer misses didPopNext).
   String? _lastPushedConfirmArrivalSessionId;
 
+  /// The rules for what to open next; this widget only carries them out.
+  static const DriverFlowResolver _flow = DriverFlowResolver();
+
+  /// True when the driver home is the top route. Treated as true if the route
+  /// cannot be read, so a lookup failure never blocks the flow.
+  bool _homeIsCurrent(BuildContext context) {
+    try {
+      return ModalRoute.of(context)?.isCurrent == true;
+    } catch (_) {
+      return true;
+    }
+  }
+
   void _refreshPendingSessions() {
     try {
       final bloc = _driverMenuBloc;
@@ -119,76 +120,16 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     }
   }
 
-  String _statusOfAssignedQueueEntry(dynamic session) {
-    if (session is AssignedSession) {
-      return session.retrievalLifecycleStatus;
-    }
-    if (session is Map<String, dynamic>) {
-      final rawStatus = session['status'];
-      if (rawStatus is String && rawStatus.trim().isNotEmpty) {
-        return rawStatus.trim().toUpperCase();
-      }
-      if (rawStatus is Map<String, dynamic>) {
-        for (final key in ['name', 'value', 'status', 'state', 'code']) {
-          final value = rawStatus[key];
-          if (value is String && value.trim().isNotEmpty) {
-            return value.trim().toUpperCase();
-          }
-        }
-      }
-    }
-    return '';
-  }
-
-  String? _firstAssignableRetrievalSessionId(List<dynamic> sessions) {
-    for (final session in sessions) {
-      final id =
-          AssignedSessionsBackgroundBloc.sessionIdOfFirstSession([session]);
-      if (id == null || id.isEmpty) continue;
-      if (_statusOfAssignedQueueEntry(session) != 'ASSIGNED') continue;
-      if (TokenStorage.collectKeysInTransitAckContainsSync(id)) continue;
-      return id;
-    }
-    return null;
-  }
-
-  bool _isAssignedRetrievalPendingSession(PendingSession session) {
-    final taskType = (session.taskType ?? '').trim().toUpperCase();
-    final isRetrievalTask =
-        taskType.contains('RETRIEVAL') || taskType.contains('RETRIEVE');
-    if (!isRetrievalTask) return false;
-    return session.status.trim().toUpperCase() == 'ASSIGNED';
-  }
-
-  List<AssignedSession> _assignedFallbackSessionsFromPending(
-    PendingSessionsResponse pending,
-  ) {
-    final sessions = <AssignedSession>[];
-    for (final pendingSession in pending.sessions) {
-      if (!_isAssignedRetrievalPendingSession(pendingSession)) continue;
-      sessions.add(SessionConverter.pendingToAssigned(pendingSession));
-    }
-    return sessions;
-  }
-
-  void _syncAssignedFromPendingFallback(
-    BuildContext context,
-    PendingSessionsResponse? pending,
-  ) {
-    if (pending == null) return;
+  void _syncAssignedFromPendingFallback(PendingSessionsResponse? pending) {
     final assignedBloc = _assignedBloc;
     if (assignedBloc == null || assignedBloc.isClosed) return;
 
-    final fallbackSessions = _assignedFallbackSessionsFromPending(pending);
-    if (fallbackSessions.isEmpty) return;
-
-    final state = assignedBloc.state;
-    if (state is AssignedSessionsBackgroundData &&
-        _firstAssignableRetrievalSessionId(state.sessions) != null) {
-      return;
-    }
-
-    assignedBloc.add(SetSessionsFromPending(fallbackSessions));
+    final sessions = _flow.assignedSessionsToAdoptFromPending(
+      pending,
+      assignedBloc.state,
+    );
+    if (sessions == null) return;
+    assignedBloc.add(SetSessionsFromPending(sessions));
   }
 
   void _startPendingSessionsRefreshTimer() {
@@ -440,203 +381,6 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     super.dispose();
   }
 
-  /// Deferred Collect Keys: block auto Confirm Arrival only while park flow is active.
-  bool _canResumeDeferredRetrievalConfirm(
-    BuildContext context,
-    String sessionId,
-  ) {
-    try {
-      if (ParkFlowSignals.isCarPhotoParkFlowActive) return false;
-    } catch (_) {}
-    try {
-      final route = ModalRoute.of(context);
-      if (route?.isCurrent != true) return false;
-    } catch (_) {}
-    try {
-      final hivePark = TokenStorage.getSessionIdSync();
-      if (hivePark != null &&
-          hivePark.isNotEmpty &&
-          hivePark.trim() == sessionId.trim()) {
-        return false;
-      }
-    } catch (_) {}
-    try {
-      final menu = context.read<DriverMenuBloc>().state;
-      if (menu is DriverHomeLoaded && menu.pendingSessions != null) {
-        final p = menu.pendingSessions!;
-        final rep = p.reparkingSession;
-        if (rep != null && rep.sessionId.trim() == sessionId.trim()) {
-          return false;
-        }
-        final chk = p.checkedInSession;
-        if (chk != null && chk.sessionId.trim() == sessionId.trim()) {
-          return false;
-        }
-      }
-    } catch (_) {}
-    return true;
-  }
-
-  bool _pendingSessionNeedsConfirmArrivalNavigation(
-    BuildContext context,
-    PendingSession s,
-  ) {
-    if (TokenStorage.shouldSuppressAutoConfirmArrivalForSessionSync(
-        s.sessionId)) {
-      return false;
-    }
-    if (!TokenStorage.collectKeysInTransitAckContainsSync(s.sessionId)) {
-      return true;
-    }
-    return _canResumeDeferredRetrievalConfirm(context, s.sessionId);
-  }
-
-  /// Same session id as assigned retrieval still needs Confirm Arrival (including deferred after park).
-  bool _pendingNeedsConfirmForAssignedRetrieval(
-    BuildContext context,
-    PendingSessionsResponse? pending,
-    String assignedRetrievalSessionId,
-  ) {
-    if (pending == null) return false;
-    final aid = assignedRetrievalSessionId.trim();
-    if (aid.isEmpty) return false;
-    for (final s in pending.sessions) {
-      if (s.sessionId.trim() != aid) continue;
-      if (s.isArrived &&
-          _pendingSessionNeedsConfirmArrivalNavigation(context, s)) {
-        return true;
-      }
-      if (s.isAccepted &&
-          _pendingSessionNeedsConfirmArrivalNavigation(context, s)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  DateTime? _pendingSessionFifoTime(PendingSession session) {
-    final assignedAtRaw = (session.assignedAt ?? '').trim();
-    if (assignedAtRaw.isNotEmpty) {
-      final assignedAt = DateTime.tryParse(assignedAtRaw);
-      if (assignedAt != null) return assignedAt;
-    }
-    final createdAtRaw = session.createdAt.trim();
-    if (createdAtRaw.isNotEmpty) {
-      return DateTime.tryParse(createdAtRaw);
-    }
-    return null;
-  }
-
-  int _comparePendingSessionsFifo(PendingSession a, PendingSession b) {
-    final ta = _pendingSessionFifoTime(a);
-    final tb = _pendingSessionFifoTime(b);
-    if (ta == null && tb == null) {
-      return a.sessionId.compareTo(b.sessionId);
-    }
-    if (ta == null) return 1;
-    if (tb == null) return -1;
-    final c = ta.compareTo(tb);
-    if (c != 0) return c;
-    return a.sessionId.compareTo(b.sessionId);
-  }
-
-  /// Driver-flow target selection:
-  /// 1) keep first API item if it is a parking continuation task
-  /// 2) otherwise resume retrieval Confirm Arrival in FIFO order (oldest first)
-  /// 3) fallback to first API item
-  PendingSession? _nextPendingSessionForDriverFlow(
-    BuildContext context,
-    PendingSessionsResponse pending,
-  ) {
-    if (pending.sessions.isEmpty) return null;
-    final top = pending.sessions.first;
-    if (top.isReparking || top.isCheckedIn) {
-      return top;
-    }
-
-    final retrievalCandidates = pending.sessions
-        .where((s) => s.isArrived || s.isAccepted)
-        .toList()
-      ..sort(_comparePendingSessionsFifo);
-    if (retrievalCandidates.isNotEmpty) {
-      // Strict FIFO: always keep the oldest accepted/arrived retrieval as head.
-      // Do not advance to newer retrievals while this head is pending/suppressed.
-      return retrievalCandidates.first;
-    }
-
-    return top;
-  }
-
-  bool _shouldDeferRetrievalSheetForTopPendingTask(
-    BuildContext context,
-    PendingSessionsResponse? pending,
-    String assignedRetrievalSessionId,
-  ) {
-    if (pending == null || pending.sessions.isEmpty) return false;
-    final assignedId = assignedRetrievalSessionId.trim();
-    if (assignedId.isEmpty) return false;
-    final nextPending = _nextPendingSessionForDriverFlow(context, pending);
-    if (nextPending == null) return false;
-    if (nextPending.sessionId.trim() != assignedId) return false;
-    if (nextPending.isReparking || nextPending.isCheckedIn) return true;
-    if (nextPending.isArrived || nextPending.isAccepted) {
-      return true;
-    }
-    return false;
-  }
-
-  AssignedSession? _findAssignedSessionById(List<dynamic> sessions, String id) {
-    final aid = id.trim();
-    if (aid.isEmpty) return null;
-    for (final s in sessions) {
-      if (s is AssignedSession) {
-        if (s.id.trim() == aid) return s;
-      } else if (s is Map<String, dynamic>) {
-        final raw = (s['sessionId'] ?? s['id'])?.toString().trim();
-        if (raw == aid) {
-          try {
-            return AssignedSession.fromJson(s);
-          } catch (_) {}
-        }
-      }
-    }
-    return null;
-  }
-
-  /// When pending API lags, next deferred id may still appear on assigned-to-me only.
-  AssignedSession? _firstAssignedDeferredNeedingConfirm(BuildContext context) {
-    final defOrder = TokenStorage.collectKeysInTransitOrderedIdsSync();
-    if (defOrder.isEmpty) return null;
-    final assignedState = context.read<AssignedSessionsBackgroundBloc>().state;
-    if (assignedState is! AssignedSessionsBackgroundData ||
-        !assignedState.hasSessions) {
-      return null;
-    }
-    for (final id in defOrder) {
-      if (TokenStorage.shouldSuppressAutoConfirmArrivalForSessionSync(id)) {
-        continue;
-      }
-      final s = _findAssignedSessionById(assignedState.sessions, id);
-      if (s == null) continue;
-      final st = s.retrievalLifecycleStatus;
-      if (st == 'ARRIVED' && _canResumeDeferredRetrievalConfirm(context, id)) {
-        return s;
-      }
-    }
-    for (final id in defOrder) {
-      if (TokenStorage.shouldSuppressAutoConfirmArrivalForSessionSync(id)) {
-        continue;
-      }
-      final s = _findAssignedSessionById(assignedState.sessions, id);
-      if (s == null) continue;
-      final st = s.retrievalLifecycleStatus;
-      if (st == 'ACCEPTED' && _canResumeDeferredRetrievalConfirm(context, id)) {
-        return s;
-      }
-    }
-    return null;
-  }
-
   /// Repark / checked-in / Confirm Arrival / retrieval sheet — single place so
   /// [didPopNext] can re-run the same logic after a route pop (listener alone may not fire).
   void _tryResumeDriverFlowFromHome(BuildContext context) {
@@ -656,226 +400,340 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
       });
     }
 
-    var scheduledDriverFlowNavigation = false;
-
     final pending = menuState.pendingSessions;
-    PendingSession? nextPendingForFlow;
-    if (pending != null) {
-      nextPendingForFlow = _nextPendingSessionForDriverFlow(
-        context,
-        pending,
-      );
-      // If the next pending row is a different session than what we last opened,
-      // clear the stuck guard (RouteAware.didPopNext only runs when this observer
-      // is on MaterialApp.navigatorObservers).
-      if (_hasNavigatedForStatus &&
-          nextPendingForFlow != null &&
-          nextPendingForFlow.sessionId.trim() !=
-              (_lastPushedConfirmArrivalSessionId ?? '').trim()) {
-        _hasNavigatedForStatus = false;
-      }
+    final nextPending =
+        pending == null ? null : _flow.nextPendingSessionForDriverFlow(pending);
+    // If the next pending row is a different session than what we last opened,
+    // clear the stuck guard (RouteAware.didPopNext only runs when this observer
+    // is on MaterialApp.navigatorObservers).
+    if (_hasNavigatedForStatus &&
+        nextPending != null &&
+        nextPending.sessionId.trim() !=
+            (_lastPushedConfirmArrivalSessionId ?? '').trim()) {
+      _hasNavigatedForStatus = false;
     }
 
-    if (!scheduledDriverFlowNavigation && !_hasNavigatedForStatus) {
-      PendingSession? target;
-      AssignedSession? assignedOnlyTarget;
+    final DriverFlowStep step = _hasNavigatedForStatus
+        ? const DriverFlowNone()
+        : _flow.resolveNextStep(
+            pending: pending,
+            nextPending: nextPending,
+            assignedState: context.read<AssignedSessionsBackgroundBloc>().state,
+            isSessionIncompleteSuppressed:
+                _shouldSuppressSessionIncompleteDialogForSession,
+          );
 
-      if (pending != null) {
-        target = nextPendingForFlow;
-      } else {
-        assignedOnlyTarget = _firstAssignedDeferredNeedingConfirm(context);
+    switch (step) {
+      case DriverFlowHold():
+        return;
+      case DriverFlowNone():
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _attemptShowAssignedSessionSheet(context);
+        });
+      case DriverFlowRepark(:final session):
+        _hasNavigatedForStatus = true;
+        _closeAssignedSessionSheetIfOpen(context);
+        _openReparkAfterFrame(context, session);
+      case DriverFlowSessionIncomplete(:final session):
+        // Keep first API task in focus; do not jump to retrieval while this is first.
+        _hasNavigatedForStatus = true;
+        _closeAssignedSessionSheetIfOpen(context);
+        if (!_hasShownSessionDialog) {
+          _hasShownSessionDialog = true;
+          _showSessionIncompleteAfterFrame(context, session);
+        }
+      case DriverFlowConfirmArrival(:final session, :final isArrived):
+        _closeAssignedSessionSheetIfOpen(context);
+        _openConfirmArrivalAfterFrame(context, session, isArrived: isArrived);
+    }
+  }
+
+  void _openReparkAfterFrame(BuildContext context, PendingSession session) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && ModalRoute.of(context)?.isCurrent == true) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => CarPhotoIntroScreen(
+              cameViaTagNumber: false,
+              sessionId: session.sessionId,
+              isReparking: true,
+              cardNumber: session.cardNumber.toString(),
+            ),
+          ),
+        );
       }
+    });
+  }
 
-      if (target != null) {
-        if (target.isReparking) {
-          scheduledDriverFlowNavigation = true;
-          _hasNavigatedForStatus = true;
-          _closeAssignedSessionSheetIfOpen(context);
-          final reparkingSession = target;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted && ModalRoute.of(context)?.isCurrent == true) {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => CarPhotoIntroScreen(
-                    cameViaTagNumber: false,
-                    sessionId: reparkingSession.sessionId,
-                    isReparking: true,
-                    cardNumber: reparkingSession.cardNumber.toString(),
-                  ),
-                ),
-              );
-            }
-          });
-        } else if (target.isCheckedIn) {
-          if (_shouldSuppressSessionIncompleteDialogForSession(
-              target.sessionId)) {
-            return;
-          }
-          // Keep first API task in focus; do not jump to retrieval while this is first.
-          scheduledDriverFlowNavigation = true;
-          _hasNavigatedForStatus = true;
-          _closeAssignedSessionSheetIfOpen(context);
-          if (!_hasShownSessionDialog) {
-            _hasShownSessionDialog = true;
-            final checkedInSession = target;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted && ModalRoute.of(context)?.isCurrent == true) {
-                SessionIncompleteDialog.show(
-                  context,
-                  cardNumber: checkedInSession.cardNumber.toString(),
-                  onContinue: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => CarPhotoIntroScreen(
-                          cameViaTagNumber: false,
-                          sessionId: checkedInSession.sessionId,
-                          cardNumber: checkedInSession.cardNumber.toString(),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              }
-            });
-          }
-        } else if ((target.isArrived || target.isAccepted) &&
-            _pendingSessionNeedsConfirmArrivalNavigation(context, target)) {
-          scheduledDriverFlowNavigation = true;
-          _closeAssignedSessionSheetIfOpen(context);
-          final pendingTarget = target;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!mounted) return;
-            final routeIsCurrent = ModalRoute.of(context)?.isCurrent == true;
-            if (!routeIsCurrent) return;
-            if (!mounted) return;
-            _hasNavigatedForStatus = true;
-            _lastPushedConfirmArrivalSessionId = pendingTarget.sessionId.trim();
-            final assignedSession =
-                SessionConverter.pendingToAssigned(pendingTarget);
+  void _showSessionIncompleteAfterFrame(
+    BuildContext context,
+    PendingSession session,
+  ) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && ModalRoute.of(context)?.isCurrent == true) {
+        SessionIncompleteDialog.show(
+          context,
+          cardNumber: session.cardNumber.toString(),
+          onContinue: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => ConfirmArrivalScreen(
-                  session: assignedSession,
-                  preventBackNavigation: true,
-                  showHandoverOnLoad: pendingTarget.isArrived,
+                builder: (_) => CarPhotoIntroScreen(
+                  cameViaTagNumber: false,
+                  sessionId: session.sessionId,
+                  cardNumber: session.cardNumber.toString(),
                 ),
               ),
             );
-          });
-        } else {
-          // Top API row is not actionable for confirm-arrival navigation
-          // (e.g. transient stale status); avoid reopening stale retrieval UI.
-        }
-      } else if (assignedOnlyTarget != null) {
-        scheduledDriverFlowNavigation = true;
-        _closeAssignedSessionSheetIfOpen(context);
-        final sessionToOpen = assignedOnlyTarget;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          final routeIsCurrent = ModalRoute.of(context)?.isCurrent == true;
-          if (!routeIsCurrent) return;
-          if (!mounted) return;
-          _hasNavigatedForStatus = true;
-          _lastPushedConfirmArrivalSessionId = sessionToOpen.id.trim();
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => ConfirmArrivalScreen(
-                session: sessionToOpen,
-                preventBackNavigation: true,
-                showHandoverOnLoad:
-                    sessionToOpen.retrievalLifecycleStatus == 'ARRIVED',
-              ),
-            ),
-          );
-        });
+          },
+        );
       }
-    }
+    });
+  }
 
-    if (!scheduledDriverFlowNavigation) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        _attemptShowAssignedSessionSheet(context);
-      });
-    }
+  void _openConfirmArrivalAfterFrame(
+    BuildContext context,
+    AssignedSession session, {
+    required bool isArrived,
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (ModalRoute.of(context)?.isCurrent != true) return;
+      _hasNavigatedForStatus = true;
+      _lastPushedConfirmArrivalSessionId = session.id.trim();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ConfirmArrivalScreen(
+            session: session,
+            preventBackNavigation: true,
+            showHandoverOnLoad: isArrived,
+          ),
+        ),
+      );
+    });
   }
 
   void _attemptShowAssignedSessionSheet(BuildContext blocContext) {
     if (!mounted || _isShowingAssignedSheet) return;
 
-    // No isCurrent check needed: the sheet uses useRootNavigator: true, so it
-    // appears on top of any driver screen (not just the home screen).
+    // The sheet uses useRootNavigator: true, so it can appear on top of any
+    // driver screen (not just the home screen).
+    final menuState = blocContext.read<DriverMenuBloc>().state;
+    final decision = _flow.decideRetrievalSheet(
+      assignedState: blocContext.read<AssignedSessionsBackgroundBloc>().state,
+      menuLoaded: menuState is DriverHomeLoaded,
+      pending: menuState is DriverHomeLoaded ? menuState.pendingSessions : null,
+      homeIsCurrent: _homeIsCurrent(blocContext),
+    );
 
-    final assignedState =
-        blocContext.read<AssignedSessionsBackgroundBloc>().state;
-    if (assignedState is! AssignedSessionsBackgroundData ||
-        !assignedState.hasSessions) {
-      return;
-    }
-
-    if (allQueuedSessionsInCollectKeysAck(assignedState.sessions)) {
-      return;
-    }
-
-    final firstId = _firstAssignableRetrievalSessionId(assignedState.sessions);
-    if (firstId == null || firstId.isEmpty) {
-      return;
-    }
-    if (TokenStorage.shouldSuppressAutoConfirmArrivalForSessionSync(firstId)) {
-      return;
-    }
-
-    final driverMenuState = blocContext.read<DriverMenuBloc>().state;
-    if (driverMenuState is! DriverHomeLoaded) {
-      _pendingShowSheetWhenMenuLoaded = true;
-      return;
-    }
-
-    final pendingSessions = driverMenuState.pendingSessions;
-    // If top pending task should be resumed directly (parking or confirm-arrival),
-    // don't flash retrieval sheet for 1-2s during refresh races on home.
-    // Keep showing the sheet on non-home routes (Confirm Arrival/Handover) so
-    // collect-keys in-transit behavior continues to work.
-    final isHomeCurrent = ModalRoute.of(blocContext)?.isCurrent == true;
-    if (isHomeCurrent &&
-        _shouldDeferRetrievalSheetForTopPendingTask(
-            blocContext, pendingSessions, firstId)) {
-      return;
-    }
-
-    // Reparking: only block retrieval for the **same** session as this assignment.
-    // Otherwise a different REPARKING row was hiding the sheet on camera/preview.
-    if (pendingSessions != null && pendingSessions.hasReparkingSession) {
-      final rep = pendingSessions.reparkingSession;
-      if (rep != null && rep.sessionId.trim() == firstId.trim()) {
+    switch (decision) {
+      case RetrievalSheetDecision.skip:
         return;
-      }
+      case RetrievalSheetDecision.waitForMenu:
+        _pendingShowSheetWhenMenuLoaded = true;
+      case RetrievalSheetDecision.show:
+        _pendingShowSheetWhenMenuLoaded = false;
+        _presentAssignedSessionSheet(blocContext);
     }
-
-    // Block retrieval sheet only when **this** assigned retrieval session still
-    // needs Confirm Arrival. Another session’s ACCEPTED/ARRIVED must not hide
-    // a new assignment while you’re on another screen.
-    if (_pendingNeedsConfirmForAssignedRetrieval(
-        blocContext, pendingSessions, firstId)) {
-      return;
-    }
-
-    _pendingShowSheetWhenMenuLoaded = false;
-    _presentAssignedSessionSheet(blocContext);
   }
 
-  Widget _buildActionBlockingLoader() {
-    return Positioned.fill(
-      child: AbsorbPointer(
-        absorbing: true,
-        child: Container(
-          color: AppColors.black.withOpacity(0.45),
-          child: const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-            ),
-          ),
-        ),
+  void _onAssignedSessionsState(
+    BuildContext blocContext,
+    AssignedSessionsBackgroundState state,
+  ) {
+    // Only "data available" means AssignedSessionsBackgroundData with sessions
+    final hasData =
+        state is AssignedSessionsBackgroundData && state.hasSessions;
+    // No data (empty, initial, or cancelled) → close sheet; never show empty sheet
+    if (!hasData) {
+      _closeAssignedSessionSheetIfOpen(blocContext);
+      TokenStorage.clearCollectKeysInTransitAckSync();
+      return;
+    }
+    // Data available → attempt to show sheet on any driver screen.
+    // The sheet uses useRootNavigator: true, so it appears on top of
+    // whatever driver screen is currently active.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _attemptShowAssignedSessionSheet(blocContext);
+    });
+  }
+
+  void _onDriverMenuState(BuildContext context, DriverMenuState state) {
+    if (state is DriverMenuLogoutSuccess) {
+      SnackBars.showSuccessSnackBar(context, state.response.message);
+      _goToLoginAfterLogout(context);
+    } else if (state is DriverMenuLogoutFailure) {
+      SnackBars.showErrorSnackBar(context, state.message);
+      // Still navigate to login screen even on failure (tokens are cleared locally)
+      _goToLoginAfterLogout(context);
+    } else if (state is DriverMenuLogoutBlockedByPendingWork) {
+      _onLogoutBlockedByPendingWork(context, state);
+    } else if (state is DriverMenuAction) {
+      _onDriverMenuAction(context, state.action);
+    } else if (state is DriverHomeLoaded) {
+      _syncAssignedFromPendingFallback(state.pendingSessions);
+      _tryResumeDriverFlowFromHome(context);
+    }
+  }
+
+  void _goToLoginAfterLogout(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => const LoginScreen(),
       ),
+      (route) => false,
+    );
+    // Reset state
+    context.read<DriverMenuBloc>().add(const DriverMenuReset());
+  }
+
+  void _onLogoutBlockedByPendingWork(
+    BuildContext context,
+    DriverMenuLogoutBlockedByPendingWork state,
+  ) {
+    PreBreakInfoDialog.show(
+      context,
+      title: 'Cannot Logout',
+      actionLabel: 'logout',
+      info: state.preBreakInfo,
+    ).then((selectedDriver) async {
+      if (!context.mounted) return;
+      if (selectedDriver == null) {
+        context.read<DriverMenuBloc>().add(const DriverMenuReset());
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => const DriverHomeScreen(),
+          ),
+          (route) => false,
+        );
+        return;
+      }
+      // After passing sessions, re-check pending work before retrying logout.
+      // This avoids a confusing "popup loop" when other blockers (active retrievals /
+      // pending assignments) still exist.
+      try {
+        final latest = await PreBreakInfoApiService.getPreBreakInfo();
+        if (!context.mounted) return;
+        if (latest.hasBlockingData) {
+          SnackBars.showErrorSnackBar(
+            context,
+            'Logout is still blocked. Please finish active retrievals / pending assignments first.',
+          );
+          PreBreakInfoDialog.show(
+            context,
+            title: 'Cannot Logout',
+            actionLabel: 'logout',
+            info: latest,
+          );
+          return;
+        }
+      } catch (e) {
+        // If we fail to re-check, fall back to previous behavior.
+        print('🟢 LOGOUT FLOW recheck failed, retrying logout anyway: $e');
+      }
+
+      context.read<DriverMenuBloc>().add(const DriverLogoutPressed());
+    });
+  }
+
+  void _onDriverMenuAction(BuildContext context, DriverMenuActionType action) {
+    final Widget screen;
+    switch (action) {
+      case DriverMenuActionType.profile:
+        screen = const ProfileScreen();
+      case DriverMenuActionType.guidelines:
+        screen = const GuidelinesScreen();
+      case DriverMenuActionType.help:
+        screen = const HelpScreen();
+      case DriverMenuActionType.logout:
+        // Handled by DriverMenuLogoutSuccess/Failure
+        return;
+    }
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+    // Reset state so the same action can be handled again later
+    context.read<DriverMenuBloc>().add(const DriverMenuReset());
+  }
+
+  void _onDriverStatusState(BuildContext context, DriverStatusState state) {
+    if (state is DriverBreakStartSuccess) {
+      SnackBars.showSuccessSnackBar(context, state.message);
+    } else if (state is DriverBreakEndSuccess) {
+      SnackBars.showSuccessSnackBar(context, state.message);
+    } else if (state is DriverBreakBlockedByPendingWork) {
+      PreBreakInfoDialog.show(
+        context,
+        title: 'Cannot Start Break',
+        actionLabel: 'start break',
+        info: state.preBreakInfo,
+      ).then((selectedDriver) {
+        if (!context.mounted || selectedDriver == null) return;
+        context.read<DriverStatusBloc>().add(const DriverBreakToggled(true));
+      });
+    } else if (state is DriverStatusError) {
+      SnackBars.showErrorSnackBar(context, state.message);
+    }
+  }
+
+  /// Remembers the blocs for timer callbacks and refreshes assignments.
+  void _bindBlocsAndRefresh(BuildContext context) {
+    _driverFlowContext = context;
+    _driverMenuBloc = context.read<DriverMenuBloc>();
+    try {
+      final assignedBloc = context.read<AssignedSessionsBackgroundBloc>();
+      // Store the bloc reference for use in timer callbacks
+      _assignedBloc = assignedBloc;
+
+      // When opened from retrieval notification tap, refresh session/pending API first
+      if (_refreshPendingFromNotification) {
+        _refreshPendingFromNotification = false;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _refreshPendingSessions();
+          assignedBloc.add(const RefreshAssignedSessions());
+        });
+      } else {
+        // Force immediate refresh on every build when not triggered by notification
+        assignedBloc.add(const RefreshAssignedSessions());
+      }
+      // WebSocket listeners are automatically set up in bloc constructor
+    } catch (e) {
+      _assignedBloc = null;
+    }
+  }
+
+  Widget _buildHome(BuildContext context) {
+    return BlocBuilder<DriverMenuBloc, DriverMenuState>(
+      builder: (context, menuState) {
+        return BlocBuilder<DriverStatusBloc, DriverStatusState>(
+          builder: (context, statusState) {
+            // Logout has its own app-wide loader
+            // (LogoutProgressOverlay); only the break toggle is
+            // blocked from here.
+            final shouldBlockActions = statusState is DriverBreakToggleLoading;
+
+            return Stack(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    try {
+                      final assignedBloc =
+                          context.read<AssignedSessionsBackgroundBloc>();
+                      assignedBloc.add(const RefreshAssignedSessions());
+                    } catch (e) {
+                      print('Manual WebSocket refresh failed: $e');
+                    }
+                  },
+                  child: DriverHomeView(
+                    homeResetNotifier: _homeResetNotifier,
+                  ),
+                ),
+                if (shouldBlockActions) const ActionBlockingLoader(),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -894,239 +752,22 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
       child: Builder(
         builder: (context) {
           // Now we can safely access the blocs since we're inside the MultiBlocProvider
-          _driverFlowContext = context;
-          _driverMenuBloc = context.read<DriverMenuBloc>();
-          try {
-            final assignedBloc = context.read<AssignedSessionsBackgroundBloc>();
-            // Store the bloc reference for use in timer callbacks
-            _assignedBloc = assignedBloc;
-
-            // When opened from retrieval notification tap, refresh session/pending API first
-            if (_refreshPendingFromNotification) {
-              _refreshPendingFromNotification = false;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (!mounted) return;
-                _refreshPendingSessions();
-                assignedBloc.add(const RefreshAssignedSessions());
-              });
-            } else {
-              // Force immediate refresh on every build when not triggered by notification
-              assignedBloc.add(const RefreshAssignedSessions());
-            }
-            // WebSocket listeners are automatically set up in bloc constructor
-          } catch (e) {
-            _assignedBloc = null;
-          }
+          _bindBlocsAndRefresh(context);
 
           return MultiBlocListener(
             listeners: [
               BlocListener<AssignedSessionsBackgroundBloc,
                   AssignedSessionsBackgroundState>(
-                listener: (blocContext, state) {
-                  // Only "data available" means AssignedSessionsBackgroundData with sessions
-                  final hasData = state is AssignedSessionsBackgroundData &&
-                      state.hasSessions;
-                  // No data (empty, initial, or cancelled) → close sheet; never show empty sheet
-                  if (!hasData) {
-                    _closeAssignedSessionSheetIfOpen(blocContext);
-                    TokenStorage.clearCollectKeysInTransitAckSync();
-                    return;
-                  }
-                  // Data available → attempt to show sheet on any driver screen.
-                  // The sheet uses useRootNavigator: true, so it appears on top of
-                  // whatever driver screen is currently active.
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (!mounted) return;
-                    _attemptShowAssignedSessionSheet(blocContext);
-                  });
-                },
-              ),
-              // Add WebSocket connection monitoring
-              BlocListener<WebSocketBloc, WebSocketState>(
-                listener: (context, state) {
-                  // WebSocket state monitoring (no debug prints needed)
-                },
+                listener: _onAssignedSessionsState,
               ),
               BlocListener<DriverMenuBloc, DriverMenuState>(
-                listener: (context, state) {
-                  if (state is DriverMenuLogoutSuccess) {
-                    // Show success message
-                    SnackBars.showSuccessSnackBar(
-                        context, state.response.message);
-                    // Navigate to login screen
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
-                      ),
-                      (route) => false,
-                    );
-                    // Reset state
-                    context.read<DriverMenuBloc>().add(const DriverMenuReset());
-                  } else if (state is DriverMenuLogoutFailure) {
-                    // Show error message
-                    SnackBars.showErrorSnackBar(context, state.message);
-                    // Still navigate to login screen even on failure (tokens are cleared locally)
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
-                      ),
-                      (route) => false,
-                    );
-                    // Reset state
-                    context.read<DriverMenuBloc>().add(const DriverMenuReset());
-                  } else if (state is DriverMenuLogoutBlockedByPendingWork) {
-                    PreBreakInfoDialog.show(
-                      context,
-                      title: 'Cannot Logout',
-                      actionLabel: 'logout',
-                      info: state.preBreakInfo,
-                    ).then((selectedDriver) async {
-                      if (!context.mounted) return;
-                      if (selectedDriver == null) {
-                        context
-                            .read<DriverMenuBloc>()
-                            .add(const DriverMenuReset());
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (_) => const DriverHomeScreen(),
-                          ),
-                          (route) => false,
-                        );
-                        return;
-                      }
-                      // After passing sessions, re-check pending work before retrying logout.
-                      // This avoids a confusing "popup loop" when other blockers (active retrievals /
-                      // pending assignments) still exist.
-                      try {
-                        final latest =
-                            await PreBreakInfoApiService.getPreBreakInfo();
-                        if (!context.mounted) return;
-                        if (latest.hasBlockingData) {
-                          SnackBars.showErrorSnackBar(
-                            context,
-                            'Logout is still blocked. Please finish active retrievals / pending assignments first.',
-                          );
-                          PreBreakInfoDialog.show(
-                            context,
-                            title: 'Cannot Logout',
-                            actionLabel: 'logout',
-                            info: latest,
-                          );
-                          return;
-                        }
-                      } catch (e) {
-                        // If we fail to re-check, fall back to previous behavior.
-                        print(
-                            '🟢 LOGOUT FLOW recheck failed, retrying logout anyway: $e');
-                      }
-
-                      context
-                          .read<DriverMenuBloc>()
-                          .add(const DriverLogoutPressed());
-                    });
-                  } else if (state is DriverMenuAction) {
-                    switch (state.action) {
-                      case DriverMenuActionType.profile:
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const ProfileScreen(),
-                          ),
-                        );
-                        // Reset state so the same action can be handled again later
-                        context
-                            .read<DriverMenuBloc>()
-                            .add(const DriverMenuReset());
-                        break;
-                      case DriverMenuActionType.guidelines:
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const GuidelinesScreen(),
-                          ),
-                        );
-                        context
-                            .read<DriverMenuBloc>()
-                            .add(const DriverMenuReset());
-                        break;
-                      case DriverMenuActionType.help:
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const HelpScreen(),
-                          ),
-                        );
-                        context
-                            .read<DriverMenuBloc>()
-                            .add(const DriverMenuReset());
-                        break;
-                      case DriverMenuActionType.logout:
-                        // This case is now handled by DriverMenuLogoutSuccess/Failure
-                        break;
-                    }
-                  } else if (state is DriverHomeLoaded) {
-                    _syncAssignedFromPendingFallback(
-                      context,
-                      state.pendingSessions,
-                    );
-                    _tryResumeDriverFlowFromHome(context);
-                  }
-                },
+                listener: _onDriverMenuState,
               ),
               BlocListener<DriverStatusBloc, DriverStatusState>(
-                listener: (context, state) {
-                  if (state is DriverBreakStartSuccess) {
-                    SnackBars.showSuccessSnackBar(context, state.message);
-                  } else if (state is DriverBreakEndSuccess) {
-                    SnackBars.showSuccessSnackBar(context, state.message);
-                  } else if (state is DriverBreakBlockedByPendingWork) {
-                    PreBreakInfoDialog.show(
-                      context,
-                      title: 'Cannot Start Break',
-                      actionLabel: 'start break',
-                      info: state.preBreakInfo,
-                    ).then((selectedDriver) {
-                      if (!context.mounted || selectedDriver == null) return;
-                      context
-                          .read<DriverStatusBloc>()
-                          .add(const DriverBreakToggled(true));
-                    });
-                  } else if (state is DriverStatusError) {
-                    SnackBars.showErrorSnackBar(context, state.message);
-                  }
-                },
+                listener: _onDriverStatusState,
               ),
             ],
-            child: BlocBuilder<DriverMenuBloc, DriverMenuState>(
-              builder: (context, menuState) {
-                return BlocBuilder<DriverStatusBloc, DriverStatusState>(
-                  builder: (context, statusState) {
-                    // Logout has its own app-wide loader
-                    // (LogoutProgressOverlay); only the break toggle is
-                    // blocked from here.
-                    final shouldBlockActions =
-                        statusState is DriverBreakToggleLoading;
-
-                    return Stack(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            try {
-                              final assignedBloc = context
-                                  .read<AssignedSessionsBackgroundBloc>();
-                              assignedBloc.add(const RefreshAssignedSessions());
-                            } catch (e) {
-                              print('Manual WebSocket refresh failed: $e');
-                            }
-                          },
-                          child: DriverHomeView(
-                            homeResetNotifier: _homeResetNotifier,
-                          ),
-                        ),
-                        if (shouldBlockActions) _buildActionBlockingLoader(),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
+            child: _buildHome(context),
           );
         },
       ),

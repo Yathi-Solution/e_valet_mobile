@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:evalet/api/operator/operator_grouping/operator_driver_groups_api_service.dart';
+import 'package:evalet/services/operator/driver_groups_repository.dart';
 import 'package:evalet/models/core/api_exceptions.dart';
-import 'package:evalet/models/operator/operator_grouping/add_group_member_request.dart';
 import 'package:evalet/models/operator/operator_valet/valet_response.dart';
 import 'package:evalet/services/translations/app_translations_notifier.dart';
 import 'package:evalet/ui/common/colors.dart';
@@ -67,8 +66,7 @@ class _GroupingAddGroupDialogBodyState
   void initState() {
     super.initState();
     _nameController = TextEditingController();
-    _assignedDriverIdsFuture =
-        OperatorDriverGroupsApiService.getAssignedDriverUserIds(
+    _assignedDriverIdsFuture = DriverGroupsRepository.assignedDriverUserIds(
       outletId: widget.outletId,
     );
   }
@@ -107,18 +105,11 @@ class _GroupingAddGroupDialogBodyState
     });
 
     try {
-      final created = await OperatorDriverGroupsApiService.createDriverGroup(
+      await DriverGroupsRepository.createGroupWithMembers(
         outletId: widget.outletId,
         name: groupName,
+        driverUserIds: _selectedValets.map((v) => v.userId).toList(),
       );
-
-      for (final v in _selectedValets) {
-        await OperatorDriverGroupsApiService.addDriverGroupMember(
-          outletId: widget.outletId,
-          groupId: created.id,
-          request: AddGroupMemberRequest(driverUserId: v.userId),
-        );
-      }
 
       if (!mounted) return;
       Navigator.of(context).pop();

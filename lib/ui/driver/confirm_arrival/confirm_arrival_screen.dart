@@ -3,13 +3,8 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:evalet/services/translations/app_translations_notifier.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:evalet/api/driver/initiate_repark_api_service.dart';
-import 'package:evalet/api/driver/assigned_sessions_api_service.dart';
-import 'package:evalet/api/driver/sessions_pending_api.dart';
-import 'package:evalet/api/operator/operator_dashboard/operator_assign_retrieval_api_service.dart';
 import 'package:evalet/bloc/driver/confirm_arrival/confirm_arrival_bloc.dart';
 import 'package:evalet/bloc/driver/confirm_arrival/confirm_arrival_event.dart';
 import 'package:evalet/bloc/driver/confirm_arrival/confirm_arrival_state.dart';
@@ -28,8 +23,8 @@ import 'package:evalet/ui/driver/confirm_arrival/confirm_arrival_widgets/car_inf
 import 'package:evalet/ui/driver/confirm_arrival/confirm_arrival_widgets/handover_buttons_section.dart';
 import 'package:evalet/ui/driver/confirm_arrival/confirm_arrival_widgets/slide_to_confirm_button.dart';
 import 'package:evalet/models/core/api_exceptions.dart';
-import 'package:evalet/models/driver/re-park/initiate_repark_request.dart';
-import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/services/driver/repark_service.dart';
+import 'package:evalet/services/driver/retrieval_override_service.dart';
 import 'package:evalet/services/oauth/token_interceptor.dart';
 
 class ConfirmArrivalScreen extends StatefulWidget {
@@ -314,75 +309,28 @@ class _ConfirmArrivalScreenState extends State<ConfirmArrivalScreen> {
         return;
       }
 
-      // 1) GET /operators/assign-retrieval - primary source for status when operator changes in Car Logs
-      final assignmentStatus =
-          await OperatorAssignRetrievalApiService.getAssignmentStatus(
-        sessionId: widget.session.id,
+      final result = await RetrievalOverrideService.check(
+        widget.session.id,
+        isHandoverShown: () => _showHandoverButtons,
       );
       if (!mounted) return;
-      if (assignmentStatus != null) {
-        if (assignmentStatus.isParked || assignmentStatus.isCompleted) {
+      switch (result) {
+        case RetrievalOverrideResult.none:
+          break;
+        case RetrievalOverrideResult.arrived:
+          if (!_showHandoverButtons) _showHandoverStage();
+        case RetrievalOverrideResult.completedByOperator:
           dev.log(
             'ConfirmArrival poll: operator parked/completed → schedule pop session=${widget.session.id}',
             name: 'ConfirmArrival',
           );
-          _operatorOverridePollTimer?.cancel();
-          _operatorOverridePollTimer = null;
-          if (mounted) {
-            final t = context.read<AppTranslationsNotifier>();
-            SnackBars.showSuccessSnackBar(
-              context,
-              t.getByKey(
-                'transactionCompletedByOperator',
-                TextConstants.transactionCompletedByOperator,
-              ),
-            );
-            _safePopAfterSnackBar(reason: 'operator_assignment_status');
-          }
-          return;
-        }
-        if (!_showHandoverButtons && assignmentStatus.isArrived) {
-          _showHandoverStage();
-          return;
-        }
-      }
-
-      // 2) Fallback: Check assigned sessions - session removed when operator completes
-      final sessions = await AssignedSessionsApiService.fetchAssignedSessions();
-      if (!mounted) return;
-      final sessionStillAssigned =
-          sessions.any((s) => s.id == widget.session.id);
-      if (!sessionStillAssigned) {
-        dev.log(
-          'ConfirmArrival poll: session not in assigned-to-me → schedule pop session=${widget.session.id}',
-          name: 'ConfirmArrival',
-        );
-        _operatorOverridePollTimer?.cancel();
-        _operatorOverridePollTimer = null;
-        if (mounted) {
-          final t = context.read<AppTranslationsNotifier>();
-          SnackBars.showSuccessSnackBar(
-            context,
-            t.getByKey(
-              'transactionCompletedByOperator',
-              TextConstants.transactionCompletedByOperator,
-            ),
+          _popBecauseOperatorCompleted(reason: 'operator_assignment_status');
+        case RetrievalOverrideResult.removedFromAssigned:
+          dev.log(
+            'ConfirmArrival poll: session not in assigned-to-me → schedule pop session=${widget.session.id}',
+            name: 'ConfirmArrival',
           );
-          _safePopAfterSnackBar(reason: 'session_removed_assigned');
-        }
-        return;
-      }
-
-      // 3) Fallback: GET /sessions/pending - check if operator changed to ARRIVED
-      if (!_showHandoverButtons) {
-        final pending = await SessionsPendingApiService.getPendingSessions();
-        if (!mounted) return;
-        final matching = pending.sessions
-            .where((s) => s.sessionId == widget.session.id)
-            .toList();
-        if (matching.isNotEmpty && matching.first.isArrived) {
-          _showHandoverStage();
-        }
+          _popBecauseOperatorCompleted(reason: 'session_removed_assigned');
       }
     } catch (e, st) {
       dev.log(
@@ -394,6 +342,23 @@ class _ConfirmArrivalScreenState extends State<ConfirmArrivalScreen> {
     }
   }
 
+  /// The operator finished this session from the dashboard: tell the driver
+  /// and leave the screen.
+  void _popBecauseOperatorCompleted({required String reason}) {
+    _operatorOverridePollTimer?.cancel();
+    _operatorOverridePollTimer = null;
+    if (!mounted) return;
+    final t = context.read<AppTranslationsNotifier>();
+    SnackBars.showSuccessSnackBar(
+      context,
+      t.getByKey(
+        'transactionCompletedByOperator',
+        TextConstants.transactionCompletedByOperator,
+      ),
+    );
+    _safePopAfterSnackBar(reason: reason);
+  }
+
   void _cancelOperatorOverridePolling() {
     _operatorOverridePollTimer?.cancel();
     _operatorOverridePollTimer = null;
@@ -401,30 +366,8 @@ class _ConfirmArrivalScreenState extends State<ConfirmArrivalScreen> {
 
   Future<void> _handleCustomerMissingTap() async {
     try {
-      LocationPermission permission = await LocationService.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await LocationService.requestPermission();
-      }
-
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        throw ApiException(
-          'Location permission is required to initiate repark.',
-          code: 'location_permission_denied',
-        );
-      }
-
-      final coordinates = await LocationService.getFastCoordinates();
-
-      final request = InitiateReparkRequest(
-        latitude: coordinates['latitude']!,
-        longitude: coordinates['longitude']!,
-        accuracy: coordinates['accuracy']!,
-      );
-
-      final response = await InitiateReparkApiService.initiateRepark(
-        sessionId: widget.session.id,
-        request: request,
+      final response = await ReparkService.initiateFromCurrentLocation(
+        widget.session.id,
       );
 
       if (!mounted) return;
