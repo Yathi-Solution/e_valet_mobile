@@ -62,6 +62,7 @@ class AppTypography {
       );
   static TextStyle get bodyStyle =>
       style(fontSize: body, color: AppColors.bodyText);
+
   /// Secondary labels (12px, muted gray).
   static TextStyle get labelStyle => style(
         fontSize: label,

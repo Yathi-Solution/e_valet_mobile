@@ -76,9 +76,8 @@ class PreviewSubmitButton extends StatelessWidget {
                                     TextConstants.submitButton)),
                         fontSize: textSize,
                         fontWeight: FontWeight.w600,
-                        color: canPress
-                            ? AppColors.white
-                            : AppColors.disabledText,
+                        color:
+                            canPress ? AppColors.white : AppColors.disabledText,
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

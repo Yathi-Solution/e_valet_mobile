@@ -258,8 +258,7 @@ class _MyParkedCarsScreenState extends State<MyParkedCarsScreen> {
       body: SafeArea(
         child: BlocBuilder<ConnectivityBloc, ConnectivityState>(
           builder: (context, connectivityState) {
-            final showManualRequest =
-                connectivityState is ConnectivityOnline;
+            final showManualRequest = connectivityState is ConnectivityOnline;
 
             if (_lastConnectivityState is! ConnectivityOnline &&
                 connectivityState is ConnectivityOnline) {

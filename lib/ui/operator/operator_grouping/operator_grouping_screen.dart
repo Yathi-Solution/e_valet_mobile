@@ -429,7 +429,8 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
                               ),
                               const SizedBox(height: 8),
                               TextComponent(
-                                labelText: getDisplayErrorMessage(snapshot.error),
+                                labelText:
+                                    getDisplayErrorMessage(snapshot.error),
                                 color: AppColors.mutedText,
                                 fontSize: 12,
                                 textAlign: TextAlign.center,

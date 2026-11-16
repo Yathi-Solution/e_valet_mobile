@@ -54,7 +54,7 @@ class LoginOutletTooFarPage extends StatelessWidget {
     required this.scannerMode,
     required this.operatorStyleMenus,
     required this.onLogoutPushLogin,
-  }) : assert(
+  })  : assert(
           retryMode != LoginOutletTooFarRetryMode.driverClockIn ||
               driverOutlet != null,
           'driverOutlet is required for driverClockIn retries',
@@ -81,7 +81,9 @@ class LoginOutletTooFarPage extends StatelessWidget {
             navigateToHomeForAuthenticatedProfile(context, state.profile);
           } else if (state is OutletLocationRetryTransientFailure) {
             SnackBars.showErrorSnackBar(context, state.notification);
-            context.read<OutletLocationRetryCubit>().acknowledgeTransientFailure();
+            context
+                .read<OutletLocationRetryCubit>()
+                .acknowledgeTransientFailure();
           }
         },
         builder: (context, retryState) {

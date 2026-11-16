@@ -14,7 +14,8 @@ import 'package:evalet/services/oauth/token_interceptor.dart';
 /// `NetworkType` WIFI | MOBILE_DATA.
 class DriverConnectivityLogService {
   DriverConnectivityLogService._();
-  static final DriverConnectivityLogService instance = DriverConnectivityLogService._();
+  static final DriverConnectivityLogService instance =
+      DriverConnectivityLogService._();
 
   static const Duration _flushInterval = Duration(hours: 3);
   static const String _statusConnected = 'CONNECTED';
@@ -92,7 +93,8 @@ class DriverConnectivityLogService {
     if (shiftId == null || shiftId <= 0) return;
 
     // If admin disabled connectivity logging for this driver, skip flushing.
-    final connectivityEnabled = await TokenStorage.getDriverConnectivityEnabled();
+    final connectivityEnabled =
+        await TokenStorage.getDriverConnectivityEnabled();
     if (!connectivityEnabled) return;
 
     final outletId = await TokenStorage.getDriverConnectivityOutletId();
@@ -141,7 +143,8 @@ class DriverConnectivityLogService {
       return;
     }
 
-    final connectivityEnabled = await TokenStorage.getDriverConnectivityEnabled();
+    final connectivityEnabled =
+        await TokenStorage.getDriverConnectivityEnabled();
     if (!connectivityEnabled) {
       return;
     }
@@ -183,7 +186,8 @@ class DriverConnectivityLogService {
     if (shiftId == null || shiftId <= 0) return;
 
     // Respect driver connectivity settings flag.
-    final connectivityEnabled = await TokenStorage.getDriverConnectivityEnabled();
+    final connectivityEnabled =
+        await TokenStorage.getDriverConnectivityEnabled();
     if (!connectivityEnabled) return;
 
     if (!await _isInternetReachable()) {
@@ -252,7 +256,8 @@ class DriverConnectivityLogService {
           .map(
             (m) => ConnectivityLogEventItem(
               status: (m['status'] as String? ?? '').trim(),
-              networkType: _normalizeStoredNetworkType(m['networkType'] as String? ?? ''),
+              networkType: _normalizeStoredNetworkType(
+                  m['networkType'] as String? ?? ''),
               occurredAt: m['occurredAt'] as String? ?? '',
             ),
           )

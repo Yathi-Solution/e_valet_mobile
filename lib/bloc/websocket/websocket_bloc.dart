@@ -444,8 +444,7 @@ class WebSocketBloc extends Bloc<WebSocketEvent, WebSocketState> {
       print('Error checking session and reconnecting WebSocket: $e');
       if (!emit.isDone) {
         emit(WebSocketError(
-            message: 'Token refresh failed',
-            error: getDisplayErrorMessage(e)));
+            message: 'Token refresh failed', error: getDisplayErrorMessage(e)));
       }
     } finally {
       _isRefreshingToken = false;

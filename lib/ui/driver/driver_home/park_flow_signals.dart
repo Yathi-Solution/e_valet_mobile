@@ -31,7 +31,9 @@ class ParkFlowSignals {
   /// or tolerate offline gracefully. Hide the global no-internet blocker
   /// and any bottom "no internet" messages while these are active.
   static bool get shouldSuppressNoInternetOverlay =>
-      isCarPhotoParkFlowActive || isVehicleDetailsFlowActive || isOnDriverHomeCards;
+      isCarPhotoParkFlowActive ||
+      isVehicleDetailsFlowActive ||
+      isOnDriverHomeCards;
 
   static void beginCarPhotoParkFlow() {
     _carPhotoDepth++;

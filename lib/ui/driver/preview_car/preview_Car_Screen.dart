@@ -121,8 +121,8 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
       // Get current GPS location
       // Use the lookup started in initState; retry once if it failed so the
       // driver still sees a proper error (permission, location off, ...).
-      final coordinates = await _warmCoordinates ??
-          await LocationService.getFastCoordinates();
+      final coordinates =
+          await _warmCoordinates ?? await LocationService.getFastCoordinates();
 
       if (!context.mounted) return;
 
@@ -432,9 +432,9 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     PreviewHeader(
-                                        isReparking: widget.isReparking,
-                                        cardNumber: widget.cardNumber,
-                                      ),
+                                      isReparking: widget.isReparking,
+                                      cardNumber: widget.cardNumber,
+                                    ),
                                     SizedBox(height: screenHeight * 0.02),
                                     PreviewImageCard(
                                       imagePath: widget.imagePath!,
@@ -568,7 +568,8 @@ class _PreviewCarScreenState extends State<PreviewCarScreen> {
                                                     padding: EdgeInsets.all(
                                                         screenWidth * 0.02),
                                                     decoration: BoxDecoration(
-                                                      color: AppColors.accentSoft,
+                                                      color:
+                                                          AppColors.accentSoft,
                                                       shape: BoxShape.circle,
                                                     ),
                                                     child: Icon(

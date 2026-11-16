@@ -281,8 +281,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         unawaited(MyCardsApiService.refreshAssignedCardsInBackground());
 
         try {
-          final parkedResponse =
-              await MyParkedSessionsApiService.refreshParkedSessionsForDisplay();
+          final parkedResponse = await MyParkedSessionsApiService
+              .refreshParkedSessionsForDisplay();
           log(
             'Driver parked cars refreshed on (re)login: ${parkedResponse.sessionCount} sessions',
           );
@@ -416,7 +416,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       // Clear previous data on every new login (silent)
       await TokenStorage.clearDriverConnectivitySettings();
 
-      final settings = await ConnectivitySettingsApiService.getDriverConnectivitySettings(
+      final settings =
+          await ConnectivitySettingsApiService.getDriverConnectivitySettings(
         outletId: outletId,
       );
 
@@ -464,7 +465,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         longitude: longitude,
         accuracy: accuracy,
       );
-      final clockInResponse = await DriverStatusApiService.clockIn(clockInRequest);
+      final clockInResponse =
+          await DriverStatusApiService.clockIn(clockInRequest);
       await DriverConnectivityLogService.instance.onShiftActiveAfterClockIn(
         shiftId: clockInResponse.shiftId,
         outletId: clockInResponse.outletId,

@@ -147,7 +147,8 @@ class _MyCardsScreenState extends State<MyCardsScreen> {
             }
 
             try {
-              final numbers = data.cards.map((c) => c.cardNumber).toList(growable: false);
+              final numbers =
+                  data.cards.map((c) => c.cardNumber).toList(growable: false);
               TokenStorage.saveDriverAssignedCardNumbers(numbers);
             } catch (_) {}
 

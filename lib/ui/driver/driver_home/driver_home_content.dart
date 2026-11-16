@@ -140,82 +140,82 @@ class _DriverHomeContentState extends State<DriverHomeContent>
             }
           },
           child: Column(
-          children: [
-            // Header Content Section (status card) — back button on left when in park flow, break toggle on right
-            DriverHeaderWidget(
-              isOnline: widget.isOnline,
-              screenWidth: screenWidth,
-              screenHeight: screenHeight,
-              isTablet: isTablet,
-              isDesktop: isDesktop,
-              showBackButton: _showParkFlow,
-              onBackPressed: _showParkFlow
-                  ? () => setState(() => _showParkFlow = false)
-                  : null,
-            ),
-            // Main Content Section with SafeArea
-            // Show break content when on break (whether online or offline); else online content or offline content.
-            Expanded(
-              child: SafeArea(
-                top: false,
-                child: Container(
-                  color: AppColors.lightBeigeBackground,
-                  child: widget.isOnBreak
-                      ? SingleChildScrollView(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.04,
-                            ),
-                            child: DriverBreakContent(
-                              screenWidth: screenWidth,
-                              screenHeight: screenHeight,
-                              isTablet: isTablet,
-                              isDesktop: isDesktop,
-                              onBreakEnd: widget.onBreakEnd,
-                            ),
-                          ),
-                        )
-                      : widget.isOnline
-                          ? Padding(
+            children: [
+              // Header Content Section (status card) — back button on left when in park flow, break toggle on right
+              DriverHeaderWidget(
+                isOnline: widget.isOnline,
+                screenWidth: screenWidth,
+                screenHeight: screenHeight,
+                isTablet: isTablet,
+                isDesktop: isDesktop,
+                showBackButton: _showParkFlow,
+                onBackPressed: _showParkFlow
+                    ? () => setState(() => _showParkFlow = false)
+                    : null,
+              ),
+              // Main Content Section with SafeArea
+              // Show break content when on break (whether online or offline); else online content or offline content.
+              Expanded(
+                child: SafeArea(
+                  top: false,
+                  child: Container(
+                    color: AppColors.lightBeigeBackground,
+                    child: widget.isOnBreak
+                        ? SingleChildScrollView(
+                            child: Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: screenWidth * 0.04,
                               ),
-                              child: DriverOnlineContent(
-                                key: _onlineContentKey,
-                                driverName: widget.driverName,
-                                retrievePendingCount:
-                                    widget.retrievePendingCount,
+                              child: DriverBreakContent(
                                 screenWidth: screenWidth,
                                 screenHeight: screenHeight,
                                 isTablet: isTablet,
                                 isDesktop: isDesktop,
-                                showParkFlow: _showParkFlow,
-                                onParkFlowChanged: (value) =>
-                                    setState(() => _showParkFlow = value),
+                                onBreakEnd: widget.onBreakEnd,
                               ),
-                            )
-                          : SingleChildScrollView(
-                              child: Padding(
+                            ),
+                          )
+                        : widget.isOnline
+                            ? Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: screenWidth * 0.04,
                                 ),
-                                child: DriverOfflineContent(
+                                child: DriverOnlineContent(
+                                  key: _onlineContentKey,
+                                  driverName: widget.driverName,
+                                  retrievePendingCount:
+                                      widget.retrievePendingCount,
                                   screenWidth: screenWidth,
                                   screenHeight: screenHeight,
                                   isTablet: isTablet,
                                   isDesktop: isDesktop,
+                                  showParkFlow: _showParkFlow,
+                                  onParkFlowChanged: (value) =>
+                                      setState(() => _showParkFlow = value),
+                                ),
+                              )
+                            : SingleChildScrollView(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.04,
+                                  ),
+                                  child: DriverOfflineContent(
+                                    screenWidth: screenWidth,
+                                    screenHeight: screenHeight,
+                                    isTablet: isTablet,
+                                    isDesktop: isDesktop,
+                                  ),
                                 ),
                               ),
-                            ),
+                  ),
                 ),
               ),
-            ),
-            // Footer
-            SafeArea(
-              top: false,
-              child: const Footer(),
-            ),
-          ],
+              // Footer
+              SafeArea(
+                top: false,
+                child: const Footer(),
+              ),
+            ],
           ),
         ),
       ),

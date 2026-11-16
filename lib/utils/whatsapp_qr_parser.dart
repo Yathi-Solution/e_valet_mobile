@@ -46,9 +46,8 @@ int? tryParseCardNumberFromWhatsAppUrl(String url) {
     final scan = _cardScan.firstMatch(textToSearch);
     if (scan != null) return int.tryParse(scan.group(2) ?? '');
     // Match "Card #67" – allow normal # or full-width ＃ (U+FF03), optional spaces
-    RegExpMatch? match =
-        RegExp(r'Card\s*[#＃]\s*(\d+)', caseSensitive: false)
-            .firstMatch(textToSearch);
+    RegExpMatch? match = RegExp(r'Card\s*[#＃]\s*(\d+)', caseSensitive: false)
+        .firstMatch(textToSearch);
     if (match == null) {
       // Fallback: first digit sequence after "Card" (e.g. "Card No. 67", "Card 67")
       match = RegExp(r'Card\s*[^\d]*?(\d+)', caseSensitive: false)

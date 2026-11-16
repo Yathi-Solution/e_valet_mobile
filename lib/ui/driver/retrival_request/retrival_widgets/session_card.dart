@@ -125,23 +125,24 @@ class SessionCard extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            if (!parkedByMe) InkWell(
-                              onTap: () =>
-                                  _makePhoneCall(session.parkedBy?.phone ?? ''),
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                padding: EdgeInsets.all(screenWidth * 0.02),
-                                decoration: BoxDecoration(
-                                  color: AppColors.secondary.withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.phone,
-                                  color: AppColors.secondary,
-                                  size: screenWidth * 0.045,
+                            if (!parkedByMe)
+                              InkWell(
+                                onTap: () => _makePhoneCall(
+                                    session.parkedBy?.phone ?? ''),
+                                borderRadius: BorderRadius.circular(20),
+                                child: Container(
+                                  padding: EdgeInsets.all(screenWidth * 0.02),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.secondary.withOpacity(0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.phone,
+                                    color: AppColors.secondary,
+                                    size: screenWidth * 0.045,
+                                  ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ],

@@ -22,6 +22,7 @@ class ButtonMetrics {
   // Confirm arrival / handover (#50–53)
   static double confirmHeight(BuildContext context) =>
       MediaQuery.sizeOf(context).height * 0.07;
+
   /// Countdown seconds badge on confirm arrival, handover, and re-park CTAs.
   static const double countdownBadgeSize = 40;
   static const double countdownBadgeFontSize = 18;

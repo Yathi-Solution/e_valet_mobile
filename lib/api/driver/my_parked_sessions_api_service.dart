@@ -43,7 +43,8 @@ class MyParkedSessionsApiService {
   }
 
   /// Clears stale cache, fetches fresh parked sessions from the API, merges any pending offline parks, and saves.
-  static Future<MyParkedSessionsResponse> refreshParkedSessionsForDisplay() async {
+  static Future<MyParkedSessionsResponse>
+      refreshParkedSessionsForDisplay() async {
     await clearCache();
     final localSessions = await OfflineParkingService.getLocalParkedSessions();
 
@@ -134,8 +135,7 @@ class MyParkedSessionsApiService {
   ) async {
     final outletId = int.tryParse(dotenv.env['OUTLET_ID'] ?? '') ?? 0;
     final checkins = await OfflineParkingService.getPendingCheckins();
-    final outletFromCheckin =
-        checkins.isNotEmpty ? checkins.first.outletId : 0;
+    final outletFromCheckin = checkins.isNotEmpty ? checkins.first.outletId : 0;
 
     return MyParkedSessionsResponse(
       outletId: outletFromCheckin > 0 ? outletFromCheckin : outletId,

@@ -40,7 +40,9 @@ class _ParkedCarsAppBarActionState extends State<ParkedCarsAppBarAction> {
         ),
       );
       if (context.mounted) {
-        context.read<DriverMenuBloc>().add(const DriverPendingSessionsRefresh());
+        context
+            .read<DriverMenuBloc>()
+            .add(const DriverPendingSessionsRefresh());
       }
     } finally {
       if (mounted) {
@@ -66,8 +68,7 @@ class _ParkedCarsAppBarActionState extends State<ParkedCarsAppBarAction> {
         return prevCount != currCount;
       },
       builder: (context, state) {
-        final count =
-            state is DriverHomeLoaded ? state.parkedCarsCount : 0;
+        final count = state is DriverHomeLoaded ? state.parkedCarsCount : 0;
 
         return IconButton(
           tooltip: 'Parked cars',
@@ -101,7 +102,8 @@ class _ParkedCarsAppBarActionState extends State<ParkedCarsAppBarAction> {
                     decoration: BoxDecoration(
                       color: AppColors.error,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: AppColors.textOnDark, width: 1.5),
+                      border:
+                          Border.all(color: AppColors.textOnDark, width: 1.5),
                     ),
                     child: Center(
                       child: TextComponent(
