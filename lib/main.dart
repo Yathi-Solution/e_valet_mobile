@@ -27,6 +27,7 @@ import 'package:evalet/bloc/connectivity/connectivity_event.dart';
 import 'package:evalet/services/oauth/session_events.dart';
 import 'package:evalet/services/permissions/permissions_service.dart';
 import 'package:evalet/ui/oauth/login/login.dart';
+import 'package:evalet/ui/common/widgets/logout_progress_overlay.dart';
 import 'package:evalet/ui/common/widgets/snack_bar.dart';
 import 'package:evalet/ui/driver/driver_home/driver_home_route_observer.dart';
 import 'package:evalet/ui/permissions/permissions_screen.dart';
@@ -182,7 +183,10 @@ class MyApp extends StatelessWidget {
           ),
           builder: (context, child) {
             return _AppLifecycleHandler(
-              child: child ?? const SizedBox.shrink(),
+              // Above the navigator, so the logout loader covers every screen.
+              child: LogoutProgressOverlay(
+                child: child ?? const SizedBox.shrink(),
+              ),
             );
           },
         ),

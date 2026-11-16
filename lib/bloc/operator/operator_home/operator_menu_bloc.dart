@@ -5,6 +5,7 @@ import 'package:evalet/api/oauth/logout_api_service.dart';
 import 'package:evalet/models/core/api_exceptions.dart';
 import 'package:evalet/models/driver/status/clock_out_request.dart';
 import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/services/oauth/logout_progress.dart';
 import 'package:evalet/services/oauth/session_manager.dart';
 import 'package:evalet/services/oauth/token_interceptor.dart';
 import 'operator_menu_event.dart';
@@ -27,6 +28,7 @@ class OperatorMenuBloc extends Bloc<OperatorMenuEvent, OperatorMenuState> {
   ) async {
     if (_logoutInProgress) return;
     _logoutInProgress = true;
+    LogoutProgress.active.value = true;
     emit(const OperatorMenuLogoutLoading());
 
     try {
@@ -54,6 +56,7 @@ class OperatorMenuBloc extends Bloc<OperatorMenuEvent, OperatorMenuState> {
       emit(OperatorMenuLogoutFailure('Logout failed: ${getDisplayErrorMessage(e)}'));
     } finally {
       _logoutInProgress = false;
+      LogoutProgress.active.value = false;
     }
   }
 
