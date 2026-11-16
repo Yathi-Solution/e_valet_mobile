@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:evalet/api/operator/operator_grouping/operator_driver_groups_api_service.dart';
 import 'package:evalet/api/operator/operator_valet/valet_list_api_service.dart';
+import 'package:evalet/bloc/operator/operator_home/operator_menu_bloc.dart';
+import 'package:evalet/bloc/operator/operator_home/operator_menu_event.dart';
 import 'package:evalet/models/core/api_exceptions.dart';
 import 'package:evalet/models/operator/operator_grouping/driver_group.dart';
 import 'package:evalet/models/operator/operator_grouping/driver_group_member.dart';
@@ -17,6 +19,7 @@ import 'package:evalet/ui/guidelines/guidelines_screen.dart';
 import 'package:evalet/ui/help_support/help_screen.dart';
 import 'package:evalet/ui/oauth/profile/profile_screen.dart';
 import 'package:evalet/ui/operator/operator_drawer/operator_drawer.dart';
+import 'package:evalet/ui/operator/operator_drawer/operator_logout_scope.dart';
 import 'package:evalet/ui/operator/operator_grouping/widgets/grouping_add_group_dialog.dart';
 import 'package:evalet/ui/operator/operator_overtime/operator_overtime_screen.dart';
 import 'package:evalet/ui/operator/operator_grouping/widgets/grouping_add_members_dialog.dart';
@@ -38,11 +41,18 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
   Future<List<DriverGroup>>? _groupsFuture;
   final Map<int, Future<List<DriverGroupMember>>> _membersFuturesByGroupId = {};
   Future<List<ValetResponse>>? _valetsFuture;
+  final OperatorMenuBloc _menuBloc = OperatorMenuBloc();
 
   @override
   void initState() {
     super.initState();
     _loadGroups();
+  }
+
+  @override
+  void dispose() {
+    _menuBloc.close();
+    super.dispose();
   }
 
   void _loadGroups() {
@@ -251,7 +261,7 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
     }
 
     if (index == 8) {
-      Navigator.of(context).pop();
+      _menuBloc.add(const OperatorMenuLogoutRequested());
       return;
     }
 
@@ -267,6 +277,11 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Makes Logout in the drawer work from this screen.
+    return OperatorLogoutScope(bloc: _menuBloc, child: _buildScreen(context));
+  }
+
+  Widget _buildScreen(BuildContext context) {
     final t = context.watch<AppTranslationsNotifier>();
     final width = MediaQuery.of(context).size.width;
     final isAndroidPhone = !kIsWeb &&

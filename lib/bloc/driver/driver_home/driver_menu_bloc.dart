@@ -14,6 +14,7 @@ import 'package:evalet/models/core/api_exceptions.dart';
 import 'package:evalet/models/driver/parked/my_parked_sessions_response.dart';
 import 'package:evalet/models/driver/status/clock_out_request.dart';
 import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/services/oauth/logout_progress.dart';
 import 'package:evalet/services/oauth/token_interceptor.dart';
 import 'package:evalet/ui/common/text_constants.dart';
 
@@ -52,10 +53,14 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
   ) async {
     if (_logoutInProgress) return;
     _logoutInProgress = true;
+    // Drives the app-wide loader, so it shows on whichever screen the driver
+    // tapped Logout from, not only on the home screen.
+    LogoutProgress.active.value = true;
     try {
       await _logout(emit);
     } finally {
       _logoutInProgress = false;
+      LogoutProgress.active.value = false;
     }
   }
 
@@ -116,8 +121,9 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
           accuracy = locationData['accuracy'] as double? ?? 0.0;
           log('Using stored location for clock-out');
         } else {
-          // Fallback: Get current location if stored location not available
-          final coordinates = await LocationService.getCurrentCoordinates();
+          // Fallback: quick fix (reuses the last known position) if no stored
+          // location, so a weak GPS signal cannot hold up logout for long.
+          final coordinates = await LocationService.getFastCoordinates();
           latitude = coordinates['latitude']!;
           longitude = coordinates['longitude']!;
           accuracy = coordinates['accuracy']!;

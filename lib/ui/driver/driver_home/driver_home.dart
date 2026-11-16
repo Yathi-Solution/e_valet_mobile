@@ -1098,13 +1098,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
               builder: (context, menuState) {
                 return BlocBuilder<DriverStatusBloc, DriverStatusState>(
                   builder: (context, statusState) {
-                    final isLogoutActionInProgress =
-                        menuState is DriverMenuLogoutPrecheckLoading ||
-                            menuState is DriverMenuLogoutLoading;
-                    final isBreakActionInProgress =
-                        statusState is DriverBreakToggleLoading;
+                    // Logout has its own app-wide loader
+                    // (LogoutProgressOverlay); only the break toggle is
+                    // blocked from here.
                     final shouldBlockActions =
-                        isLogoutActionInProgress || isBreakActionInProgress;
+                        statusState is DriverBreakToggleLoading;
 
                     return Stack(
                       children: [

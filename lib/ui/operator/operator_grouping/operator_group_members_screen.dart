@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:evalet/api/operator/operator_grouping/operator_driver_groups_api_service.dart';
+import 'package:evalet/bloc/operator/operator_home/operator_menu_bloc.dart';
+import 'package:evalet/bloc/operator/operator_home/operator_menu_event.dart';
 import 'package:evalet/models/core/api_exceptions.dart';
 import 'package:evalet/models/operator/operator_grouping/driver_group_member.dart';
 import 'package:evalet/services/translations/app_translations_notifier.dart';
@@ -12,6 +14,7 @@ import 'package:evalet/ui/guidelines/guidelines_screen.dart';
 import 'package:evalet/ui/help_support/help_screen.dart';
 import 'package:evalet/ui/oauth/profile/profile_screen.dart';
 import 'package:evalet/ui/operator/operator_drawer/operator_drawer.dart';
+import 'package:evalet/ui/operator/operator_drawer/operator_logout_scope.dart';
 import 'package:evalet/ui/operator/operator_overtime/operator_overtime_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -41,10 +44,18 @@ class _OperatorGroupMembersScreenState
 
   Future<({String groupName, List<DriverGroupMember> members})>? _future;
 
+  final OperatorMenuBloc _menuBloc = OperatorMenuBloc();
+
   @override
   void initState() {
     super.initState();
     _loadMembers();
+  }
+
+  @override
+  void dispose() {
+    _menuBloc.close();
+    super.dispose();
   }
 
   void _loadMembers() {
@@ -99,7 +110,7 @@ class _OperatorGroupMembersScreenState
     }
 
     if (index == 8) {
-      Navigator.of(context).pop();
+      _menuBloc.add(const OperatorMenuLogoutRequested());
       return;
     }
 
@@ -115,6 +126,11 @@ class _OperatorGroupMembersScreenState
 
   @override
   Widget build(BuildContext context) {
+    // Makes Logout in the drawer work from this screen.
+    return OperatorLogoutScope(bloc: _menuBloc, child: _buildScreen(context));
+  }
+
+  Widget _buildScreen(BuildContext context) {
     final t = context.watch<AppTranslationsNotifier>();
     final width = MediaQuery.of(context).size.width;
     final isAndroidPhone = !kIsWeb &&
