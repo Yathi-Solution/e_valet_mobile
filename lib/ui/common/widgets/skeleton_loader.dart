@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
+import 'package:evalet/ui/common/colors.dart';
 
 class SkeletonLoader extends StatefulWidget {
   final double height;

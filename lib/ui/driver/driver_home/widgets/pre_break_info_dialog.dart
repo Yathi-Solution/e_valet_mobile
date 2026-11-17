@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/api/driver/pass_parked_sessions_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/pre_break/pre_break_info_response.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/api/driver/pass_parked_sessions_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/pre_break/pre_break_info_response.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 import 'package:provider/provider.dart';
 
 class PreBreakInfoDialog extends StatefulWidget {
@@ -236,101 +236,102 @@ class _PreBreakInfoDialogState extends State<PreBreakInfoDialog> {
             maxHeight: screenHeight * 0.62,
           ),
           child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (retrievalCards.isNotEmpty) ...[
-                _buildCardChipsSection(
-                  context,
-                  title: 'Retrieval card numbers',
-                  cards: retrievalCards,
-                  screenWidth: screenWidth,
-                ),
-                const SizedBox(height: 12),
-              ],
-              if (parkedCards.isNotEmpty) ...[
-                _buildCardChipsSection(
-                  context,
-                  title: 'Parked card numbers',
-                  cards: parkedCards,
-                  screenWidth: screenWidth,
-                ),
-              ],
-              if ((retrievalCards.isNotEmpty || parkedCards.isNotEmpty) &&
-                  availableDrivers.isNotEmpty)
-                const SizedBox(height: 14),
-              if (availableDrivers.isNotEmpty) ...[
-                TextComponent(
-                  labelText: t.getByKey(
-                    'pendingWorkAvailableDriversLabel',
-                    TextConstants.pendingWorkAvailableDriversLabel,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (retrievalCards.isNotEmpty) ...[
+                  _buildCardChipsSection(
+                    context,
+                    title: 'Retrieval card numbers',
+                    cards: retrievalCards,
+                    screenWidth: screenWidth,
                   ),
-                  fontSize: screenWidth * 0.036,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.black,
-                ),
-                const SizedBox(height: 8),
-                ...availableDrivers.map(
-                  (driver) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(10),
-                      onTap: () {
-                        setState(() {
-                          _selectedDriverUserId = driver.driverUserId;
-                        });
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _selectedDriverUserId == driver.driverUserId
-                              ? AppColors.primary.withOpacity(0.15)
-                              : AppColors.cardBackground,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: _selectedDriverUserId == driver.driverUserId
-                                ? AppColors.primary
-                                : AppColors.greyLight,
+                  const SizedBox(height: 12),
+                ],
+                if (parkedCards.isNotEmpty) ...[
+                  _buildCardChipsSection(
+                    context,
+                    title: 'Parked card numbers',
+                    cards: parkedCards,
+                    screenWidth: screenWidth,
+                  ),
+                ],
+                if ((retrievalCards.isNotEmpty || parkedCards.isNotEmpty) &&
+                    availableDrivers.isNotEmpty)
+                  const SizedBox(height: 14),
+                if (availableDrivers.isNotEmpty) ...[
+                  TextComponent(
+                    labelText: t.getByKey(
+                      'pendingWorkAvailableDriversLabel',
+                      TextConstants.pendingWorkAvailableDriversLabel,
+                    ),
+                    fontSize: screenWidth * 0.036,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.black,
+                  ),
+                  const SizedBox(height: 8),
+                  ...availableDrivers.map(
+                    (driver) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: () {
+                          setState(() {
+                            _selectedDriverUserId = driver.driverUserId;
+                          });
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 10,
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              _selectedDriverUserId == driver.driverUserId
-                                  ? Icons.radio_button_checked
-                                  : Icons.radio_button_off,
+                          decoration: BoxDecoration(
+                            color: _selectedDriverUserId == driver.driverUserId
+                                ? AppColors.primary.withOpacity(0.15)
+                                : AppColors.cardBackground,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
                               color:
                                   _selectedDriverUserId == driver.driverUserId
                                       ? AppColors.primary
-                                      : AppColors.grey,
-                              size: 20,
+                                      : AppColors.greyLight,
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: TextComponent(
-                                labelText: driver.name.isEmpty
-                                    ? driver.driverUserId
-                                    : driver.name,
-                                fontSize: screenWidth * 0.034,
-                                color: AppColors.black,
-                                fontWeight: FontWeight.w500,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _selectedDriverUserId == driver.driverUserId
+                                    ? Icons.radio_button_checked
+                                    : Icons.radio_button_off,
+                                color:
+                                    _selectedDriverUserId == driver.driverUserId
+                                        ? AppColors.primary
+                                        : AppColors.grey,
+                                size: 20,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextComponent(
+                                  labelText: driver.name.isEmpty
+                                      ? driver.driverUserId
+                                      : driver.name,
+                                  fontSize: screenWidth * 0.034,
+                                  color: AppColors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
         ),
       ),
       actions: [

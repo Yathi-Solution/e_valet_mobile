@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/oauth/client_summary.dart';
-import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
-import 'package:niloufer_valet_mobile/models/outlet/outlet.dart';
+import 'package:evalet/models/oauth/client_summary.dart';
+import 'package:evalet/models/oauth/profile.dart';
+import 'package:evalet/models/outlet/outlet.dart';
 
 abstract class LoginState extends Equatable {
   const LoginState();

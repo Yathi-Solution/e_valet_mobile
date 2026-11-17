@@ -1,6 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:niloufer_valet_mobile/api/core/app_version_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
+import 'package:evalet/api/core/app_version_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
 
 /// Service for mandatory app version check.
 /// - Calls API at most once per day (first app open of the day) via [AppVersionApiService].

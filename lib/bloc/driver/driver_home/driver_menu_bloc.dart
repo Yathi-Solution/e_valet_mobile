@@ -2,20 +2,21 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/pre_break_info_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/my_cards_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/driver_status_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/sessions_pending_api.dart';
-import 'package:niloufer_valet_mobile/api/oauth/logout_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/parked/my_parked_sessions_response.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/clock_out_request.dart';
-import 'package:niloufer_valet_mobile/services/location/location_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/api/driver/pre_break_info_api_service.dart';
+import 'package:evalet/api/driver/my_cards_api_service.dart';
+import 'package:evalet/api/driver/driver_status_api_service.dart';
+import 'package:evalet/api/driver/my_parked_sessions_api_service.dart';
+import 'package:evalet/api/driver/sessions_pending_api.dart';
+import 'package:evalet/api/oauth/logout_api_service.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_event.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/parked/my_parked_sessions_response.dart';
+import 'package:evalet/models/driver/status/clock_out_request.dart';
+import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/services/oauth/logout_progress.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 
 class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
   DriverMenuBloc() : super(const DriverMenuInitial()) {
@@ -38,10 +39,32 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     on<DriverOnlineStatusToggled>(_onOnlineStatusToggled);
   }
 
+  /// True from the Logout tap until logout succeeds, fails or is blocked.
+  ///
+  /// The logout loader is driven by this bloc's state, which also carries the
+  /// home data. While this is set, home refreshes must not emit, or they would
+  /// replace the loading state and hide the loader mid-logout; repeated Logout
+  /// taps are ignored for the same reason.
+  bool _logoutInProgress = false;
+
   Future<void> _onLogoutPressed(
     DriverLogoutPressed event,
     Emitter<DriverMenuState> emit,
   ) async {
+    if (_logoutInProgress) return;
+    _logoutInProgress = true;
+    // Drives the app-wide loader, so it shows on whichever screen the driver
+    // tapped Logout from, not only on the home screen.
+    LogoutProgress.active.value = true;
+    try {
+      await _logout(emit);
+    } finally {
+      _logoutInProgress = false;
+      LogoutProgress.active.value = false;
+    }
+  }
+
+  Future<void> _logout(Emitter<DriverMenuState> emit) async {
     emit(const DriverMenuLogoutPrecheckLoading());
     try {
       final preBreakInfo = await PreBreakInfoApiService.getPreBreakInfo();
@@ -98,8 +121,9 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
           accuracy = locationData['accuracy'] as double? ?? 0.0;
           log('Using stored location for clock-out');
         } else {
-          // Fallback: Get current location if stored location not available
-          final coordinates = await LocationService.getCurrentCoordinates();
+          // Fallback: quick fix (reuses the last known position) if no stored
+          // location, so a weak GPS signal cannot hold up logout for long.
+          final coordinates = await LocationService.getFastCoordinates();
           latitude = coordinates['latitude']!;
           longitude = coordinates['longitude']!;
           accuracy = coordinates['accuracy']!;
@@ -152,6 +176,8 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     final driverName =
         firstName.isNotEmpty ? firstName : TextConstants.driverFallbackName;
 
+    if (_logoutInProgress) return;
+
     final parkedCarsData = await _fetchParkedCarsData();
     final parkedCarsCount = parkedCarsData?.sessionCount ?? 0;
 
@@ -159,6 +185,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     try {
       final pendingSessions =
           await SessionsPendingApiService.getPendingSessions();
+      if (_logoutInProgress) return;
       emit(DriverHomeLoaded(
         driverName: driverName,
         isOnBreak: false,
@@ -170,6 +197,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     } catch (e) {
       // If API call fails, still emit loaded state without pending sessions
       // This allows the screen to load even if the API fails
+      if (_logoutInProgress) return;
       emit(DriverHomeLoaded(
         driverName: driverName,
         isOnBreak: false,
@@ -184,6 +212,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     DriverPendingSessionsRefresh event,
     Emitter<DriverMenuState> emit,
   ) async {
+    if (_logoutInProgress) return;
     if (state is! DriverHomeLoaded) {
       add(const DriverHomeStarted());
       return;
@@ -197,6 +226,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     try {
       final pendingSessions =
           await SessionsPendingApiService.getPendingSessions();
+      if (_logoutInProgress) return;
       emit(currentState.copyWith(
         pendingSessions: pendingSessions,
         parkedCarsCount: parkedCarsCount,
@@ -204,6 +234,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
       ));
     } catch (e) {
       // Keep existing pending sessions if refresh fails; still update parked data
+      if (_logoutInProgress) return;
       emit(currentState.copyWith(
         parkedCarsCount: parkedCarsCount,
         parkedCarsData: parkedCarsData,
@@ -215,7 +246,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     DriverOnBreakToggled event,
     Emitter<DriverMenuState> emit,
   ) {
-    if (state is DriverHomeLoaded) {
+    if (!_logoutInProgress && state is DriverHomeLoaded) {
       final currentState = state as DriverHomeLoaded;
       emit(currentState.copyWith(isOnBreak: event.isOnBreak));
     }
@@ -225,7 +256,7 @@ class DriverMenuBloc extends Bloc<DriverMenuEvent, DriverMenuState> {
     DriverOnlineStatusToggled event,
     Emitter<DriverMenuState> emit,
   ) {
-    if (state is DriverHomeLoaded) {
+    if (!_logoutInProgress && state is DriverHomeLoaded) {
       final currentState = state as DriverHomeLoaded;
       emit(currentState.copyWith(isOnline: event.isOnline));
     }

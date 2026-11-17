@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/driver/parked_cars/my_parked_cars_screen.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_bloc.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_event.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_state.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/driver/parked_cars/my_parked_cars_screen.dart';
 
 /// App bar control: car icon + parked count; opens [MyParkedCarsScreen].
 class ParkedCarsAppBarAction extends StatefulWidget {
@@ -40,7 +40,9 @@ class _ParkedCarsAppBarActionState extends State<ParkedCarsAppBarAction> {
         ),
       );
       if (context.mounted) {
-        context.read<DriverMenuBloc>().add(const DriverPendingSessionsRefresh());
+        context
+            .read<DriverMenuBloc>()
+            .add(const DriverPendingSessionsRefresh());
       }
     } finally {
       if (mounted) {
@@ -66,8 +68,7 @@ class _ParkedCarsAppBarActionState extends State<ParkedCarsAppBarAction> {
         return prevCount != currCount;
       },
       builder: (context, state) {
-        final count =
-            state is DriverHomeLoaded ? state.parkedCarsCount : 0;
+        final count = state is DriverHomeLoaded ? state.parkedCarsCount : 0;
 
         return IconButton(
           tooltip: 'Parked cars',
@@ -101,7 +102,8 @@ class _ParkedCarsAppBarActionState extends State<ParkedCarsAppBarAction> {
                     decoration: BoxDecoration(
                       color: AppColors.error,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: AppColors.textOnDark, width: 1.5),
+                      border:
+                          Border.all(color: AppColors.textOnDark, width: 1.5),
                     ),
                     child: Center(
                       child: TextComponent(

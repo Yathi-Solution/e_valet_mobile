@@ -3,26 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
 import 'package:camera/camera.dart';
 import 'package:lottie/lottie.dart';
-import 'package:niloufer_valet_mobile/api/driver/sessions_pending_api.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/card_number_badge.dart';
-import 'package:niloufer_valet_mobile/ui/driver/car_Camera/car_Camer_widgets/camera_preview_widget.dart';
-import 'package:niloufer_valet_mobile/ui/driver/car_Camera/car_Camer_widgets/camera_top_overlay.dart';
-import 'package:niloufer_valet_mobile/ui/driver/preview_car/preview_Car_Screen.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/car_camera/car_Camer_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/car_camera/car_camera_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/car_camera/car_Camera_State.dart';
-import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/park_flow_signals.dart';
+import 'package:evalet/api/driver/sessions_pending_api.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/card_number_badge.dart';
+import 'package:evalet/ui/driver/car_Camera/car_Camer_widgets/camera_preview_widget.dart';
+import 'package:evalet/ui/driver/car_Camera/car_Camer_widgets/camera_top_overlay.dart';
+import 'package:evalet/ui/driver/preview_car/preview_Car_Screen.dart';
+import 'package:evalet/bloc/driver/car_camera/car_Camer_bloc.dart';
+import 'package:evalet/bloc/driver/car_camera/car_camera_event.dart';
+import 'package:evalet/bloc/driver/car_camera/car_Camera_State.dart';
+import 'package:evalet/services/oauth/session_manager.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/services/offline_sync/offline_parking_service.dart';
+import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
 
 /// Third screen: Car Photo only — Lottie (Carphoto.json) 2 sec then camera → Capture → Preview (user enters parking location, taps Done) → Park/Repark API → Car Success.
 /// When [sessionId] is provided (e.g. from pending session / card), it is saved so submit uses it; [isReparking] is passed to the Park API.
@@ -96,6 +96,8 @@ class _CarPhotoIntroScreenState extends State<CarPhotoIntroScreen>
 
   Future<void> _checkPendingSessionCancellation() async {
     if (!mounted || _isHandlingCancellation) return;
+    // A park submit is in flight: the session leaving the pending list is expected.
+    if (ParkFlowSignals.isParkSubmitInProgress) return;
     final sessionId = await TokenStorage.getSessionId();
     if (sessionId == null || sessionId.isEmpty) return;
     if (OfflineParkingService.isOfflineSessionId(sessionId)) return;
@@ -103,6 +105,10 @@ class _CarPhotoIntroScreenState extends State<CarPhotoIntroScreen>
     try {
       final pending = await SessionsPendingApiService.getPendingSessions();
       final stillExists = pending.sessions.any((s) => s.sessionId == sessionId);
+      // The park may have completed while this request was in flight; a
+      // parked session is no longer "pending" but it was not cancelled.
+      if (ParkFlowSignals.isParkSubmitInProgress) return;
+      if (await TokenStorage.getSessionId() != sessionId) return;
       if (!stillExists) {
         await _redirectToHomeOnCancellation();
       }

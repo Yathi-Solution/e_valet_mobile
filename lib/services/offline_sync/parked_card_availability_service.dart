@@ -1,5 +1,5 @@
-import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
+import 'package:evalet/api/driver/my_parked_sessions_api_service.dart';
+import 'package:evalet/services/offline_sync/offline_parking_service.dart';
 
 /// Offline checks for whether a valet card is already parked / checked-in locally.
 class ParkedCardAvailabilityService {

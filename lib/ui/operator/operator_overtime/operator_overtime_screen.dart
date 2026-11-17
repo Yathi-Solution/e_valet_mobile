@@ -4,29 +4,28 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_home/operator_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_home/operator_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_home/operator_menu_state.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_overtime/operator_overtime_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_overtime/operator_overtime_event.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_overtime/operator_overtime_state.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/guidelines/guidelines_screen.dart';
-import 'package:niloufer_valet_mobile/ui/help_support/help_screen.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/login/login.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/profile/profile_screen.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_dashboard/operator_dashboard.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_drawer/operator_drawer.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_grouping/operator_grouping_screen.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_overtime/overtime_confirm_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_overtime/overtime_valet_row.dart';
-import 'package:niloufer_valet_mobile/utils/time_utils.dart';
+import 'package:evalet/bloc/operator/operator_home/operator_menu_bloc.dart';
+import 'package:evalet/bloc/operator/operator_home/operator_menu_event.dart';
+import 'package:evalet/bloc/operator/operator_overtime/operator_overtime_bloc.dart';
+import 'package:evalet/bloc/operator/operator_overtime/operator_overtime_event.dart';
+import 'package:evalet/bloc/operator/operator_overtime/operator_overtime_state.dart';
+import 'package:evalet/models/operator/operator_valet/valet_response.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/guidelines/guidelines_screen.dart';
+import 'package:evalet/ui/help_support/help_screen.dart';
+import 'package:evalet/ui/oauth/profile/profile_screen.dart';
+import 'package:evalet/ui/operator/operator_dashboard/operator_dashboard.dart';
+import 'package:evalet/ui/operator/operator_drawer/operator_drawer.dart';
+import 'package:evalet/ui/operator/operator_drawer/operator_logout_scope.dart';
+import 'package:evalet/ui/operator/operator_grouping/operator_grouping_screen.dart';
+import 'package:evalet/ui/operator/operator_overtime/overtime_confirm_dialog.dart';
+import 'package:evalet/ui/operator/operator_overtime/overtime_valet_row.dart';
+import 'package:evalet/utils/time_utils.dart';
 
 /// Over Time screen for the valet operator.
 /// Shows the same valet list data as the valet dashboard: name, phone, and status (Available / On Duty / On Break / Offline).
@@ -154,27 +153,10 @@ class _OperatorOverTimeScreenState extends State<OperatorOverTimeScreen> {
         isAndroidPhone ? (width * 0.05).clamp(18.0, 22.0) : (width * 0.03);
     final headerDescriptionFontSize =
         isAndroidPhone ? (width * 0.038).clamp(14.0, 16.0) : (width * 0.02);
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: _menuBloc),
-        BlocProvider.value(value: _overtimeBloc),
-      ],
-      child: BlocListener<OperatorMenuBloc, OperatorMenuState>(
-        listener: (context, state) {
-          if (state is OperatorMenuLogoutSuccess) {
-            SnackBars.showSuccessSnackBar(context, state.message);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-              (route) => false,
-            );
-          } else if (state is OperatorMenuLogoutFailure) {
-            SnackBars.showErrorSnackBar(context, state.message);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-              (route) => false,
-            );
-          }
-        },
+    return OperatorLogoutScope(
+      bloc: _menuBloc,
+      child: BlocProvider.value(
+        value: _overtimeBloc,
         child: BlocListener<OperatorOvertimeBloc, OperatorOvertimeState>(
           listenWhen: (previous, current) =>
               current is OperatorOvertimeGrantSuccess ||

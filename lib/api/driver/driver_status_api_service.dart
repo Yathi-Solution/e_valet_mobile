@@ -1,16 +1,16 @@
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/api/core/base_dio_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/driver_status.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/clock_in_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/clock_in_response.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/clock_out_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/clock_out_response.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/break_start_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/break_start_response.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/break_end_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/break_end_response.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/api/core/base_dio_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/status/driver_status.dart';
+import 'package:evalet/models/driver/status/clock_in_request.dart';
+import 'package:evalet/models/driver/status/clock_in_response.dart';
+import 'package:evalet/models/driver/status/clock_out_request.dart';
+import 'package:evalet/models/driver/status/clock_out_response.dart';
+import 'package:evalet/models/driver/status/break_start_request.dart';
+import 'package:evalet/models/driver/status/break_start_response.dart';
+import 'package:evalet/models/driver/status/break_end_request.dart';
+import 'package:evalet/models/driver/status/break_end_response.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 class DriverStatusApiService {
   DriverStatusApiService._();

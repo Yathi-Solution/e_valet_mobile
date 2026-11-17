@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:hive/hive.dart';
-import 'package:niloufer_valet_mobile/api/translations/language_api_service.dart';
-import 'package:niloufer_valet_mobile/models/translations/language.dart';
+import 'package:evalet/api/translations/language_api_service.dart';
+import 'package:evalet/models/translations/language.dart';
 
 class LanguageCache {
   static const String _languagesKey = 'cached_languages';

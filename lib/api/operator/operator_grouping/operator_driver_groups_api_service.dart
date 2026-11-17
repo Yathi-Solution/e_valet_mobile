@@ -1,12 +1,12 @@
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/api/core/base_dio_service.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/api/core/base_dio_service.dart';
 import 'package:flutter/foundation.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_grouping/add_group_member_request.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_grouping/create_driver_group_response.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group_members_response.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_groups_response.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/operator/operator_grouping/add_group_member_request.dart';
+import 'package:evalet/models/operator/operator_grouping/create_driver_group_response.dart';
+import 'package:evalet/models/operator/operator_grouping/driver_group_members_response.dart';
+import 'package:evalet/models/operator/operator_grouping/driver_groups_response.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 class OperatorDriverGroupsApiService {
   OperatorDriverGroupsApiService._();

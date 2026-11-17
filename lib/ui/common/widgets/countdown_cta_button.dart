@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/button_metrics.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+
 /// Full-width primary CTA with optional countdown badge on the left.
 class CountdownCtaButton extends StatelessWidget {
   final String label;
@@ -50,16 +51,13 @@ class CountdownCtaButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final disabled = countdownSeconds > 0;
-    final effectiveOnPressed =
-        (isLoading || disabled) ? null : onPressed;
-    final effectiveHeight =
-        height ?? ButtonMetrics.confirmHeight(context);
+    final effectiveOnPressed = (isLoading || disabled) ? null : onPressed;
+    final effectiveHeight = height ?? ButtonMetrics.confirmHeight(context);
     final fontSize = useBigFont
         ? ButtonMetrics.confirmBigFontSize(context)
         : ButtonMetrics.confirmFontSize(context);
 
-    final bool showLeading =
-        isLoading || disabled || iconWhenEnabled != null;
+    final bool showLeading = isLoading || disabled || iconWhenEnabled != null;
 
     Widget? leading;
     if (isLoading) {
@@ -88,8 +86,7 @@ class CountdownCtaButton extends StatelessWidget {
         minimumSize: Size(double.infinity, effectiveHeight),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(ButtonMetrics.confirmRadius),
+          borderRadius: BorderRadius.circular(ButtonMetrics.confirmRadius),
         ),
       ),
       child: Stack(
@@ -121,7 +118,8 @@ class CountdownCtaButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: effectiveOnPressed != null,
-      label: disabled ? '$label, disabled for $countdownSeconds seconds' : label,
+      label:
+          disabled ? '$label, disabled for $countdownSeconds seconds' : label,
       child: button,
     );
   }

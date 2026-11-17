@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group_member.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/operator/operator_grouping/driver_group.dart';
+import 'package:evalet/models/operator/operator_grouping/driver_group_member.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 /// When the API returns names like `Group 1`, swap the English prefix for i18n.
 String localizedDriverGroupTitle(String apiName, AppTranslationsNotifier t) {

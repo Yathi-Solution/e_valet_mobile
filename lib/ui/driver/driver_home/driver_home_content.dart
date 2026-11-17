@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/footer.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/driver_header_widget.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_online_content.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_offline_content.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_break_content.dart';
-import 'package:niloufer_valet_mobile/ui/scanner/scanner_qr_dialog.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/park_flow_signals.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_bloc.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_event.dart';
+import 'package:evalet/bloc/connectivity/connectivity_bloc.dart';
+import 'package:evalet/bloc/connectivity/connectivity_state.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/footer.dart';
+import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
+import 'package:evalet/ui/driver/driver_home/driver_header_widget.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_online_content.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_offline_content.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_break_content.dart';
+import 'package:evalet/ui/scanner/scanner_qr_dialog.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
 
 class DriverHomeContent extends StatefulWidget {
   final String driverName;
@@ -140,82 +140,82 @@ class _DriverHomeContentState extends State<DriverHomeContent>
             }
           },
           child: Column(
-          children: [
-            // Header Content Section (status card) — back button on left when in park flow, break toggle on right
-            DriverHeaderWidget(
-              isOnline: widget.isOnline,
-              screenWidth: screenWidth,
-              screenHeight: screenHeight,
-              isTablet: isTablet,
-              isDesktop: isDesktop,
-              showBackButton: _showParkFlow,
-              onBackPressed: _showParkFlow
-                  ? () => setState(() => _showParkFlow = false)
-                  : null,
-            ),
-            // Main Content Section with SafeArea
-            // Show break content when on break (whether online or offline); else online content or offline content.
-            Expanded(
-              child: SafeArea(
-                top: false,
-                child: Container(
-                  color: AppColors.lightBeigeBackground,
-                  child: widget.isOnBreak
-                      ? SingleChildScrollView(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.04,
-                            ),
-                            child: DriverBreakContent(
-                              screenWidth: screenWidth,
-                              screenHeight: screenHeight,
-                              isTablet: isTablet,
-                              isDesktop: isDesktop,
-                              onBreakEnd: widget.onBreakEnd,
-                            ),
-                          ),
-                        )
-                      : widget.isOnline
-                          ? Padding(
+            children: [
+              // Header Content Section (status card) — back button on left when in park flow, break toggle on right
+              DriverHeaderWidget(
+                isOnline: widget.isOnline,
+                screenWidth: screenWidth,
+                screenHeight: screenHeight,
+                isTablet: isTablet,
+                isDesktop: isDesktop,
+                showBackButton: _showParkFlow,
+                onBackPressed: _showParkFlow
+                    ? () => setState(() => _showParkFlow = false)
+                    : null,
+              ),
+              // Main Content Section with SafeArea
+              // Show break content when on break (whether online or offline); else online content or offline content.
+              Expanded(
+                child: SafeArea(
+                  top: false,
+                  child: Container(
+                    color: AppColors.lightBeigeBackground,
+                    child: widget.isOnBreak
+                        ? SingleChildScrollView(
+                            child: Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: screenWidth * 0.04,
                               ),
-                              child: DriverOnlineContent(
-                                key: _onlineContentKey,
-                                driverName: widget.driverName,
-                                retrievePendingCount:
-                                    widget.retrievePendingCount,
+                              child: DriverBreakContent(
                                 screenWidth: screenWidth,
                                 screenHeight: screenHeight,
                                 isTablet: isTablet,
                                 isDesktop: isDesktop,
-                                showParkFlow: _showParkFlow,
-                                onParkFlowChanged: (value) =>
-                                    setState(() => _showParkFlow = value),
+                                onBreakEnd: widget.onBreakEnd,
                               ),
-                            )
-                          : SingleChildScrollView(
-                              child: Padding(
+                            ),
+                          )
+                        : widget.isOnline
+                            ? Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: screenWidth * 0.04,
                                 ),
-                                child: DriverOfflineContent(
+                                child: DriverOnlineContent(
+                                  key: _onlineContentKey,
+                                  driverName: widget.driverName,
+                                  retrievePendingCount:
+                                      widget.retrievePendingCount,
                                   screenWidth: screenWidth,
                                   screenHeight: screenHeight,
                                   isTablet: isTablet,
                                   isDesktop: isDesktop,
+                                  showParkFlow: _showParkFlow,
+                                  onParkFlowChanged: (value) =>
+                                      setState(() => _showParkFlow = value),
+                                ),
+                              )
+                            : SingleChildScrollView(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.04,
+                                  ),
+                                  child: DriverOfflineContent(
+                                    screenWidth: screenWidth,
+                                    screenHeight: screenHeight,
+                                    isTablet: isTablet,
+                                    isDesktop: isDesktop,
+                                  ),
                                 ),
                               ),
-                            ),
+                  ),
                 ),
               ),
-            ),
-            // Footer
-            SafeArea(
-              top: false,
-              child: const Footer(),
-            ),
-          ],
+              // Footer
+              SafeArea(
+                top: false,
+                child: const Footer(),
+              ),
+            ],
           ),
         ),
       ),

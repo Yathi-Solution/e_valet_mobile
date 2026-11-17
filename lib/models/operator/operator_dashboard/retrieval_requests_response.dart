@@ -1,4 +1,4 @@
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/retrieval_request.dart';
+import 'package:evalet/models/operator/operator_dashboard/retrieval_request.dart';
 
 class RetrievalRequestsResponse {
   final List<RetrievalRequest> requests;

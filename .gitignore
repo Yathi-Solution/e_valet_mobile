@@ -45,7 +45,9 @@ app.*.map.json
 /android/app/release
 
 .env
-niloufer-valet-keystore.jks
+# Signing keys (never commit; also see android/.gitignore for key.properties)
+*.jks
+*.keystore
 
 pubspec.lock
 

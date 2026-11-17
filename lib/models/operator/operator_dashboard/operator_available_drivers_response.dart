@@ -1,4 +1,4 @@
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/available_drivers.dart';
+import 'package:evalet/models/operator/operator_dashboard/available_drivers.dart';
 
 class OperatorAvailableDriversResponse {
   final List<AvailableDriver> drivers;

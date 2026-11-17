@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:niloufer_valet_mobile/services/translations/translations_cache.dart';
+import 'package:evalet/services/translations/translations_cache.dart';
 
 /// Holds the current translation map in memory so the UI can read translated
 /// strings synchronously. Call [load] on app start and after the user changes

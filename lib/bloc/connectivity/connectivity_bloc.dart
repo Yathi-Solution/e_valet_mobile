@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'connectivity_event.dart';
 import 'connectivity_state.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
-import 'package:niloufer_valet_mobile/services/connectivity/driver_connectivity_log_service.dart';
+import 'package:evalet/services/offline_sync/offline_parking_service.dart';
+import 'package:evalet/services/connectivity/driver_connectivity_log_service.dart';
 
 class ConnectivityBloc extends Bloc<ConnectivityEvent, ConnectivityState> {
   final Connectivity _connectivity = Connectivity();

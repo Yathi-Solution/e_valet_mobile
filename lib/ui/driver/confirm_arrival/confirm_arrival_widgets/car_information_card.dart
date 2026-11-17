@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/full_image_viewer_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/vehicle_photo_placeholder.dart';
+import 'package:evalet/models/driver/session/assigned_session.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/full_image_viewer_dialog.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/widgets/vehicle_photo_placeholder.dart';
 
 class CarInformationCard extends StatelessWidget {
   final AssignedSession session;
@@ -26,6 +26,7 @@ class CarInformationCard extends StatelessWidget {
     final t = context.watch<AppTranslationsNotifier>();
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final parkedByMe = session.parkedBy?.isCurrentUser ?? false;
 
     return Container(
       decoration: BoxDecoration(
@@ -140,29 +141,33 @@ class CarInformationCard extends StatelessWidget {
                     ),
                     if (!compact) SizedBox(height: screenHeight * 0.01),
                     TextComponent(
-                      labelText: session.parkedBy?.name ??
-                          t.get(TextConstants.unknown),
+                      labelText: parkedByMe
+                          ? t.get(TextConstants.you)
+                          : session.parkedBy?.name ??
+                              t.get(TextConstants.unknown),
                       fontSize:
                           compact ? screenWidth * 0.032 : screenWidth * 0.04,
                       fontWeight: FontWeight.w500,
                       color: AppColors.black,
                     ),
                     Spacer(),
-                    // Phone Icon
-                    IconButton(
-                      padding: compact ? const EdgeInsets.all(4) : null,
-                      constraints: compact
-                          ? const BoxConstraints(minWidth: 32, minHeight: 32)
-                          : null,
-                      onPressed: () =>
-                          _makePhoneCall(session.parkedBy?.phone ?? ''),
-                      icon: Icon(
-                        Icons.phone,
-                        color: AppColors.secondary,
-                        size:
-                            compact ? screenWidth * 0.045 : screenWidth * 0.06,
+                    // Phone Icon (hidden when the valet parked the car themselves)
+                    if (!parkedByMe)
+                      IconButton(
+                        padding: compact ? const EdgeInsets.all(4) : null,
+                        constraints: compact
+                            ? const BoxConstraints(minWidth: 32, minHeight: 32)
+                            : null,
+                        onPressed: () =>
+                            _makePhoneCall(session.parkedBy?.phone ?? ''),
+                        icon: Icon(
+                          Icons.phone,
+                          color: AppColors.secondary,
+                          size: compact
+                              ? screenWidth * 0.045
+                              : screenWidth * 0.06,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ],

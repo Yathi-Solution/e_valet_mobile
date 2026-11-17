@@ -1,11 +1,11 @@
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/api/core/base_dio_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/oauth/logout_response.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/services/connectivity/driver_connectivity_log_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
-import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/api/core/base_dio_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/oauth/logout_response.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/services/connectivity/driver_connectivity_log_service.dart';
+import 'package:evalet/services/oauth/session_manager.dart';
+import 'package:evalet/api/driver/my_parked_sessions_api_service.dart';
 
 class LogoutApiService {
   LogoutApiService._();

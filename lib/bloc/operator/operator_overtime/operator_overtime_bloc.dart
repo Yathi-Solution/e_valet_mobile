@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/operator/operator_overtime/grant_overtime_api_service.dart';
-import 'package:niloufer_valet_mobile/api/operator/operator_valet/valet_list_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_overtime/grant_overtime_request.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_overtime/operator_overtime_event.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_overtime/operator_overtime_state.dart';
+import 'package:evalet/api/operator/operator_overtime/grant_overtime_api_service.dart';
+import 'package:evalet/api/operator/operator_valet/valet_list_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/operator/operator_overtime/grant_overtime_request.dart';
+import 'package:evalet/bloc/operator/operator_overtime/operator_overtime_event.dart';
+import 'package:evalet/bloc/operator/operator_overtime/operator_overtime_state.dart';
 
 class OperatorOvertimeBloc
     extends Bloc<OperatorOvertimeEvent, OperatorOvertimeState> {

@@ -1,0 +1,11 @@
+#!/bin/sh
+# Refreshes the auto-generated sections of README.md before every commit.
+# Enable once per clone:  git config core.hooksPath .githooks
+
+if ! command -v dart >/dev/null 2>&1; then
+  echo "pre-commit: dart not found on PATH, README.md was not refreshed."
+  exit 0
+fi
+
+dart tool/update_readme.dart || exit 1
+git add README.md

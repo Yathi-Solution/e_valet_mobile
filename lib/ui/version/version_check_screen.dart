@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:niloufer_valet_mobile/services/version/version_service.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/version/mandatory_update_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/version/version_check_args.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/login/login.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/driver_home.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_dashboard/operator_dashboard.dart';
-import 'package:niloufer_valet_mobile/ui/scanner/scanner_home.dart';
-import 'package:niloufer_valet_mobile/ui/permissions/permissions_screen.dart';
-import 'package:niloufer_valet_mobile/services/permissions/permissions_service.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/services/version/version_service.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/version/mandatory_update_dialog.dart';
+import 'package:evalet/ui/version/version_check_args.dart';
+import 'package:evalet/ui/oauth/login/login.dart';
+import 'package:evalet/ui/driver/driver_home/driver_home.dart';
+import 'package:evalet/ui/operator/operator_dashboard/operator_dashboard.dart';
+import 'package:evalet/ui/scanner/scanner_home.dart';
+import 'package:evalet/ui/permissions/permissions_screen.dart';
+import 'package:evalet/services/permissions/permissions_service.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
 
 /// Wrapper that shows the destination screen and runs version check as a popup
 /// (dialog) on top. No dedicated version-check screen — only a small dialog.

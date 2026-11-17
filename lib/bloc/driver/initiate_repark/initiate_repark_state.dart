@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/driver/re-park/initiate_repark_response.dart';
+import 'package:evalet/models/driver/re-park/initiate_repark_response.dart';
 
 abstract class InitiateReparkState extends Equatable {
   const InitiateReparkState();

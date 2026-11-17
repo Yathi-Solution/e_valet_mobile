@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:niloufer_valet_mobile/api/driver/connectivity_log_api_service.dart';
-import 'package:niloufer_valet_mobile/models/driver/connectivity/connectivity_log_batch_request.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/driver/connectivity_log_api_service.dart';
+import 'package:evalet/models/driver/connectivity/connectivity_log_batch_request.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 /// Logs driver internet on/off transitions locally and POSTs batches every 3h from login
 /// (or immediately when back online if a flush was due while offline).
@@ -14,7 +14,8 @@ import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
 /// `NetworkType` WIFI | MOBILE_DATA.
 class DriverConnectivityLogService {
   DriverConnectivityLogService._();
-  static final DriverConnectivityLogService instance = DriverConnectivityLogService._();
+  static final DriverConnectivityLogService instance =
+      DriverConnectivityLogService._();
 
   static const Duration _flushInterval = Duration(hours: 3);
   static const String _statusConnected = 'CONNECTED';
@@ -92,7 +93,8 @@ class DriverConnectivityLogService {
     if (shiftId == null || shiftId <= 0) return;
 
     // If admin disabled connectivity logging for this driver, skip flushing.
-    final connectivityEnabled = await TokenStorage.getDriverConnectivityEnabled();
+    final connectivityEnabled =
+        await TokenStorage.getDriverConnectivityEnabled();
     if (!connectivityEnabled) return;
 
     final outletId = await TokenStorage.getDriverConnectivityOutletId();
@@ -141,7 +143,8 @@ class DriverConnectivityLogService {
       return;
     }
 
-    final connectivityEnabled = await TokenStorage.getDriverConnectivityEnabled();
+    final connectivityEnabled =
+        await TokenStorage.getDriverConnectivityEnabled();
     if (!connectivityEnabled) {
       return;
     }
@@ -183,7 +186,8 @@ class DriverConnectivityLogService {
     if (shiftId == null || shiftId <= 0) return;
 
     // Respect driver connectivity settings flag.
-    final connectivityEnabled = await TokenStorage.getDriverConnectivityEnabled();
+    final connectivityEnabled =
+        await TokenStorage.getDriverConnectivityEnabled();
     if (!connectivityEnabled) return;
 
     if (!await _isInternetReachable()) {
@@ -252,7 +256,8 @@ class DriverConnectivityLogService {
           .map(
             (m) => ConnectivityLogEventItem(
               status: (m['status'] as String? ?? '').trim(),
-              networkType: _normalizeStoredNetworkType(m['networkType'] as String? ?? ''),
+              networkType: _normalizeStoredNetworkType(
+                  m['networkType'] as String? ?? ''),
               occurredAt: m['occurredAt'] as String? ?? '',
             ),
           )

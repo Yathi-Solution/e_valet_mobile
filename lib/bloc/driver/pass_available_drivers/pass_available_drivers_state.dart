@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/pass_available_driver.dart';
+import 'package:evalet/models/driver/session/pass_available_driver.dart';
 
 abstract class PassAvailableDriversState extends Equatable {
   const PassAvailableDriversState();

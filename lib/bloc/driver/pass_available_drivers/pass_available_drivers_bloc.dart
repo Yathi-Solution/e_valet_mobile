@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/pass_available_drivers_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
+import 'package:evalet/api/driver/pass_available_drivers_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
 import 'pass_available_drivers_event.dart';
 import 'pass_available_drivers_state.dart';
 

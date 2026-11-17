@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:niloufer_valet_mobile/models/notification/notification_type.dart';
+import 'package:evalet/models/notification/notification_type.dart';
 import 'dart:developer';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';

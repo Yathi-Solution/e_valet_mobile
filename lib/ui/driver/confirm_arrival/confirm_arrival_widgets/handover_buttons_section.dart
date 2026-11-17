@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/countdown_cta_button.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/button_metrics.dart';
+import 'package:evalet/ui/common/widgets/countdown_cta_button.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+
 class HandoverButtonsSection extends StatefulWidget {
   final bool isLoading;
   final VoidCallback onConfirmHandover;
@@ -204,8 +205,8 @@ class HandoverButtonsSectionState extends State<HandoverButtonsSection> {
               return CountdownCtaButton(
                 label: t.get(TextConstants.slideToConfirmHandover),
                 onPressed: widget.onConfirmHandover,
-                isLoading: widget.isLoading &&
-                    _confirmHandoverRemainingSeconds <= 0,
+                isLoading:
+                    widget.isLoading && _confirmHandoverRemainingSeconds <= 0,
                 countdownSeconds: _confirmHandoverRemainingSeconds,
                 iconWhenEnabled: Icons.handshake,
                 height: constraints.maxHeight,

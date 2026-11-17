@@ -1,14 +1,18 @@
-import 'package:niloufer_valet_mobile/models/oauth/user_profile.dart';
+import 'package:evalet/models/oauth/user_profile.dart';
 
 class ProfileResponse {
   final UserProfile user;
   final String applicationId;
   final List<String> roles;
 
+  /// Name of the client (tenant) this session is signed in to; empty if unknown.
+  final String clientName;
+
   ProfileResponse({
     required this.user,
     required this.applicationId,
     required this.roles,
+    this.clientName = '',
   });
 
   /// Parses JSON response from profile API.
@@ -55,6 +59,7 @@ class ProfileResponse {
       user: UserProfile.fromJson(userJson),
       applicationId: applicationId,
       roles: parsedRoles,
+      clientName: (json['clientName'] ?? '').toString(),
     );
   }
 
@@ -82,6 +87,7 @@ class ProfileResponse {
       roles: [
         if (json['role'] != null) json['role'].toString(),
       ],
+      clientName: (client['name'] ?? '').toString().trim(),
     );
   }
 
@@ -94,6 +100,7 @@ class ProfileResponse {
       'user': user.toJson(),
       'applicationId': applicationId,
       'roles': roles,
+      'clientName': clientName,
     };
   }
 

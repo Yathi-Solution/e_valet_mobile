@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/common/button_metrics.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/button_metrics.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 /// Action card (Park Vehicle / Retrieve Vehicle) per design system.
 class DriverActionCard extends StatelessWidget {
@@ -53,15 +53,23 @@ class DriverActionCard extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 120),
-                  child: Image.asset(
-                    imagePath,
-                    width: double.infinity,
-                    fit: BoxFit.contain,
+                // The artwork's bottom strip is empty white space, so only the
+                // top 80% of the image is shown; the rest is clipped away.
+                ClipRect(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    heightFactor: 0.8,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 120),
+                      child: Image.asset(
+                        imagePath,
+                        width: double.infinity,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

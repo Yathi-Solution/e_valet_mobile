@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/typography.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/typography.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 /// Card number badge per design system: off-white bg, coral border, near-black text.
 class CardNumberBadge extends StatelessWidget {

@@ -54,6 +54,10 @@ class TextConstants {
   /// Error shown to a driver who tries to park/retrieve using a card not allocated to them.
   static const String driverCardNotAssigned =
       'The card number does not match with your cards. You may have taken another driver\'s card.';
+
+  /// Error shown to a driver who scans a card that belongs to another outlet.
+  static const String driverCardDifferentOutlet =
+      'This valet card belongs to a different outlet. Please scan a card assigned to your current outlet.';
   static const String driverCardsLoading =
       'Your assigned cards are still loading. Please wait a moment and try again.';
   static const String cardsAllocationHint =
@@ -208,8 +212,7 @@ class TextConstants {
   /// Hint for the parking/photo screen (after tag/QR submit): car photo only.
   static const String vehicleDetailsParkingPhotoHint =
       'Capture a photo of the car.';
-  static const String tapToCaptureVehiclePhoto =
-      'Tap to capture vehicle photo';
+  static const String tapToCaptureVehiclePhoto = 'Tap to capture vehicle photo';
   static const String previewDoneButton = 'Done';
   static const String scanTabLabel = 'Scan';
   static const String typeIdNumberTabLabel = 'ID Number';
@@ -232,6 +235,9 @@ class TextConstants {
 
   /// Selected outlet from login (operator/scanner/driver session).
   static const String profileOutletLabel = 'Outlet';
+
+  /// Client (tenant) the user is signed in to.
+  static const String profileClientLabel = 'Client';
   static const String usernameLabel = 'Username';
   static const String joinedLabel = 'Joined';
   static const String resetPassword = 'Reset Password';
@@ -337,6 +343,9 @@ class TextConstants {
   static const String cardNumber = 'Card Number';
   static const String parkedBy = 'Parked By';
   static const String unknown = 'Unknown';
+
+  /// Shown in place of the valet's name when they parked the car themselves.
+  static const String you = 'You';
   static const String retrievalRequest = 'Retrieval Request';
   static const String retrievalRequested = 'Retrieval Requested';
   static const String noActiveRetrievalRequests =

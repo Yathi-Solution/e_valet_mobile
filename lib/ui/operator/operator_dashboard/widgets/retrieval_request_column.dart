@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/operator_available_drivers_response.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/retrieval_requests_response.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/skeleton_loader.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_dashboard/widgets/retrieval_request_card.dart';
+import 'package:evalet/models/operator/operator_dashboard/operator_available_drivers_response.dart';
+import 'package:evalet/models/operator/operator_dashboard/retrieval_requests_response.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/widgets/skeleton_loader.dart';
+import 'package:evalet/ui/operator/operator_dashboard/widgets/retrieval_request_card.dart';
 
 /// One column of retrieval request cards.
 /// Left column: only RETRIEVAL_REQUESTED. Right column: all other statuses (Assigned, Accepted, Arrived, etc.).

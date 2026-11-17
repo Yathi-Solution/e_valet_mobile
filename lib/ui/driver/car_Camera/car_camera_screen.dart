@@ -3,19 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/sessions_pending_api.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/driver/preview_car/preview_Car_Screen.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/car_camera/car_Camer_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/car_camera/car_camera_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/car_camera/car_Camera_State.dart';
-import 'package:niloufer_valet_mobile/ui/driver/car_Camera/car_Camer_widgets/camera_preview_widget.dart';
-import 'package:niloufer_valet_mobile/ui/driver/car_Camera/car_Camer_widgets/camera_top_overlay.dart';
-import 'package:niloufer_valet_mobile/ui/driver/car_Camera/car_Camer_widgets/camera_bottom_overlay.dart';
+import 'package:evalet/api/driver/sessions_pending_api.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
+import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/driver/preview_car/preview_Car_Screen.dart';
+import 'package:evalet/bloc/driver/car_camera/car_Camer_bloc.dart';
+import 'package:evalet/bloc/driver/car_camera/car_camera_event.dart';
+import 'package:evalet/bloc/driver/car_camera/car_Camera_State.dart';
+import 'package:evalet/ui/driver/car_Camera/car_Camer_widgets/camera_preview_widget.dart';
+import 'package:evalet/ui/driver/car_Camera/car_Camer_widgets/camera_top_overlay.dart';
+import 'package:evalet/ui/driver/car_Camera/car_Camer_widgets/camera_bottom_overlay.dart';
 
 class CarCameraScreen extends StatefulWidget {
   final String? sessionId;
@@ -77,12 +78,18 @@ class _CarCameraScreenState extends State<CarCameraScreen>
 
   Future<void> _checkPendingSessionCancellation() async {
     if (!mounted || _isHandlingCancellation) return;
+    // A park submit is in flight: the session leaving the pending list is expected.
+    if (ParkFlowSignals.isParkSubmitInProgress) return;
     final sessionId = await TokenStorage.getSessionId();
     if (sessionId == null || sessionId.isEmpty) return;
 
     try {
       final pending = await SessionsPendingApiService.getPendingSessions();
       final stillExists = pending.sessions.any((s) => s.sessionId == sessionId);
+      // The park may have completed while this request was in flight; a
+      // parked session is no longer "pending" but it was not cancelled.
+      if (ParkFlowSignals.isParkSubmitInProgress) return;
+      if (await TokenStorage.getSessionId() != sessionId) return;
       if (!stillExists) {
         await _redirectToHomeOnCancellation();
       }

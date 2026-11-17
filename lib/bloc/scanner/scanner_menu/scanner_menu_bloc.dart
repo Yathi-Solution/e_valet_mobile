@@ -1,9 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/oauth/logout_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/api/oauth/logout_api_service.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_event.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/services/oauth/logout_progress.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 
 class ScannerMenuBloc extends Bloc<ScannerMenuEvent, ScannerMenuState> {
   ScannerMenuBloc() : super(const ScannerMenuInitial()) {
@@ -20,6 +21,8 @@ class ScannerMenuBloc extends Bloc<ScannerMenuEvent, ScannerMenuState> {
     ScannerLogoutPressed event,
     Emitter<ScannerMenuState> emit,
   ) async {
+    if (LogoutProgress.active.value) return;
+    LogoutProgress.active.value = true;
     emit(const ScannerMenuLogoutLoading());
     try {
       final response = await LogoutApiService.logout();
@@ -28,6 +31,8 @@ class ScannerMenuBloc extends Bloc<ScannerMenuEvent, ScannerMenuState> {
       emit(ScannerMenuLogoutFailure(e.message));
     } catch (e) {
       emit(const ScannerMenuLogoutFailure(TextConstants.genericError));
+    } finally {
+      LogoutProgress.active.value = false;
     }
   }
 }

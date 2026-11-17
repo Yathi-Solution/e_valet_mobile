@@ -176,9 +176,10 @@ class PreBreakInfoResponse extends Equatable {
     return passedTo == me;
   }
 
-  List<PreBreakSessionInfo> get _blockingPassedToMeSessions => passedToMeSessions
-      .where(_isPassedToMeSessionStillBlocking)
-      .toList(growable: false);
+  List<PreBreakSessionInfo> get _blockingPassedToMeSessions =>
+      passedToMeSessions
+          .where(_isPassedToMeSessionStillBlocking)
+          .toList(growable: false);
 
   List<PreBreakSessionInfo> get blockingSessions => [
         ..._blockingOwnParkedSessions,

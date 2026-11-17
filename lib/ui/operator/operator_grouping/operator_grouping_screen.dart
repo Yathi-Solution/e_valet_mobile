@@ -1,26 +1,28 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:niloufer_valet_mobile/api/operator/operator_grouping/operator_driver_groups_api_service.dart';
-import 'package:niloufer_valet_mobile/api/operator/operator_valet/valet_list_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_grouping/driver_group_member.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/guidelines/guidelines_screen.dart';
-import 'package:niloufer_valet_mobile/ui/help_support/help_screen.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/profile/profile_screen.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_drawer/operator_drawer.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_grouping/widgets/grouping_add_group_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_overtime/operator_overtime_screen.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_grouping/widgets/grouping_add_members_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_grouping/widgets/grouping_group_list_card.dart';
+import 'package:evalet/services/operator/driver_groups_repository.dart';
+import 'package:evalet/bloc/operator/operator_home/operator_menu_bloc.dart';
+import 'package:evalet/bloc/operator/operator_home/operator_menu_event.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/operator/operator_grouping/driver_group.dart';
+import 'package:evalet/models/operator/operator_grouping/driver_group_member.dart';
+import 'package:evalet/models/operator/operator_valet/valet_response.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/guidelines/guidelines_screen.dart';
+import 'package:evalet/ui/help_support/help_screen.dart';
+import 'package:evalet/ui/oauth/profile/profile_screen.dart';
+import 'package:evalet/ui/operator/operator_drawer/operator_drawer.dart';
+import 'package:evalet/ui/operator/operator_drawer/operator_logout_scope.dart';
+import 'package:evalet/ui/operator/operator_grouping/widgets/grouping_add_group_dialog.dart';
+import 'package:evalet/ui/operator/operator_overtime/operator_overtime_screen.dart';
+import 'package:evalet/ui/operator/operator_grouping/widgets/grouping_add_members_dialog.dart';
+import 'package:evalet/ui/operator/operator_grouping/widgets/grouping_group_list_card.dart';
 import 'package:provider/provider.dart';
 
 class OperatorGroupingScreen extends StatefulWidget {
@@ -38,6 +40,7 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
   Future<List<DriverGroup>>? _groupsFuture;
   final Map<int, Future<List<DriverGroupMember>>> _membersFuturesByGroupId = {};
   Future<List<ValetResponse>>? _valetsFuture;
+  final OperatorMenuBloc _menuBloc = OperatorMenuBloc();
 
   @override
   void initState() {
@@ -45,25 +48,27 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
     _loadGroups();
   }
 
+  @override
+  void dispose() {
+    _menuBloc.close();
+    super.dispose();
+  }
+
   void _loadGroups() {
     setState(() {
-      _groupsFuture = OperatorDriverGroupsApiService.getDriverGroups(
-        outletId: _outletId,
-      ).then((res) => res.groups);
+      _groupsFuture = DriverGroupsRepository.groups(outletId: _outletId);
       _membersFuturesByGroupId.clear();
       _valetsFuture = null;
     });
   }
 
   void _loadValetsIfNeeded() {
-    _valetsFuture ??= ValetListApiService.getValets(outletId: _outletId)
-        .then((r) => r.valets);
+    _valetsFuture ??= DriverGroupsRepository.valets(outletId: _outletId);
   }
 
   void _reloadValets() {
     setState(() {
-      _valetsFuture = ValetListApiService.getValets(outletId: _outletId)
-          .then((r) => r.valets);
+      _valetsFuture = DriverGroupsRepository.valets(outletId: _outletId);
     });
   }
 
@@ -83,11 +88,10 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
       reloadValets: _reloadValets,
       onMembersAdded: (gid) {
         setState(() {
-          _membersFuturesByGroupId[gid] =
-              OperatorDriverGroupsApiService.getDriverGroupMembers(
+          _membersFuturesByGroupId[gid] = DriverGroupsRepository.members(
             outletId: _outletId,
             groupId: gid,
-          ).then((res) => res.members);
+          );
         });
       },
     );
@@ -173,7 +177,7 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
     if (!shouldRemove) return;
 
     try {
-      await OperatorDriverGroupsApiService.removeDriverGroupMember(
+      await DriverGroupsRepository.removeMember(
         outletId: _outletId,
         groupId: groupId,
         driverUserId: member.driverUserId,
@@ -251,7 +255,7 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
     }
 
     if (index == 8) {
-      Navigator.of(context).pop();
+      _menuBloc.add(const OperatorMenuLogoutRequested());
       return;
     }
 
@@ -267,6 +271,11 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Makes Logout in the drawer work from this screen.
+    return OperatorLogoutScope(bloc: _menuBloc, child: _buildScreen(context));
+  }
+
+  Widget _buildScreen(BuildContext context) {
     final t = context.watch<AppTranslationsNotifier>();
     final width = MediaQuery.of(context).size.width;
     final isAndroidPhone = !kIsWeb &&
@@ -414,7 +423,8 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
                               ),
                               const SizedBox(height: 8),
                               TextComponent(
-                                labelText: getDisplayErrorMessage(snapshot.error),
+                                labelText:
+                                    getDisplayErrorMessage(snapshot.error),
                                 color: AppColors.mutedText,
                                 fontSize: 12,
                                 textAlign: TextAlign.center,
@@ -462,11 +472,10 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
                             t: t,
                             membersFuture: _membersFuturesByGroupId.putIfAbsent(
                               g.id,
-                              () => OperatorDriverGroupsApiService
-                                  .getDriverGroupMembers(
+                              () => DriverGroupsRepository.members(
                                 outletId: _outletId,
                                 groupId: g.id,
-                              ).then((res) => res.members),
+                              ),
                             ),
                             onAddMembers: () => _showAddMembersDialog(
                               groupId: g.id,
@@ -475,11 +484,10 @@ class _OperatorGroupingScreenState extends State<OperatorGroupingScreen> {
                             onRetryMembers: () {
                               setState(() {
                                 _membersFuturesByGroupId[g.id] =
-                                    OperatorDriverGroupsApiService
-                                        .getDriverGroupMembers(
+                                    DriverGroupsRepository.members(
                                   outletId: _outletId,
                                   groupId: g.id,
-                                ).then((res) => res.members);
+                                );
                               });
                             },
                             onRemoveMember: (member) => _removeMemberFromGroup(

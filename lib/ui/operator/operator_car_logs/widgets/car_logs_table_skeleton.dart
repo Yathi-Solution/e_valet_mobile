@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/skeleton_loader.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/skeleton_loader.dart';
 
 /// Skeleton placeholder for the car logs table (header + data rows).
 class CarLogsTableSkeleton extends StatelessWidget {

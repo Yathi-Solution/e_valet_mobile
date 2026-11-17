@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:niloufer_valet_mobile/api/driver/driver_status_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/my_cards_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
-import 'package:niloufer_valet_mobile/api/oauth/profile_api_service.dart';
-import 'package:niloufer_valet_mobile/api/outlet/outlet_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/outlet/verify_location_request.dart';
-import 'package:niloufer_valet_mobile/services/location/location_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/services/translations/translations_cache.dart';
-import 'package:niloufer_valet_mobile/services/websocket/websocket_helper.dart';
+import 'package:evalet/api/driver/driver_status_api_service.dart';
+import 'package:evalet/api/driver/my_cards_api_service.dart';
+import 'package:evalet/api/driver/my_parked_sessions_api_service.dart';
+import 'package:evalet/api/oauth/profile_api_service.dart';
+import 'package:evalet/api/outlet/outlet_api_service.dart';
+import 'package:evalet/bloc/websocket/websocket_bloc.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/outlet/verify_location_request.dart';
+import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/services/oauth/session_manager.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/services/translations/translations_cache.dart';
+import 'package:evalet/services/websocket/websocket_helper.dart';
 import 'splash_event.dart';
 import 'splash_state.dart';
 
@@ -115,7 +115,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
           'Driver cards refreshed on splash restore: ${cardsResponse.cards.length} cards',
         );
       } catch (e) {
-        print('Splash: Failed to refresh driver cards on restore (non-fatal): $e');
+        print(
+            'Splash: Failed to refresh driver cards on restore (non-fatal): $e');
       }
 
       try {
@@ -125,7 +126,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
           'Driver parked cars refreshed on splash restore: ${parkedResponse.sessionCount} sessions',
         );
       } catch (e) {
-        print('Splash: Failed to refresh parked cars on restore (non-fatal): $e');
+        print(
+            'Splash: Failed to refresh parked cars on restore (non-fatal): $e');
       }
     }
 
@@ -159,7 +161,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
 
   /// Loads profile from the network, or last cached roles/user id when the failure
   /// is transient (e.g. no connectivity). Returns null only when login is required.
-  Future<({List<String> roles, String userId})?> _loadProfileOrOfflineSnapshot() async {
+  Future<({List<String> roles, String userId})?>
+      _loadProfileOrOfflineSnapshot() async {
     try {
       final profile = await ProfileApiService.getProfile();
       final roles = profile.normalizedRoles;
@@ -181,7 +184,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     }
   }
 
-  Future<({List<String> roles, String userId})?> _readCachedAuthSnapshot() async {
+  Future<({List<String> roles, String userId})?>
+      _readCachedAuthSnapshot() async {
     final roles = await TokenStorage.getCachedNormalizedRoles();
     final userId = await TokenStorage.getCachedUserId();
     if (roles == null || roles.isEmpty || userId == null || userId.isEmpty) {

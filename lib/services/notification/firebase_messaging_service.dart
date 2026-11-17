@@ -1,17 +1,17 @@
 import 'dart:async';
-import 'package:niloufer_valet_mobile/models/notification/notification_type.dart';
+import 'package:evalet/models/notification/notification_type.dart';
 import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:niloufer_valet_mobile/api/notification/notification_api_service.dart';
-import 'package:niloufer_valet_mobile/models/notification/fcm_register_request.dart';
-import 'package:niloufer_valet_mobile/services/device/device_info_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/notification/notification_api_service.dart';
+import 'package:evalet/models/notification/fcm_register_request.dart';
+import 'package:evalet/services/device/device_info_service.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 import 'notification_service.dart';
 import 'local_notification_service.dart';
 import 'text_to_speech_service.dart';
-import 'package:niloufer_valet_mobile/services/vibration_controller.dart';
+import 'package:evalet/services/vibration_controller.dart';
 
 /// Top-level function to handle background messages.
 /// Must be a top-level function (not a class method).

@@ -3,14 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_dashboard/operator_dashboard_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_dashboard/operator_dashboard_event.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_dashboard/operator_dashboard_state.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/elevated_button.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/bloc/operator/operator_dashboard/operator_dashboard_bloc.dart';
+import 'package:evalet/bloc/operator/operator_dashboard/operator_dashboard_event.dart';
+import 'package:evalet/bloc/operator/operator_dashboard/operator_dashboard_state.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/elevated_button.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
 
 class ManualRequestWidget extends StatefulWidget {
   final VoidCallback onRequestCreated;

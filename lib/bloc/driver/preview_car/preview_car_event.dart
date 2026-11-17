@@ -17,6 +17,7 @@ class SubmitPhotoRequested extends PreviewCarEvent {
   final String? parkingLocation;
   final String? vehicleNumber;
   final int? cardNumber;
+
   /// When true, scanner/check-in API already succeeded; only park API should sync.
   final bool checkinSubmittedOnServer;
 

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_home/driver_menu_event.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/scanner/scanner_menu/scanner_menu_event.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_cards/my_cards_screen.dart';
-import 'package:niloufer_valet_mobile/ui/guidelines/guidelines_screen.dart';
-import 'package:niloufer_valet_mobile/ui/help_support/help_screen.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/profile/profile_screen.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_bloc.dart';
+import 'package:evalet/bloc/driver/driver_home/driver_menu_event.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_bloc.dart';
+import 'package:evalet/bloc/scanner/scanner_menu/scanner_menu_event.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/driver/driver_cards/my_cards_screen.dart';
+import 'package:evalet/ui/guidelines/guidelines_screen.dart';
+import 'package:evalet/ui/help_support/help_screen.dart';
+import 'package:evalet/ui/oauth/profile/profile_screen.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
 /// App bar overflow menu. When [scannerMode] is true, shows only Profile and

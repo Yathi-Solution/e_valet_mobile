@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_bloc.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_bloc.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_event.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_state.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 class DriverBreakToggleWidget extends StatelessWidget {
   final double screenWidth;
@@ -79,7 +79,9 @@ class DriverBreakToggleWidget extends StatelessWidget {
                   )
                 : Semantics(
                     button: true,
-                    label: isOnBreak ? 'On break, tap to go available' : 'Available, tap to go on break',
+                    label: isOnBreak
+                        ? 'On break, tap to go available'
+                        : 'Available, tap to go on break',
                     child: SizedBox(
                       width: 44,
                       height: 44,
@@ -126,7 +128,8 @@ class _BreakToggle extends StatelessWidget {
         height: trackHeight,
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
-          color: value ? AppColors.coral : AppColors.trackGray,
+          // Green while available, so the resting state doesn't read as "off".
+          color: value ? AppColors.coral : AppColors.success,
           borderRadius: BorderRadius.circular(trackHeight / 2),
         ),
         child: AnimatedAlign(

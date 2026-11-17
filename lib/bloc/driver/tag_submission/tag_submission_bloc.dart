@@ -1,16 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/session_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/checkin_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/offline_checkin_request.dart';
-import 'package:niloufer_valet_mobile/services/background/background_sync_service.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/parked_card_availability_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/api/driver/session_api_service.dart';
+import 'package:evalet/bloc/driver/tag_submission/tag_submission_event.dart';
+import 'package:evalet/bloc/driver/tag_submission/tag_submission_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/session/checkin_request.dart';
+import 'package:evalet/models/driver/session/offline_checkin_request.dart';
+import 'package:evalet/services/background/background_sync_service.dart';
+import 'package:evalet/services/offline_sync/offline_parking_service.dart';
+import 'package:evalet/services/offline_sync/parked_card_availability_service.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/utils/card_outlet_check.dart';
 
 class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
   TagSubmissionBloc() : super(const TagSubmissionInitial()) {
@@ -26,6 +27,7 @@ class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
     final request = CheckinRequest(
       outletId: event.qrData.outletId,
       cardNumber: event.qrData.cardNumber,
+      outletCode: event.qrData.outletCode,
     );
     await _submitCheckin(request, emit);
   }
@@ -66,6 +68,16 @@ class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
         await TokenStorage.saveSessionId(response.sessionId);
       }
 
+      // The server only accepts a card whose Outlet Code belongs to this
+      // outlet, so remember the code for refusing other outlets' cards offline.
+      final outletCode = request.outletCode;
+      if (outletCode != null) {
+        await TokenStorage.saveConfirmedOutletCode(
+          outletId: request.outletId,
+          outletCode: outletCode,
+        );
+      }
+
       emit(TagSubmissionSuccess(response.message));
     } on ApiException catch (e) {
       if (e.code == 'session_expired') {
@@ -78,23 +90,51 @@ class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
         return;
       }
 
+      if (_isDifferentOutletError(e)) {
+        emit(const TagSubmissionError(TextConstants.driverCardDifferentOutlet));
+        return;
+      }
+
       emit(TagSubmissionError(e.message));
     } catch (e) {
-      debugPrint('Check-in failed, falling back to offline storage: $e');
-      await _saveOfflineAndEmitSuccess(request, emit);
+      // Not a connectivity failure, so don't report it as "saved offline".
+      debugPrint('Check-in failed: $e');
+      emit(const TagSubmissionError(
+        'Failed to check in. Please try again.',
+      ));
     }
   }
 
+  /// Only a real connectivity failure may be saved offline. Anything else
+  /// (a server refusal, a bad response) must surface as an error rather than
+  /// look like a successful check-in.
   bool _shouldFallbackToOffline(ApiException e) {
-    return e.code == 'network_error' ||
-        e.code == 'timeout' ||
-        e.code == 'unknown_error';
+    return e.code == 'network_error' || e.code == 'timeout';
+  }
+
+  /// The server refused the card because it belongs to another outlet:
+  /// 400 CARD_NOT_AT_OUTLET (Outlet Code mismatch) or the 403 raised when the
+  /// card's outlet is not the one the driver is clocked in at.
+  bool _isDifferentOutletError(ApiException e) {
+    return e.code == 'CARD_NOT_AT_OUTLET' ||
+        (e.statusCode == 403 &&
+            e.message.toLowerCase().contains('not valid for your outlet'));
   }
 
   Future<void> _saveOfflineAndEmitSuccess(
     CheckinRequest request,
     Emitter<TagSubmissionState> emit,
   ) async {
+    // Offline the server cannot refuse another outlet's card, and saving it
+    // would look like a successful check-in that only fails at sync.
+    if (isCardFromAnotherOutlet(
+      cardOutletCode: request.outletCode,
+      currentOutletCode: TokenStorage.getConfirmedOutletCodeSync(),
+    )) {
+      emit(const TagSubmissionError(TextConstants.driverCardDifferentOutlet));
+      return;
+    }
+
     try {
       if (await ParkedCardAvailabilityService.isCardNumberAlreadyInUse(
         request.cardNumber,
@@ -110,6 +150,7 @@ class TagSubmissionBloc extends Bloc<TagSubmissionEvent, TagSubmissionState> {
         cardNumber: request.cardNumber,
         clientSessionId: clientSessionId,
         timestamp: DateTime.now().toIso8601String(),
+        outletCode: request.outletCode,
       );
 
       await OfflineParkingService.savePendingCheckin(offlineCheckin);

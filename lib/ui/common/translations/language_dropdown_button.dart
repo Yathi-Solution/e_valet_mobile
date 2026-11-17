@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/models/translations/language.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/models/translations/language.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/language_cache.dart';
-import 'package:niloufer_valet_mobile/services/translations/translations_cache.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/translations/language_popup_dialog.dart';
+import 'package:evalet/services/translations/language_cache.dart';
+import 'package:evalet/services/translations/translations_cache.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/translations/language_popup_dialog.dart';
 
 class LanguageDropdownButton extends StatefulWidget {
   final double iconSize;

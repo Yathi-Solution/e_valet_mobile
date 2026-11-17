@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/common/typography.dart';
+import 'package:evalet/ui/common/typography.dart';
 
 class TextComponent extends StatefulWidget {
   const TextComponent({

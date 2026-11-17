@@ -2,21 +2,22 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/api/driver/sessions_pending_api.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_action_card.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_vehicle_details_screen.dart';
-import 'package:niloufer_valet_mobile/ui/driver/retrival_request/pending_retrieval_requests_screen.dart';
-import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/offline_parking_service.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/login/login.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/api/driver/sessions_pending_api.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/bloc/driver/tag_submission/tag_submission_bloc.dart';
+import 'package:evalet/bloc/driver/tag_submission/tag_submission_state.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_action_card.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_vehicle_details_screen.dart';
+import 'package:evalet/ui/driver/retrival_request/pending_retrieval_requests_screen.dart';
+import 'package:evalet/services/oauth/session_manager.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/driver/driver_home/park_flow_signals.dart';
+import 'package:evalet/services/offline_sync/offline_parking_service.dart';
+import 'package:evalet/ui/oauth/login/login.dart';
 
 class DriverOnlineContent extends StatefulWidget {
   final String driverName;
@@ -71,6 +72,8 @@ class _DriverOnlineContentState extends State<DriverOnlineContent>
 
   Future<void> _checkPendingSessionCancellation() async {
     if (!mounted || _handlingPendingCancellation) return;
+    // A park submit is in flight: the session leaving the pending list is expected.
+    if (ParkFlowSignals.isParkSubmitInProgress) return;
     final sessionId = await TokenStorage.getSessionId();
     if (sessionId == null || sessionId.isEmpty) return;
     if (OfflineParkingService.isOfflineSessionId(sessionId)) return;
@@ -81,6 +84,10 @@ class _DriverOnlineContentState extends State<DriverOnlineContent>
           pending.sessions.any((s) => s.sessionId == sessionId);
 
       // Backend cancelled/expired the session if it's no longer returned.
+      // The park may have completed while this request was in flight; a
+      // parked session is no longer "pending" but it was not cancelled.
+      if (ParkFlowSignals.isParkSubmitInProgress) return;
+      if (await TokenStorage.getSessionId() != sessionId) return;
       if (!stillPending) {
         _handlingPendingCancellation = true;
         await _handlePendingSessionCancelled();

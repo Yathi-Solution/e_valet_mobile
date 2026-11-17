@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/custom_app_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/models/driver/session/assigned_session.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/custom_app_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 /// Full-screen page showing car/session details (badge, parking location, parked by, call).
 class CarDetailsScreen extends StatelessWidget {
@@ -44,6 +44,7 @@ class CarDetailsSection extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final fontSize = screenWidth * 0.045;
     final labelFontSize = screenWidth * 0.045;
+    final parkedByMe = session.parkedBy?.isCurrentUser ?? false;
 
     return Container(
       width: double.infinity,
@@ -104,18 +105,21 @@ class CarDetailsSection extends StatelessWidget {
                         Expanded(
                           child: TextComponent(
                             labelText:
-                                '${t.get(TextConstants.parkedByLabel)} ${session.parkedBy?.name ?? t.get(TextConstants.unknown)}',
+                                '${t.get(TextConstants.parkedByLabel)} ${parkedByMe ? t.get(TextConstants.you) : session.parkedBy?.name ?? t.get(TextConstants.unknown)}',
                             fontSize: fontSize,
                             color: AppColors.black,
                             maxLines: 1,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        _CallButton(
-                          onPressed: () => FlutterPhoneDirectCaller.callNumber(
-                              session.parkedBy?.phone ?? ''),
-                        ),
+                        if (!parkedByMe) ...[
+                          const SizedBox(width: 8),
+                          _CallButton(
+                            onPressed: () =>
+                                FlutterPhoneDirectCaller.callNumber(
+                                    session.parkedBy?.phone ?? ''),
+                          ),
+                        ],
                       ],
                     ),
                   ],

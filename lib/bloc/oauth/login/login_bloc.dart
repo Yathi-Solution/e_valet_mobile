@@ -2,27 +2,28 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:niloufer_valet_mobile/api/driver/config_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/driver_status_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/my_cards_api_service.dart';
-import 'package:niloufer_valet_mobile/api/driver/my_parked_sessions_api_service.dart';
-import 'package:niloufer_valet_mobile/api/oauth/login_api_service.dart';
-import 'package:niloufer_valet_mobile/api/outlet/outlet_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/clock_in_request.dart';
-import 'package:niloufer_valet_mobile/models/oauth/phone_password_login_request.dart';
-import 'package:niloufer_valet_mobile/models/oauth/login_result.dart';
-import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
-import 'package:niloufer_valet_mobile/models/outlet/verify_location_request.dart';
-import 'package:niloufer_valet_mobile/models/outlet/verify_location_response.dart';
-import 'package:niloufer_valet_mobile/services/location/location_service.dart';
-import 'package:niloufer_valet_mobile/services/notification/firebase_messaging_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/services/connectivity/driver_connectivity_log_service.dart';
-import 'package:niloufer_valet_mobile/services/websocket/websocket_helper.dart';
-import 'package:niloufer_valet_mobile/api/driver/connectivity_settings_api_service.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/api/driver/config_api_service.dart';
+import 'package:evalet/api/driver/driver_status_api_service.dart';
+import 'package:evalet/api/driver/my_cards_api_service.dart';
+import 'package:evalet/api/driver/my_parked_sessions_api_service.dart';
+import 'package:evalet/api/oauth/login_api_service.dart';
+import 'package:evalet/api/outlet/outlet_api_service.dart';
+import 'package:evalet/bloc/websocket/websocket_bloc.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/status/clock_in_request.dart';
+import 'package:evalet/models/oauth/phone_password_login_request.dart';
+import 'package:evalet/models/oauth/login_result.dart';
+import 'package:evalet/models/oauth/profile.dart';
+import 'package:evalet/models/outlet/outlet.dart';
+import 'package:evalet/models/outlet/verify_location_request.dart';
+import 'package:evalet/models/outlet/verify_location_response.dart';
+import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/services/notification/firebase_messaging_service.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/services/connectivity/driver_connectivity_log_service.dart';
+import 'package:evalet/services/websocket/websocket_helper.dart';
+import 'package:evalet/api/driver/connectivity_settings_api_service.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 import 'login_event.dart';
 import 'login_state.dart';
 
@@ -166,6 +167,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     // Fetch outlets so the user can pick one before clock-in / verify-location
     final outlets = await OutletApiService.getOutlets();
 
+    // Only one outlet available: skip the picker and continue with it directly.
+    // The state stays [LoginLoading] so the login button keeps its spinner.
+    if (outlets.length == 1) {
+      await _completeOutletSelection(outlets.first, emit);
+      return;
+    }
+
     emit(LoginSuccessNeedsOutletSelection(
       profile: profile,
       outlets: outlets,
@@ -179,12 +187,21 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     OutletSelected event,
     Emitter<LoginState> emit,
   ) async {
-    final profile = _pendingProfile;
-    if (profile == null) return;
+    if (_pendingProfile == null) return;
 
     emit(const LoginOutletSelectionLoading());
 
-    final outlet = event.outlet;
+    await _completeOutletSelection(event.outlet, emit);
+  }
+
+  /// Clock-in / verify-location for the chosen [outlet]. Used both when the
+  /// user picks from the dialog and when there is only one outlet.
+  Future<void> _completeOutletSelection(
+    Outlet outlet,
+    Emitter<LoginState> emit,
+  ) async {
+    final profile = _pendingProfile;
+    if (profile == null) return;
 
     try {
       // Get the user's current location (shared by both driver and operator/scanner paths)
@@ -264,8 +281,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         unawaited(MyCardsApiService.refreshAssignedCardsInBackground());
 
         try {
-          final parkedResponse =
-              await MyParkedSessionsApiService.refreshParkedSessionsForDisplay();
+          final parkedResponse = await MyParkedSessionsApiService
+              .refreshParkedSessionsForDisplay();
           log(
             'Driver parked cars refreshed on (re)login: ${parkedResponse.sessionCount} sessions',
           );
@@ -399,7 +416,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       // Clear previous data on every new login (silent)
       await TokenStorage.clearDriverConnectivitySettings();
 
-      final settings = await ConnectivitySettingsApiService.getDriverConnectivitySettings(
+      final settings =
+          await ConnectivitySettingsApiService.getDriverConnectivitySettings(
         outletId: outletId,
       );
 
@@ -447,7 +465,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         longitude: longitude,
         accuracy: accuracy,
       );
-      final clockInResponse = await DriverStatusApiService.clockIn(clockInRequest);
+      final clockInResponse =
+          await DriverStatusApiService.clockIn(clockInRequest);
       await DriverConnectivityLogService.instance.onShiftActiveAfterClockIn(
         shiftId: clockInResponse.shiftId,
         outletId: clockInResponse.outletId,

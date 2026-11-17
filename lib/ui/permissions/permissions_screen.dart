@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:niloufer_valet_mobile/services/permissions/permissions_service.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/version/version_check_args.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/login/login.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/driver_home.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_dashboard/operator_dashboard.dart';
-import 'package:niloufer_valet_mobile/ui/scanner/scanner_home.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/services/permissions/permissions_service.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/version/version_check_args.dart';
+import 'package:evalet/ui/oauth/login/login.dart';
+import 'package:evalet/ui/driver/driver_home/driver_home.dart';
+import 'package:evalet/ui/operator/operator_dashboard/operator_dashboard.dart';
+import 'package:evalet/ui/scanner/scanner_home.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
 
 /// Full-screen blocking permissions screen (NPCI-style).
 /// [args] required when [returnToPrevious] is false (initial flow after version check).

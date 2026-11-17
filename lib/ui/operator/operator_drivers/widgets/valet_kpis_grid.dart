@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_kpis_response.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_drivers/widgets/valet_kpi_card.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_drivers/operator_drivers_screen.dart';
+import 'package:evalet/models/operator/operator_valet/valet_kpis_response.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/operator/operator_drivers/widgets/valet_kpi_card.dart';
+import 'package:evalet/ui/operator/operator_drivers/operator_drivers_screen.dart';
 
 class ValetKpisGrid extends StatelessWidget {
   final ValetKpisResponse? kpis;

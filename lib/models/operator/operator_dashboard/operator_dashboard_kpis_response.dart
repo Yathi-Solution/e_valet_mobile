@@ -1,5 +1,5 @@
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/available_tags.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/available_valets.dart';
+import 'package:evalet/models/operator/operator_dashboard/available_tags.dart';
+import 'package:evalet/models/operator/operator_dashboard/available_valets.dart';
 
 class OperatorDashboardKpisResponse {
   final AvailableTags availableTags;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_qr_scanner_content.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_qr_scanner_content.dart';
 
 /// Vehicle details screen (QR/tag entry) shown after tapping Park Vehicle.
 class DriverVehicleDetailsScreen extends StatelessWidget {

@@ -1,7 +1,7 @@
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session_parked_by.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session_photo.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/pending_session.dart';
+import 'package:evalet/models/driver/session/assigned_session.dart';
+import 'package:evalet/models/driver/session/assigned_session_parked_by.dart';
+import 'package:evalet/models/driver/session/assigned_session_photo.dart';
+import 'package:evalet/models/driver/session/pending_session.dart';
 
 /// Utility class to convert PendingSession to AssignedSession
 /// This is used when navigating to screens that require AssignedSession

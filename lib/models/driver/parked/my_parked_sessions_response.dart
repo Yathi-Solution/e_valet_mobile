@@ -42,7 +42,8 @@ class MyParkedSession extends Equatable {
 
   static String _parseSource(dynamic raw) {
     if (raw == null) return 'OWN';
-    if (raw is String) return raw.trim().isEmpty ? 'OWN' : raw.trim().toUpperCase();
+    if (raw is String)
+      return raw.trim().isEmpty ? 'OWN' : raw.trim().toUpperCase();
     if (raw is Map<String, dynamic>) {
       final v = raw['name'] ?? raw['value'] ?? raw['source'] ?? raw['type'];
       final s = v?.toString().trim();

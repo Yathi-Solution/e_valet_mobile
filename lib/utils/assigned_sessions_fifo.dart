@@ -1,4 +1,4 @@
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session.dart';
+import 'package:evalet/models/driver/session/assigned_session.dart';
 
 /// Puts assigned sessions in FIFO order: oldest [AssignedSession.assignedAt] first.
 /// The retrieval sheet uses [List.first]; without this, API order alone decides "next".

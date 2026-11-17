@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session.dart';
+import 'package:evalet/models/driver/session/assigned_session.dart';
 
 abstract class RetrivalRequestEvent extends Equatable {
   const RetrivalRequestEvent();

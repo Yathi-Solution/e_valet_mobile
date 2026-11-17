@@ -1,14 +1,14 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:niloufer_valet_mobile/api/driver/image_API.dart';
-import 'package:niloufer_valet_mobile/api/driver/re-park_api.dart';
-import 'package:niloufer_valet_mobile/api/driver/session_api_service.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/driver/park/offline_parking_photo.dart';
-import 'package:niloufer_valet_mobile/models/driver/park/park_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/re-park/repark_photo_request.dart';
-import 'package:niloufer_valet_mobile/models/driver/parked/my_parked_sessions_response.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/offline_checkin_request.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/driver/image_API.dart';
+import 'package:evalet/api/driver/re-park_api.dart';
+import 'package:evalet/api/driver/session_api_service.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/driver/park/offline_parking_photo.dart';
+import 'package:evalet/models/driver/park/park_request.dart';
+import 'package:evalet/models/driver/re-park/repark_photo_request.dart';
+import 'package:evalet/models/driver/parked/my_parked_sessions_response.dart';
+import 'package:evalet/models/driver/session/offline_checkin_request.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 import 'package:flutter/foundation.dart';
 
 class OfflineParkingService {
@@ -237,8 +237,8 @@ class OfflineParkingService {
       return _syncSingleCheckinEntry(matchedEntry.key, matchedEntry.value);
     }
 
-    final cardNumber = photo.cardNumber ??
-        cardNumberFromOfflineSessionId(sessionId);
+    final cardNumber =
+        photo.cardNumber ?? cardNumberFromOfflineSessionId(sessionId);
     if (cardNumber == null || cardNumber <= 0) {
       debugPrint('Cannot sync check-in: missing card number for $sessionId');
       return false;
@@ -259,7 +259,8 @@ class OfflineParkingService {
       clientSessionId: sessionId,
       timestamp: photo.timestamp,
     );
-    return _syncSingleCheckinEntry(null, fallbackCheckin, remapSessionId: sessionId);
+    return _syncSingleCheckinEntry(null, fallbackCheckin,
+        remapSessionId: sessionId);
   }
 
   static Future<void> _syncRemainingCheckins() async {
@@ -280,8 +281,7 @@ class OfflineParkingService {
   }) async {
     await _ensureCheckinBoxOpen();
     final box = Hive.box<OfflineCheckinRequest>(_checkinBoxName);
-    final clientSessionId =
-        remapSessionId ?? checkin.clientSessionId.trim();
+    final clientSessionId = remapSessionId ?? checkin.clientSessionId.trim();
 
     if (!TokenStorage.isDriverCardNumberAllowedSync(checkin.cardNumber)) {
       debugPrint(
@@ -328,13 +328,15 @@ class OfflineParkingService {
               !isOfflineSessionId(currentSessionId)) {
             await _remapPhotosSessionId(clientSessionId, currentSessionId);
           }
-          debugPrint('Check-in already exists on server for card ${checkin.cardNumber}');
+          debugPrint(
+              'Check-in already exists on server for card ${checkin.cardNumber}');
           success = true;
           continue;
         }
 
         attempts++;
-        debugPrint('Failed to sync check-in for card ${checkin.cardNumber}: $e');
+        debugPrint(
+            'Failed to sync check-in for card ${checkin.cardNumber}: $e');
         if (attempts < 3) {
           await Future.delayed(const Duration(seconds: 5));
         }
@@ -394,7 +396,8 @@ class OfflineParkingService {
       } catch (e) {
         if (_isAlreadyParkedError(e)) {
           await box.delete(key);
-          debugPrint('Park already exists on server, removing local entry: $key');
+          debugPrint(
+              'Park already exists on server, removing local entry: $key');
           success = true;
           continue;
         }

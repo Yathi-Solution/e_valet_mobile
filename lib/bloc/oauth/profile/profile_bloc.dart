@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/oauth/profile_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/oauth/profile/profile_event.dart';
-import 'package:niloufer_valet_mobile/bloc/oauth/profile/profile_state.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/api/oauth/profile_api_service.dart';
+import 'package:evalet/bloc/oauth/profile/profile_event.dart';
+import 'package:evalet/bloc/oauth/profile/profile_state.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc() : super(const ProfileInitial()) {

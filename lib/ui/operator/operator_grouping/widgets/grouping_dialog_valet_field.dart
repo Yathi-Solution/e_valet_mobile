@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_valet/valet_response.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_grouping/widgets/grouping_valet_picker_sheet.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/models/operator/operator_valet/valet_response.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/operator/operator_grouping/widgets/grouping_valet_picker_sheet.dart';
 
 /// Valet multi-select used inside Add Group / Add Members dialogs.
 class GroupingDialogValetField extends StatelessWidget {

@@ -10,6 +10,17 @@ class ParkFlowSignals {
   /// no-internet banners, toasts, and full blockers while here.
   static bool _isOnDriverHomeCards = false;
 
+  /// True from the moment the driver taps Done on the preview screen until the
+  /// stored session id has been cleared after a successful park. While set, a
+  /// session missing from the pending list means "just parked", not "cancelled".
+  static bool _parkSubmitInProgress = false;
+
+  static bool get isParkSubmitInProgress => _parkSubmitInProgress;
+
+  static void setParkSubmitInProgress(bool value) {
+    _parkSubmitInProgress = value;
+  }
+
   static bool get isCarPhotoParkFlowActive => _carPhotoDepth > 0;
 
   static bool get isVehicleDetailsFlowActive => _vehicleDetailsDepth > 0;
@@ -20,7 +31,9 @@ class ParkFlowSignals {
   /// or tolerate offline gracefully. Hide the global no-internet blocker
   /// and any bottom "no internet" messages while these are active.
   static bool get shouldSuppressNoInternetOverlay =>
-      isCarPhotoParkFlowActive || isVehicleDetailsFlowActive || isOnDriverHomeCards;
+      isCarPhotoParkFlowActive ||
+      isVehicleDetailsFlowActive ||
+      isOnDriverHomeCards;
 
   static void beginCarPhotoParkFlow() {
     _carPhotoDepth++;

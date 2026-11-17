@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
 
 class BaseHttpService {
   final String baseUrl;

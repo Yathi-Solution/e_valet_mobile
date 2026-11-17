@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/driver_break_toggle_widget.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_bloc.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_state.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_break_toggle_widget.dart';
 
 class DriverHeaderWidget extends StatelessWidget {
   final bool isOnline;

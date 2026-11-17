@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/notification/notification_priority.dart';
-import 'package:niloufer_valet_mobile/models/notification/notification_type.dart';
+import 'package:evalet/models/notification/notification_priority.dart';
+import 'package:evalet/models/notification/notification_type.dart';
 
 /// Notification model representing a push notification
 class NotificationModel extends Equatable {

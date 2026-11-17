@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/available_drivers.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/retrieval_request.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/full_image_viewer_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/utils/driver_utils.dart';
+import 'package:evalet/models/operator/operator_dashboard/available_drivers.dart';
+import 'package:evalet/models/operator/operator_dashboard/retrieval_request.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/full_image_viewer_dialog.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/utils/driver_utils.dart';
 
 class AssignmentConfirmationDialog extends StatelessWidget {
   final AvailableDriver driver;

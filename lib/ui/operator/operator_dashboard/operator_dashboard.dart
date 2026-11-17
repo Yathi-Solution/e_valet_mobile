@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_home/operator_menu_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/operator/operator_home/operator_menu_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/oauth/login/login.dart';
+import 'package:evalet/ui/operator/operator_drawer/operator_logout_scope.dart';
 import 'operator_dashboard_view.dart';
 
 class OperatorDashboardScreen extends StatelessWidget {
@@ -11,26 +7,7 @@ class OperatorDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => OperatorMenuBloc(),
-      child: BlocListener<OperatorMenuBloc, OperatorMenuState>(
-        listener: (context, state) {
-          if (state is OperatorMenuLogoutSuccess) {
-            SnackBars.showSuccessSnackBar(context, state.message);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-              (route) => false,
-            );
-          } else if (state is OperatorMenuLogoutFailure) {
-            SnackBars.showErrorSnackBar(context, state.message);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-              (route) => false,
-            );
-          }
-        },
-        child: const OperatorDashboardView(),
-      ),
-    );
+    // The logout loader is app-wide (LogoutProgressOverlay), not per screen.
+    return const OperatorLogoutScope(child: OperatorDashboardView());
   }
 }

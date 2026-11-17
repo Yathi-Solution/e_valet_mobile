@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:niloufer_valet_mobile/api/driver/assigned_sessions_api_service.dart';
-import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session.dart';
-import 'package:niloufer_valet_mobile/utils/assigned_sessions_fifo.dart';
+import 'package:evalet/api/driver/assigned_sessions_api_service.dart';
+import 'package:evalet/bloc/websocket/websocket_bloc.dart';
+import 'package:evalet/models/driver/session/assigned_session.dart';
+import 'package:evalet/utils/assigned_sessions_fifo.dart';
 
 part 'assigned_sessions_background_event.dart';
 part 'assigned_sessions_background_state.dart';

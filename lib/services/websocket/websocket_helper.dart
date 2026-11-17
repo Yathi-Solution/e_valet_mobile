@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:niloufer_valet_mobile/bloc/websocket/websocket_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/websocket/websocket_event.dart';
-import 'package:niloufer_valet_mobile/api/core/api_config.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
+import 'package:evalet/bloc/websocket/websocket_bloc.dart';
+import 'package:evalet/bloc/websocket/websocket_event.dart';
+import 'package:evalet/api/core/api_config.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
 
 /// Helper class to manage WebSocket lifecycle during app flow
 class WebSocketHelper {
@@ -82,11 +82,11 @@ class WebSocketHelper {
         timeoutTimer.cancel();
       }
 
-      // Small delay before joining rooms
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      // Join outlet room only (driver/operator rooms are auto-joined by backend based on user roles)
-      if (outletId != null && webSocketBloc.service.isConnected) {
+      // Join outlet room only (driver/operator rooms are auto-joined by backend based on user roles).
+      // The room is remembered even if the socket is not ready yet: the bloc
+      // subscribes once the server accepts the connection, and again after
+      // every reconnect.
+      if (outletId != null) {
         print('Joining outlet room: $outletId');
         webSocketBloc.add(JoinRoom.outlet(outletId));
       }

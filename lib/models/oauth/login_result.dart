@@ -1,5 +1,5 @@
-import 'package:niloufer_valet_mobile/models/oauth/client_summary.dart';
-import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
+import 'package:evalet/models/oauth/client_summary.dart';
+import 'package:evalet/models/oauth/profile.dart';
 
 /// Outcome of POST /auth/login: either a Client-bound session (ready to use)
 /// or a Platform token that still needs a Client chosen.

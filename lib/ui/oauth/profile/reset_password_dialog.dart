@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/bloc/oauth/change_password/change_password_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/oauth/change_password/change_password_event.dart';
-import 'package:niloufer_valet_mobile/bloc/oauth/change_password/change_password_state.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/elevated_button.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/password_text_field.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text_button.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/bloc/oauth/change_password/change_password_bloc.dart';
+import 'package:evalet/bloc/oauth/change_password/change_password_event.dart';
+import 'package:evalet/bloc/oauth/change_password/change_password_state.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/elevated_button.dart';
+import 'package:evalet/ui/common/widgets/password_text_field.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/widgets/text_button.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 
 class ResetPasswordDialog extends StatefulWidget {
   const ResetPasswordDialog({super.key});

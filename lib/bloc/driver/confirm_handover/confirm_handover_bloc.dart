@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:niloufer_valet_mobile/api/driver/handover_api.dart';
-import 'package:niloufer_valet_mobile/models/core/api_exceptions.dart';
-import 'package:niloufer_valet_mobile/services/location/location_service.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/api/driver/handover_api.dart';
+import 'package:evalet/models/core/api_exceptions.dart';
+import 'package:evalet/services/location/location_service.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 import 'confirm_handover_event.dart';
 import 'confirm_handover_state.dart';
 
@@ -45,8 +45,11 @@ class ConfirmHandoverBloc
         );
       }
 
-      // Get current location coordinates with accuracy
-      final coordinates = await LocationService.getCurrentCoordinates();
+      // Driver has just moved the car: only reuse a fix from the last few
+      // seconds, otherwise wait briefly for a fresh one.
+      final coordinates = await LocationService.getFastCoordinates(
+        maxAge: const Duration(seconds: 15),
+      );
       final latitude = coordinates['latitude']!;
       final longitude = coordinates['longitude']!;
       final accuracy = coordinates['accuracy']!;

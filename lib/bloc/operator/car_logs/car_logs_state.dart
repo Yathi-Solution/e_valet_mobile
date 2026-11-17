@@ -1,5 +1,5 @@
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/car_logs_kpis_response.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/car_logs_response.dart';
+import 'package:evalet/models/operator/operator_dashboard/car_logs_kpis_response.dart';
+import 'package:evalet/models/operator/operator_dashboard/car_logs_response.dart';
 
 abstract class CarLogsState {
   const CarLogsState();

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/operator/operator_dashboard/widgets/kpi_card.dart';
-import 'package:niloufer_valet_mobile/models/operator/operator_dashboard/operator_dashboard_kpis_response.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/operator/operator_dashboard/widgets/kpi_card.dart';
+import 'package:evalet/models/operator/operator_dashboard/operator_dashboard_kpis_response.dart';
+import 'package:evalet/ui/common/text_constants.dart';
 
 class DashboardKpiGrid extends StatelessWidget {
   final OperatorDashboardKpisResponse kpis;

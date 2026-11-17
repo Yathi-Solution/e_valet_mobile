@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/driver/pre_break/pre_break_info_response.dart';
-import 'package:niloufer_valet_mobile/models/driver/status/driver_status.dart';
+import 'package:evalet/models/driver/pre_break/pre_break_info_response.dart';
+import 'package:evalet/models/driver/status/driver_status.dart';
 
 abstract class DriverStatusState extends Equatable {
   const DriverStatusState();

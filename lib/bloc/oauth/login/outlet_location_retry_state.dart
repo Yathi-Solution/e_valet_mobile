@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:niloufer_valet_mobile/models/oauth/profile.dart';
+import 'package:evalet/models/oauth/profile.dart';
 
 abstract class OutletLocationRetryState extends Equatable {
   final String displayMessage;

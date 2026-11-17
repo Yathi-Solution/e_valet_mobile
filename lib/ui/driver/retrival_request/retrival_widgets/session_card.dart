@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/models/driver/session/assigned_session.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/full_image_viewer_dialog.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
+import 'package:evalet/models/driver/session/assigned_session.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/ui/common/widgets/full_image_viewer_dialog.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
 
 class SessionCard extends StatelessWidget {
   final AssignedSession session;
@@ -18,6 +18,7 @@ class SessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.watch<AppTranslationsNotifier>();
     final screenWidth = MediaQuery.of(context).size.width;
+    final parkedByMe = session.parkedBy?.isCurrentUser ?? false;
 
     return Column(
       children: [
@@ -117,30 +118,31 @@ class SessionCard extends StatelessWidget {
                             Expanded(
                               child: TextComponent(
                                 labelText:
-                                    '${t.get(TextConstants.parkedBy)} ${session.parkedBy?.name ?? t.get(TextConstants.unknown)}',
+                                    '${t.get(TextConstants.parkedBy)} ${parkedByMe ? t.get(TextConstants.you) : session.parkedBy?.name ?? t.get(TextConstants.unknown)}',
                                 fontSize: screenWidth * 0.032,
                                 color: AppColors.black,
                                 maxLines: 2,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            InkWell(
-                              onTap: () =>
-                                  _makePhoneCall(session.parkedBy?.phone ?? ''),
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                padding: EdgeInsets.all(screenWidth * 0.02),
-                                decoration: BoxDecoration(
-                                  color: AppColors.secondary.withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.phone,
-                                  color: AppColors.secondary,
-                                  size: screenWidth * 0.045,
+                            if (!parkedByMe)
+                              InkWell(
+                                onTap: () => _makePhoneCall(
+                                    session.parkedBy?.phone ?? ''),
+                                borderRadius: BorderRadius.circular(20),
+                                child: Container(
+                                  padding: EdgeInsets.all(screenWidth * 0.02),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.secondary.withOpacity(0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.phone,
+                                    color: AppColors.secondary,
+                                    size: screenWidth * 0.045,
+                                  ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ],

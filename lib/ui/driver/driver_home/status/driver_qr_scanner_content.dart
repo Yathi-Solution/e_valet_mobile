@@ -2,30 +2,30 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:niloufer_valet_mobile/services/translations/app_translations_notifier.dart';
+import 'package:evalet/services/translations/app_translations_notifier.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:lottie/lottie.dart';
-import 'package:niloufer_valet_mobile/ui/common/colors.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/text_field.dart';
-import 'package:niloufer_valet_mobile/ui/common/widgets/snack_bar.dart';
-import 'package:niloufer_valet_mobile/ui/common/text_constants.dart';
-import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/connectivity/connectivity_state.dart';
-import 'package:niloufer_valet_mobile/bloc/qr/qr_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/qr/qr_event.dart';
-import 'package:niloufer_valet_mobile/bloc/qr/qr_state.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_event.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/tag_submission/tag_submission_state.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_bloc.dart';
-import 'package:niloufer_valet_mobile/bloc/driver/driver_status/driver_status_state.dart';
-import 'package:niloufer_valet_mobile/services/oauth/session_manager.dart';
-import 'package:niloufer_valet_mobile/services/oauth/token_interceptor.dart';
-import 'package:niloufer_valet_mobile/services/offline_sync/parked_card_availability_service.dart';
-import 'package:niloufer_valet_mobile/ui/driver/qr_reader/qr_reader_widget.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/car_photo_intro_screen.dart';
-import 'package:niloufer_valet_mobile/ui/driver/driver_home/status/tab_chip.dart';
+import 'package:evalet/ui/common/colors.dart';
+import 'package:evalet/ui/common/widgets/text.dart';
+import 'package:evalet/ui/common/widgets/text_field.dart';
+import 'package:evalet/ui/common/widgets/snack_bar.dart';
+import 'package:evalet/ui/common/text_constants.dart';
+import 'package:evalet/bloc/connectivity/connectivity_bloc.dart';
+import 'package:evalet/bloc/connectivity/connectivity_state.dart';
+import 'package:evalet/bloc/qr/qr_bloc.dart';
+import 'package:evalet/bloc/qr/qr_event.dart';
+import 'package:evalet/bloc/qr/qr_state.dart';
+import 'package:evalet/bloc/driver/tag_submission/tag_submission_bloc.dart';
+import 'package:evalet/bloc/driver/tag_submission/tag_submission_event.dart';
+import 'package:evalet/bloc/driver/tag_submission/tag_submission_state.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_bloc.dart';
+import 'package:evalet/bloc/driver/driver_status/driver_status_state.dart';
+import 'package:evalet/services/oauth/session_manager.dart';
+import 'package:evalet/services/oauth/token_interceptor.dart';
+import 'package:evalet/services/offline_sync/parked_card_availability_service.dart';
+import 'package:evalet/ui/driver/qr_reader/qr_reader_widget.dart';
+import 'package:evalet/ui/driver/driver_home/status/car_photo_intro_screen.dart';
+import 'package:evalet/ui/driver/driver_home/status/tab_chip.dart';
 
 class DriverQrScannerContent extends StatefulWidget {
   final double screenWidth;
@@ -274,10 +274,10 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
                       cardNumber: _lastSubmittedCardNumber,
                       onReturnFromCamera: () {
                         widget.onReturnFromCarCamera?.call();
-                        if (mounted) {
-                          _introTimer?.cancel();
-                          setState(() => _showCamera = true);
-                        }
+                        // Widget may be gone (e.g. navigated away after park success).
+                        if (!mounted || !context.mounted) return;
+                        _introTimer?.cancel();
+                        setState(() => _showCamera = true);
                         context
                             .read<QrBloc>()
                             .add(const QrCameraActivateRequested());
@@ -287,10 +287,10 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
                 ).then((_) {
                   // When user returns from third screen: show camera again (intro already shown)
                   widget.onReturnFromCarCamera?.call();
-                  if (mounted) {
-                    _introTimer?.cancel();
-                    setState(() => _showCamera = true);
-                  }
+                  // Widget may be gone (e.g. navigated away after park success).
+                  if (!mounted || !context.mounted) return;
+                  _introTimer?.cancel();
+                  setState(() => _showCamera = true);
                   context.read<QrBloc>().add(const QrCameraActivateRequested());
                 });
               } else if (submissionState is TagSubmissionError) {
@@ -482,68 +482,73 @@ class _DriverQrScannerContentState extends State<DriverQrScannerContent> {
                     ),
                   ),
                 SizedBox(
-              height: h * 0.085,
-              child: BlocBuilder<QrBloc, QrState>(
-                buildWhen: (previous, current) =>
-                    previous.qrData != current.qrData,
-                builder: (context, qrState) {
-                  final hasScannedQr = qrState.qrData != null;
-                  return BlocBuilder<TagSubmissionBloc, TagSubmissionState>(
-                    builder: (context, submissionState) {
-                      final isLoading = submissionState is TagSubmissionLoading;
-                      final canSubmit = hasScannedQr && !isLoading;
-                      final buttonHeight = h * 0.085;
-                      final textSize = w * 0.072;
-                      return SizedBox(
-                        width: double.infinity,
-                        height: buttonHeight,
-                        child: ElevatedButton(
-                          onPressed:
-                              canSubmit ? () => _handleSubmit(context) : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            disabledBackgroundColor:
-                                AppColors.grey.withOpacity(0.5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(w * 0.025),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.white),
-                                  ),
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    TextComponent(
-                                      labelText: t.getByKey('submitButton',
-                                          TextConstants.submitButton),
-                                      fontSize: textSize,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.white,
-                                    ),
-                                    SizedBox(width: w * 0.02),
-                                    Icon(
-                                      Icons.arrow_forward,
-                                      color: AppColors.white,
-                                      size: textSize,
-                                    ),
-                                  ],
+                  height: h * 0.085,
+                  child: BlocBuilder<QrBloc, QrState>(
+                    buildWhen: (previous, current) =>
+                        previous.qrData != current.qrData,
+                    builder: (context, qrState) {
+                      final hasScannedQr = qrState.qrData != null;
+                      return BlocBuilder<TagSubmissionBloc, TagSubmissionState>(
+                        builder: (context, submissionState) {
+                          final isLoading =
+                              submissionState is TagSubmissionLoading;
+                          final canSubmit = hasScannedQr && !isLoading;
+                          final buttonHeight = h * 0.085;
+                          final textSize = w * 0.072;
+                          return SizedBox(
+                            width: double.infinity,
+                            height: buttonHeight,
+                            child: ElevatedButton(
+                              onPressed: canSubmit
+                                  ? () => _handleSubmit(context)
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                disabledBackgroundColor:
+                                    AppColors.grey.withOpacity(0.5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(w * 0.025),
                                 ),
-                        ),
+                                elevation: 0,
+                              ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                AppColors.white),
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        TextComponent(
+                                          labelText: t.getByKey('submitButton',
+                                              TextConstants.submitButton),
+                                          fontSize: textSize,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.white,
+                                        ),
+                                        SizedBox(width: w * 0.02),
+                                        Icon(
+                                          Icons.arrow_forward,
+                                          color: AppColors.white,
+                                          size: textSize,
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          );
+                        },
                       );
                     },
-                  );
-                },
-              ),
-            ),
+                  ),
+                ),
               ],
             ),
           ),
