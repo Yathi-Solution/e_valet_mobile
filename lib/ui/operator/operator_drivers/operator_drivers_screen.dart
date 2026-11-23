@@ -13,6 +13,7 @@ import 'package:evalet/bloc/operator/operator_valet/operator_kpis/valet_kpis_eve
 import 'package:evalet/bloc/operator/operator_valet/operator_kpis/valet_kpis_state.dart';
 import 'package:evalet/bloc/operator/operator_valet/operator_valets/valet_list_bloc.dart';
 import 'package:evalet/bloc/operator/operator_valet/operator_valets/valet_list_event.dart';
+import 'package:evalet/ui/operator/operator_drivers/widgets/add_driver_dialog.dart';
 import 'package:evalet/ui/operator/operator_drivers/widgets/valet_kpis_grid.dart';
 import 'package:evalet/ui/operator/operator_drivers/widgets/valet_list_view.dart';
 
@@ -217,7 +218,29 @@ class _OperatorDriversScreenState extends State<OperatorDriversScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton.icon(
+                    onPressed: () => AddDriverDialog.show(
+                      context: context,
+                      t: t,
+                      defaultOutletId: _outletId,
+                      onDriverAdded: refresh,
+                    ),
+                    icon: const Icon(Icons.person_add_alt_1, size: 18),
+                    label: TextComponent(
+                      labelText: t.getByKey('addDriver', 'Add Driver'),
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 BlocBuilder<ValetKpisBloc, ValetKpisState>(
                   builder: (context, state) {
                     final isLoading = state is ValetKpisLoading;
