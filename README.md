@@ -16,10 +16,10 @@ A **Flutter mobile app** for running valet parking at an outlet. Valets park and
 | Dart SDK | `^3.6.1` |
 | Screens | 30 |
 | BLoCs / cubits | 30 |
-| API service files | 48 |
-| Model files | 97 |
+| API service files | 49 |
+| Model files | 100 |
 | Service files | 39 |
-| Dart files in `lib/` | 464 |
+| Dart files in `lib/` | 469 |
 <!-- AUTO:overview:END -->
 
 ---
@@ -126,7 +126,7 @@ The request appears on the operator dashboard with the card number and a **sound
 |------|---------------|
 | **Dashboard** | KPIs, retrieval requests, available drivers. |
 | **Parked car** | Digital key rack: every car currently parked. |
-| **Valets** | Valet list with status, per-valet KPIs, details, and remote logout of a valet. |
+| **Valets** | Valet list with status, per-valet KPIs, details, and remote logout of a valet. **Add Driver** invites a new driver by phone number (name, optional email, one or more of the client's outlets); a failed invitation delivery can be resent. |
 | **Car logs** | Sortable, paged table of every session with KPIs and a details popup; a session's status can be updated. |
 | **Cards** | Which physical card numbers each driver may use. |
 | **Drivers group** | Create groups of valets and add members. |
@@ -230,13 +230,13 @@ The request appears on the operator dashboard with the card number and a **sound
 ```
 lib/
 ├── main.dart
-├── api/  (48 files)
+├── api/  (49 files)
 │   ├── core/  (4 files)
 │   ├── driver/  (18 files)
 │   ├── notification/  (1 file)
 │   ├── oauth/  (5 files)
 │   ├── ope_driv_help_support_api/  (1 file)
-│   ├── operator/  (16 files)
+│   ├── operator/  (17 files)
 │   ├── outlet/  (1 file)
 │   └── translations/  (2 files)
 ├── bloc/  (89 files)
@@ -249,13 +249,13 @@ lib/
 │   ├── scanner/  (9 files)
 │   ├── splash/  (3 files)
 │   └── websocket/  (3 files)
-├── models/  (97 files)
+├── models/  (100 files)
 │   ├── core/  (1 file)
 │   ├── driver/  (40 files)
 │   ├── help_support/  (1 file)
 │   ├── notification/  (6 files)
 │   ├── oauth/  (8 files)
-│   ├── operator/  (36 files)
+│   ├── operator/  (39 files)
 │   ├── outlet/  (3 files)
 │   └── translations/  (2 files)
 ├── services/  (39 files)
@@ -275,13 +275,13 @@ lib/
 │   ├── translations/  (3 files)
 │   ├── version/  (1 file)
 │   └── websocket/  (2 files)
-├── ui/  (180 files)
+├── ui/  (181 files)
 │   ├── common/  (34 files)
 │   ├── driver/  (62 files)
 │   ├── guidelines/  (3 files)
 │   ├── help_support/  (2 files)
 │   ├── oauth/  (13 files)
-│   ├── operator/  (59 files)
+│   ├── operator/  (60 files)
 │   ├── permissions/  (1 file)
 │   ├── scanner/  (3 files)
 │   └── version/  (3 files)
@@ -339,7 +339,7 @@ lib/
 | `notification` (1) | `notification_api_service` |
 | `oauth` (5) | `login_api_service`, `logout_api_service`, `otp_api_service`, `password_api_service`, `profile_api_service` |
 | `ope_driv_help_support_api` (1) | `help_support_api` |
-| `operator` (16) | `card_assignments_api_service`, `grant_overtime_api_service`, `operator_assign_retrieval_api_service`, `operator_auto_assign_api_service`, `operator_available_drivers_api_service`, `operator_cancel_assignment_api_service`, `operator_car_logs_api_service`, `operator_dashboard_api_service`, `operator_digital_key_rack_api_service`, `operator_driver_groups_api_service`, `operator_manual_retrieval_api_service`, `operator_retrieval_requests_api_service`, `operator_update_session_api_service`, `valet_kpis_api_service`, `valet_list_api_service`, `valet_logout_api_service` |
+| `operator` (17) | `card_assignments_api_service`, `grant_overtime_api_service`, `operator_add_driver_api_service`, `operator_assign_retrieval_api_service`, `operator_auto_assign_api_service`, `operator_available_drivers_api_service`, `operator_cancel_assignment_api_service`, `operator_car_logs_api_service`, `operator_dashboard_api_service`, `operator_digital_key_rack_api_service`, `operator_driver_groups_api_service`, `operator_manual_retrieval_api_service`, `operator_retrieval_requests_api_service`, `operator_update_session_api_service`, `valet_kpis_api_service`, `valet_list_api_service`, `valet_logout_api_service` |
 | `outlet` (1) | `outlet_api_service` |
 | `translations` (2) | `language_api_service`, `translations_api_service` |
 
