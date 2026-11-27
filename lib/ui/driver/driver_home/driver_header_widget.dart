@@ -66,32 +66,36 @@ class DriverHeaderWidget extends StatelessWidget {
                     constraints: const BoxConstraints(),
                   ),
                 ),
-              // Clock-in / clock-out, and the break toggle while clocked in.
+              // Clock-in / clock-out on the left, break on the right.
               // Hidden once the driver leaves the home cards.
-              if (!showBackButton)
+              if (!showBackButton) ...[
                 Positioned(
-                  top: 4,
-                  right: padding,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      DriverShiftToggleWidget(
+                  top: 0,
+                  bottom: 0,
+                  left: padding,
+                  child: Center(
+                    child: DriverShiftToggleWidget(
+                      screenWidth: screenWidth,
+                      isTablet: isTablet,
+                      isDesktop: isDesktop,
+                      isOnline: isCurrentlyOnline,
+                    ),
+                  ),
+                ),
+                if (isCurrentlyOnline)
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    right: padding,
+                    child: Center(
+                      child: DriverBreakToggleWidget(
                         screenWidth: screenWidth,
                         isTablet: isTablet,
                         isDesktop: isDesktop,
-                        isOnline: isCurrentlyOnline,
                       ),
-                      if (isCurrentlyOnline) ...[
-                        SizedBox(width: screenWidth * 0.02),
-                        DriverBreakToggleWidget(
-                          screenWidth: screenWidth,
-                          isTablet: isTablet,
-                          isDesktop: isDesktop,
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
-                ),
+              ],
             ],
           );
         },
