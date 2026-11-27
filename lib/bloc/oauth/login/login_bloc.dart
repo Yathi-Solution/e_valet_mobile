@@ -11,7 +11,6 @@ import 'package:evalet/api/outlet/outlet_api_service.dart';
 import 'package:evalet/bloc/websocket/websocket_bloc.dart';
 import 'package:evalet/models/core/api_exceptions.dart';
 import 'package:evalet/models/driver/status/clock_in_request.dart';
-import 'package:evalet/models/oauth/phone_password_login_request.dart';
 import 'package:evalet/models/oauth/login_result.dart';
 import 'package:evalet/models/oauth/profile.dart';
 import 'package:evalet/models/outlet/outlet.dart';
@@ -36,15 +35,17 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     this.webSocketBloc,
   }) : super(const LoginInitial()) {
     on<LoginIdChanged>(_onLoginIdChanged);
-    on<PinChanged>(_onPinChanged);
     on<LoginSubmitted>(_onLoginSubmitted);
+    on<RequestLoginCode>(_onRequestLoginCode);
+    on<VerifyLoginCode>(_onVerifyLoginCode);
+    on<ResendLoginCode>(_onResendLoginCode);
+    on<ChangeLoginPhone>(_onChangeLoginPhone);
     on<ClientSelected>(_onClientSelected);
     on<OutletSelected>(_onOutletSelected);
     on<LoginReset>(_onLoginReset);
   }
 
   String _loginId = '';
-  String _pin = '';
 
   // Preserved across the outlet selection step
   Profile? _pendingProfile;
@@ -59,56 +60,160 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     _loginId = event.loginId.trim();
   }
 
-  void _onPinChanged(
-    PinChanged event,
-    Emitter<LoginState> emit,
-  ) {
-    _pin = event.pin;
-  }
-
   Future<void> _onLoginSubmitted(
     LoginSubmitted event,
     Emitter<LoginState> emit,
   ) async {
-    emit(const LoginLoading());
+    add(const RequestLoginCode());
+  }
 
+  Future<void> _onRequestLoginCode(
+    RequestLoginCode event,
+    Emitter<LoginState> emit,
+  ) async {
+    await _requestCode(emit, channel: null);
+  }
+
+  Future<void> _onResendLoginCode(
+    ResendLoginCode event,
+    Emitter<LoginState> emit,
+  ) async {
+    await _requestCode(emit, channel: event.channel, resend: true);
+  }
+
+  Future<void> _requestCode(
+    Emitter<LoginState> emit, {
+    required String? channel,
+    bool resend = false,
+  }) async {
     if (_loginId.isEmpty) {
       emit(LoginFailure(TextConstants.validationPhoneRequired));
       return;
     }
 
-    if (_pin.isEmpty) {
-      emit(LoginFailure(TextConstants.validationPasswordRequired));
+    emit(const LoginLoading());
+    try {
+      await LoginApiService.requestLoginCode(_loginId, channel: channel);
+      emit(LoginCodeSent(_loginId));
+    } on ApiException catch (e) {
+      emit(_failureForCodeRequest(e, resend: resend));
+    } catch (_) {
+      emit(LoginFailure(
+        'Something went wrong. Please try again.',
+        phone: resend ? _loginId : null,
+      ));
+    }
+  }
+
+  LoginFailure _failureForCodeRequest(ApiException e, {required bool resend}) {
+    final onCode = resend ? _loginId : null;
+    if (e.statusCode == 429 || e.code == 'TOO_MANY_REQUESTS') {
+      return LoginFailure(
+        'Too many attempts. Wait a few minutes and try again.',
+        phone: onCode,
+        rateLimited: true,
+      );
+    }
+    if (e.code == 'INVALID_PHONE') {
+      return const LoginFailure('Enter a valid phone number.');
+    }
+    if (e.statusCode == 400 && e.code == 'http_error') {
+      return LoginFailure(
+        'Something went wrong. Please try again.',
+        phone: onCode,
+      );
+    }
+    return LoginFailure(e.displayMessage, phone: onCode);
+  }
+
+  Future<void> _onVerifyLoginCode(
+    VerifyLoginCode event,
+    Emitter<LoginState> emit,
+  ) async {
+    final code = event.code.trim();
+    if (_loginId.isEmpty) {
+      emit(LoginFailure(TextConstants.validationPhoneRequired));
+      return;
+    }
+    if (code.length != 6) {
+      emit(LoginFailure(
+        'Enter the 6-digit code.',
+        phone: _loginId,
+      ));
       return;
     }
 
+    emit(LoginCodeVerifying(_loginId));
     try {
-      final request = PhonePasswordLoginRequest(
-        phoneNumber: _loginId,
-        password: _pin,
+      final LoginResult result = await LoginApiService.verifyLoginCode(
+        phone: _loginId,
+        code: code,
       );
-
-      final LoginResult result = await LoginApiService.login(request);
-
-      if (result.needsClientSelection) {
-        if (result.clients.isEmpty) {
-          emit(const LoginFailure(
-            'No active client is available for your account. Please contact your administrator.',
-          ));
-          return;
-        }
-        emit(LoginNeedsClientSelection(result.clients));
-        return;
-      }
-
-      await _continueAfterProfile(result.profile!, emit);
+      await _afterLoginResult(result, emit);
     } on ApiException catch (e) {
-      emit(LoginFailure(e.message));
+      emit(_failureForVerify(e));
     } catch (_) {
-      emit(
-        const LoginFailure('Something went wrong. Please try again.'),
+      emit(LoginFailure(
+        'Something went wrong. Please try again.',
+        phone: _loginId,
+      ));
+    }
+  }
+
+  LoginFailure _failureForVerify(ApiException e) {
+    if (e.code == 'INVALID_LOGIN_CODE' || e.statusCode == 401) {
+      return LoginFailure(
+        'Wrong or expired code.',
+        phone: _loginId,
+        clearCode: true,
       );
     }
+    if (e.statusCode == 429 || e.code == 'TOO_MANY_REQUESTS') {
+      return LoginFailure(
+        'Too many attempts. Wait a few minutes and try again.',
+        phone: _loginId,
+        rateLimited: true,
+      );
+    }
+    if (e.code == 'INVALID_PHONE') {
+      return const LoginFailure('Enter a valid phone number.');
+    }
+    if (e.code == 'NO_ACTIVE_CLIENT') {
+      return LoginFailure(e.displayMessage);
+    }
+    if (e.statusCode == 400 && e.code == 'http_error') {
+      return LoginFailure(
+        'Something went wrong. Please try again.',
+        phone: _loginId,
+        clearCode: true,
+      );
+    }
+    return LoginFailure(e.displayMessage, phone: _loginId);
+  }
+
+  void _onChangeLoginPhone(
+    ChangeLoginPhone event,
+    Emitter<LoginState> emit,
+  ) {
+    emit(const LoginInitial());
+  }
+
+  Future<void> _afterLoginResult(
+    LoginResult result,
+    Emitter<LoginState> emit,
+  ) async {
+    if (result.needsClientSelection) {
+      if (result.clients.isEmpty) {
+        emit(const LoginFailure(
+          'No active client is available for your account. Please contact your administrator.',
+        ));
+        return;
+      }
+      emit(LoginNeedsClientSelection(result.clients));
+      return;
+    }
+
+    await _continueAfterProfile(result.profile!, emit);
   }
 
   Future<void> _onClientSelected(
@@ -120,12 +225,24 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final profile = await LoginApiService.selectClient(event.clientId);
       await _continueAfterProfile(profile, emit);
     } on ApiException catch (e) {
-      emit(LoginFailure(e.message));
+      emit(_failureForClientSelect(e));
     } catch (_) {
       emit(
         const LoginFailure('Something went wrong. Please try again.'),
       );
     }
+  }
+
+  LoginFailure _failureForClientSelect(ApiException e) {
+    const stay = {
+      'CLIENT_NOT_AVAILABLE',
+      'CLIENT_SUSPENDED',
+      'CLIENT_PROVISIONING',
+    };
+    if (stay.contains(e.code)) {
+      return LoginFailure(e.displayMessage, keepDialog: true);
+    }
+    return LoginFailure(e.displayMessage);
   }
 
   /// Shared by direct Client login and the Client-select step.

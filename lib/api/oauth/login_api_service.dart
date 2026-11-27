@@ -14,8 +14,40 @@ class LoginApiService {
 
   static String get _baseUrl => ApiConfig.valetBaseUrl;
 
-  /// POST /auth/login. A Client token finishes the login; a Platform token
-  /// (0 or 2+ Clients, or a Platform Admin) returns the Clients to choose from.
+  /// POST /auth/login-codes. Always 202, whether or not the number can sign in.
+  /// [channel] is omitted for WhatsApp (SMS fallback on the server). Send
+  /// `SMS` only for "Send by SMS".
+  static Future<void> requestLoginCode(
+    String phone, {
+    String? channel,
+  }) async {
+    final base = BaseDioService(_baseUrl, ApiConfig.defaultJsonHeaders);
+    final body = <String, dynamic>{'phone': phone};
+    if (channel != null) body['channel'] = channel;
+    await base.post(
+      '/auth/login-codes',
+      data: body,
+      endSessionOn401: false,
+    );
+  }
+
+  /// POST /auth/login-codes/verify. CLIENT scope finishes sign-in; PLATFORM
+  /// scope must pick a Client before the app can be used.
+  static Future<LoginResult> verifyLoginCode({
+    required String phone,
+    required String code,
+  }) async {
+    final base = BaseDioService(_baseUrl, ApiConfig.defaultJsonHeaders);
+    final response = await base.post(
+      '/auth/login-codes/verify',
+      data: {'phone': phone, 'code': code},
+      endSessionOn401: false,
+    );
+    return _resultFromToken(_asMap(response.data));
+  }
+
+  /// POST /auth/login. Kept for accounts that still have a password. The app
+  /// UI does not call this.
   static Future<LoginResult> login(PhonePasswordLoginRequest request) async {
     final base = BaseDioService(_baseUrl, ApiConfig.defaultJsonHeaders);
     final response = await base.post(
@@ -23,8 +55,10 @@ class LoginApiService {
       data: request.toJson(),
       endSessionOn401: false,
     );
-    final data = _asMap(response.data);
+    return _resultFromToken(_asMap(response.data));
+  }
 
+  static Future<LoginResult> _resultFromToken(Map<String, dynamic> data) async {
     if (data['scope'] == 'CLIENT') {
       return LoginResult.ready(await _completeClientLogin(data));
     }

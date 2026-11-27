@@ -86,28 +86,21 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       outletId = dotenv.env['OUTLET_ID'] ?? '1';
     }
 
-    // If user is a driver, check status before WebSocket: OFFLINE means session ended → log out and go to login.
-    // Only connect WebSocket when driver is ONLINE (or operator).
+    // OFFLINE means the backend already ended the shift. The login stays;
+    // home shows the clocked-out toggle so the driver can clock in again.
+    var driverOffline = false;
     if (isDriver) {
       try {
         final driverStatus = await DriverStatusApiService.getDriverStatus();
-        if (driverStatus.isOffline) {
-          await TokenStorage.clearAll();
-          await SessionManager.clearSessionFlags();
-          emit(const SplashCompleted(isAuthenticated: false, roles: []));
-          return;
-        }
+        driverOffline = driverStatus.isOffline;
       } catch (e) {
         // If status fetch fails (e.g. network), still allow navigation to driver home
         print('Splash: Driver status fetch failed: $e');
       }
     }
 
-    // On splash restore for a driver (app reopen while session still valid for the business day),
-    // treat it like a re-login for cards purposes: clear previous allocation data, then fetch
-    // the latest cards from GET /drivers/my-cards and store them locally. This keeps the
-    // tag/QR submit ownership validation up-to-date without requiring a full logout+login.
-    if (isDriver) {
+    // Cards and parked cars belong to an active shift. Skip them while clocked out.
+    if (isDriver && !driverOffline) {
       try {
         final cardsResponse =
             await MyCardsApiService.refreshAssignedCardsLocally();
@@ -144,13 +137,15 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       }
     }
 
-    // Initialize WebSocket only when user is allowed to continue (operator, or driver with ONLINE status)
-    if (webSocketBloc != null) {
+    // A clocked-out driver has no shift room yet. Connect once they clock in.
+    final connectSocket = webSocketBloc != null &&
+        !(isDriver && driverOffline && !isOperator && !isScanner);
+    if (connectSocket) {
       await WebSocketHelper.connectAfterLogin(
         webSocketBloc: webSocketBloc!,
         outletId: outletId,
         operatorId: isOperator ? userId : null,
-        driverId: isDriver ? userId : null,
+        driverId: isDriver && !driverOffline ? userId : null,
         initialDelay:
             const Duration(milliseconds: 1500), // Longer delay for splash
       );

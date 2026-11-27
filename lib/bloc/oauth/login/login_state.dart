@@ -18,6 +18,27 @@ class LoginLoading extends LoginState {
   const LoginLoading();
 }
 
+/// 202 from POST /auth/login-codes. The code screen is shown even when no
+/// message was actually sent.
+class LoginCodeSent extends LoginState {
+  final String phone;
+
+  const LoginCodeSent(this.phone);
+
+  @override
+  List<Object?> get props => [phone];
+}
+
+/// Verify in progress. The code screen stays up.
+class LoginCodeVerifying extends LoginState {
+  final String phone;
+
+  const LoginCodeVerifying(this.phone);
+
+  @override
+  List<Object?> get props => [phone];
+}
+
 /// Login API succeeded; now waiting for the user to select an outlet.
 /// Emitted for ALL roles (driver, operator, scanner).
 class LoginSuccessNeedsOutletSelection extends LoginState {
@@ -143,8 +164,26 @@ class LoginSuccessLocationTooFar extends LoginState {
 class LoginFailure extends LoginState {
   final String message;
 
-  const LoginFailure(this.message);
+  /// When set, the code screen stays up for this phone.
+  final String? phone;
+
+  /// Clear the 6 boxes (wrong or expired code).
+  final bool clearCode;
+
+  /// Disable the action for a while. Do not retry automatically.
+  final bool rateLimited;
+
+  /// Client picker stays open (403 on select).
+  final bool keepDialog;
+
+  const LoginFailure(
+    this.message, {
+    this.phone,
+    this.clearCode = false,
+    this.rateLimited = false,
+    this.keepDialog = false,
+  });
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, phone, clearCode, rateLimited, keepDialog];
 }
