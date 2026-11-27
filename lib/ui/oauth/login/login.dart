@@ -33,9 +33,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _loginIdController = TextEditingController();
-  final TextEditingController _pinController = TextEditingController();
   final FocusNode _loginIdFocusNode = FocusNode();
-  final FocusNode _pinFocusNode = FocusNode();
 
   bool _selectionDialogShowing = false;
   bool _initialMessageShown = false;
@@ -57,9 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     _loginIdController.dispose();
-    _pinController.dispose();
     _loginIdFocusNode.dispose();
-    _pinFocusNode.dispose();
     super.dispose();
   }
 
@@ -154,18 +150,16 @@ class _LoginScreenState extends State<LoginScreen> {
               (route) => false,
             );
           } else if (state is LoginFailure) {
-            // Dismiss outlet dialog so the error is visible (e.g. clock-in failed).
-            final nav = Navigator.of(context);
-            if (nav.canPop()) {
-              nav.pop();
+            if (!state.keepDialog) {
+              final nav = Navigator.of(context);
+              if (nav.canPop()) {
+                nav.pop();
+              }
             }
             final t = context.read<AppTranslationsNotifier>();
             String displayMessage = state.message;
             if (state.message == TextConstants.validationPhoneRequired) {
               displayMessage = t.get(TextConstants.validationPhoneRequired);
-            } else if (state.message ==
-                TextConstants.validationPasswordRequired) {
-              displayMessage = t.get(TextConstants.validationPasswordRequired);
             }
             SnackBars.showErrorSnackBar(context, displayMessage);
           }
@@ -183,9 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Center(
                       child: LoginForm(
                         loginIdController: _loginIdController,
-                        pinController: _pinController,
                         loginIdFocusNode: _loginIdFocusNode,
-                        pinFocusNode: _pinFocusNode,
                       ),
                     ),
                   ),

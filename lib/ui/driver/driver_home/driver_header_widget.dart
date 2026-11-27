@@ -4,6 +4,7 @@ import 'package:evalet/bloc/driver/driver_status/driver_status_bloc.dart';
 import 'package:evalet/bloc/driver/driver_status/driver_status_state.dart';
 import 'package:evalet/ui/common/colors.dart';
 import 'package:evalet/ui/driver/driver_home/status/driver_break_toggle_widget.dart';
+import 'package:evalet/ui/driver/driver_home/status/driver_shift_toggle_widget.dart';
 
 class DriverHeaderWidget extends StatelessWidget {
   final bool isOnline;
@@ -65,17 +66,36 @@ class DriverHeaderWidget extends StatelessWidget {
                     constraints: const BoxConstraints(),
                   ),
                 ),
-              // On Break toggle only on first screen (home with Park Vehicle). Hide on QR scan / vehicle details / any screen with back button.
-              if (isCurrentlyOnline && !showBackButton)
+              // Clock-in / clock-out on the left, break on the right.
+              // Hidden once the driver leaves the home cards.
+              if (!showBackButton) ...[
                 Positioned(
-                  top: 4, // Minimal offset from top (4 pixels)
-                  right: padding, // Gap from right edge
-                  child: DriverBreakToggleWidget(
-                    screenWidth: screenWidth,
-                    isTablet: isTablet,
-                    isDesktop: isDesktop,
+                  top: 0,
+                  bottom: 0,
+                  left: padding,
+                  child: Center(
+                    child: DriverShiftToggleWidget(
+                      screenWidth: screenWidth,
+                      isTablet: isTablet,
+                      isDesktop: isDesktop,
+                      isOnline: isCurrentlyOnline,
+                    ),
                   ),
                 ),
+                if (isCurrentlyOnline)
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    right: padding,
+                    child: Center(
+                      child: DriverBreakToggleWidget(
+                        screenWidth: screenWidth,
+                        isTablet: isTablet,
+                        isDesktop: isDesktop,
+                      ),
+                    ),
+                  ),
+              ],
             ],
           );
         },

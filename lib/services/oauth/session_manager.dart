@@ -72,23 +72,19 @@ class SessionManager {
     return token != null && token.isNotEmpty;
   }
 
-  /// Returns true if user session is valid for the current business day.
+  /// True while an access token is stored. A shift ending overnight does not
+  /// end the login; the server does that with 401 SESSION_ENDED.
   static Future<bool> isUserLoggedIn() async {
-    return await hasValidSessionForToday();
+    final isLoggedIn = (_box.get(_isLoggedInKey) as bool?) ?? false;
+    if (!isLoggedIn) return false;
+    final token = await TokenStorage.getAccessToken();
+    return token != null && token.isNotEmpty;
   }
 
-  /// Clears local auth/session data if we crossed the daily 3:00 AM cutoff.
-  /// Returns true when a forced reset happened.
+  /// Login Code sessions last until the server ends them. The 3:00 AM cutoff
+  /// no longer clears the access token.
   static Future<bool> enforceDailyResetIfNeeded() async {
-    final hasTokens = await TokenStorage.hasValidTokens();
-    if (!hasTokens) return false;
-
-    final validForCurrentBusinessDay = await hasValidSessionForToday();
-    if (validForCurrentBusinessDay) return false;
-
-    await TokenStorage.clearAll();
-    await clearSessionFlags();
-    return true;
+    return false;
   }
 
   /// Current business-day key based on a 3:00 AM cutoff.

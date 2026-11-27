@@ -94,8 +94,13 @@ class BaseDioService {
       return await call();
     } on DioException catch (e) {
       final apiException = _mapDioError(e);
+      final code = apiException.code;
+      final sessionEnded = code == 'SESSION_ENDED' ||
+          code == 'http_error' ||
+          code == 'session_expired';
       if (apiException.statusCode == 401 &&
           endSessionOn401 &&
+          sessionEnded &&
           await _hasAccessToken()) {
         await SessionEvents.end(
           () async {

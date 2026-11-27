@@ -30,6 +30,36 @@ class LoginSubmitted extends LoginEvent {
   const LoginSubmitted();
 }
 
+/// Phone screen submit. Requests a Login Code with no channel (WhatsApp).
+class RequestLoginCode extends LoginEvent {
+  const RequestLoginCode();
+}
+
+/// Code screen submit. [code] is the 6 digits, kept as a string.
+class VerifyLoginCode extends LoginEvent {
+  final String code;
+
+  const VerifyLoginCode(this.code);
+
+  @override
+  List<Object?> get props => [code];
+}
+
+/// Resend. [channel] is null for WhatsApp, or `SMS`.
+class ResendLoginCode extends LoginEvent {
+  final String? channel;
+
+  const ResendLoginCode({this.channel});
+
+  @override
+  List<Object?> get props => [channel];
+}
+
+/// Back to the phone screen. Does not call the API.
+class ChangeLoginPhone extends LoginEvent {
+  const ChangeLoginPhone();
+}
+
 /// Fired when the user picks an outlet from the outlet selection dialog.
 class OutletSelected extends LoginEvent {
   final Outlet outlet;

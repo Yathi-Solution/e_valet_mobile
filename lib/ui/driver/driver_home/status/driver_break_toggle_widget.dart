@@ -135,7 +135,8 @@ class _BreakToggle extends StatelessWidget {
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
-          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+          // Available matches Clocked in: the knob sits on the right.
+          alignment: value ? Alignment.centerLeft : Alignment.centerRight,
           child: Container(
             width: thumbSize,
             height: thumbSize,

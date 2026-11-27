@@ -4,10 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:evalet/models/oauth/profile_response.dart';
 import 'package:evalet/services/translations/app_translations_notifier.dart';
 import 'package:evalet/ui/common/colors.dart';
-import 'package:evalet/ui/common/widgets/elevated_button.dart';
 import 'package:evalet/ui/common/widgets/text.dart';
 import 'package:evalet/ui/oauth/profile/profile_info_row.dart';
-import 'package:evalet/ui/oauth/profile/reset_password_dialog.dart';
 import 'package:evalet/ui/common/text_constants.dart';
 
 class ProfileContent extends StatelessWidget {
@@ -147,24 +145,6 @@ class ProfileContent extends StatelessWidget {
                         icon: Icons.calendar_today_outlined,
                         label: t.get(TextConstants.joinedLabel),
                         value: user.createdAt.split('T').first,
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.03,
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButtonComponent(
-                          elevatedButtonBackgroundColor: AppColors.primary,
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (dialogContext) =>
-                                  const ResetPasswordDialog(),
-                            );
-                          },
-                          labelText: t.get(TextConstants.resetPassword),
-                          fontColor: AppColors.textOnDark,
-                        ),
                       ),
                     ],
                   ),
